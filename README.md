@@ -1,71 +1,115 @@
-# Insurance Distribution Intelligence
+Insurance Distribution Intelligence
 
-**A portfolio project for senior business development, partnership, strategy, and distribution roles.**
+An interactive portfolio project for business development, strategic partnerships, distribution strategy, and commercial analytics.
 
-An executable analytics dashboard that explores partner-level distribution performance, target attainment, lead-to-policy conversion, persistency, and rule-based action signals.
+"Launch the Live Dashboard" (https://fridaayp-insurance-distribution-intelligence-app-f2ueqo.streamlit.app/) · "View Source Code" (https://github.com/fridaayp/insurance-distribution-intelligence)
 
-> **Important:** all bundled data is synthetic and generated for demonstration. It does not represent a real insurer, customers, partners, or actual business results.
+Insurance Distribution Intelligence is a Streamlit dashboard designed to explore how a distribution leader might monitor partner performance, compare premium production against targets, identify signals that merit investigation, and prioritize follow-up actions.
 
-## What it demonstrates
-- Business KPI design for partner distribution
-- Monthly trend and target-vs-actual analysis
-- Partner scorecards and contribution analysis
-- Transparent rule-based underperformance and anomaly alerts
-- Action recommendations with explicit rules/basis
-- Data validation, tests, CSV exports, and CI test workflow
+«Data disclaimer: The bundled dataset is entirely synthetic. Partner names, metrics, and results are fictional and must not be interpreted as actual performance from any insurer or business.»
 
-## Run locally
+Business Questions
 
-Requires Python 3.10+.
+- Are distribution partners meeting premium targets?
+- Which partners and channels contribute most to written premium?
+- How are premium production and target attainment changing over time?
+- What signals may warrant a partner performance review?
+- Which follow-up actions should be considered based on transparent, configurable rules?
 
-```bash
-python -m venv .venv
-# Windows:
-.venv\\Scripts\\activate
-# macOS/Linux:
-source .venv/bin/activate
+Key Capabilities
 
-pip install -r requirements.txt
+- Executive KPI overview: Written premium, target attainment, leads, policy conversion, and average persistency.
+- Performance monitoring: Monthly actual-versus-target trends and partner contribution analysis.
+- Partner scorecards: Compare partner performance using consistent metrics.
+- Rule-based alerts: Flag cumulative underperformance and sharp month-over-month premium declines for investigation.
+- Decision-support recommendations: Display rule-based next steps and their rationale.
+- Interactive filters: Explore results by partner, distribution channel, reporting period, and underperformance threshold.
+- Exportable analysis: Download filtered data and analysis outputs as CSV.
+- Quality controls: Input-data validation, unit tests, and a GitHub Actions workflow that runs tests on pushes and pull requests.
+
+Dataset
+
+File: "data/synthetic_distribution_performance.csv"
+
+The dataset contains monthly observations for 12 fictional partners across 21 months, from January 2025 to September 2026. Fields include reporting month, partner, channel, target premium, actual premium, leads, policies issued, and persistency rate.
+
+Metric Definitions
+
+- Premium target attainment: Total actual premium divided by total target premium.
+- Policy conversion: Total policies issued divided by total leads.
+- Average persistency: Unweighted mean of row-level persistency rates in the selected sample.
+- Underperformance alert: Flags a partner when cumulative premium attainment falls below the selected threshold.
+- Monthly anomaly alert: Flags a premium decline of at least 30% compared with the partner's previous observed month.
+
+Alerts are investigation prompts, not proof of cause. In a production environment, KPI definitions should be agreed with Distribution, Finance, and Actuarial stakeholders. Data lineage and quality checks should be strengthened, and persistency may need cohort- or exposure-weighted treatment depending on the business definition.
+
+Technology Stack
+
+- Python
+- pandas
+- Streamlit
+- Plotly
+- unittest
+- GitHub Actions
+
+Run Locally
+
+Requires Python 3.10 or newer and the packages listed in "requirements.txt".
+
+1. Clone or download this repository.
+
+2. Open a terminal in the project folder and create a virtual environment:
+   
+   python -m venv .venv
+
+3. Activate the environment.
+   
+   Windows PowerShell:
+   
+   .venv\Scripts\Activate.ps1
+   
+   macOS/Linux:
+   
+   source .venv/bin/activate
+
+4. Install dependencies and launch the app:
+   
+   pip install -r requirements.txt
 streamlit run app.py
-```
 
-The app opens in your browser. Use the sidebar to filter partner, channel, and period.
+5. Open the local URL displayed in the terminal.
 
-## Run tests
+Run Tests
 
-```bash
-pip install pandas
+Install the project dependencies, then run:
+
 python -m unittest discover -s tests -v
-```
 
-## Dataset
-`data/synthetic_distribution_performance.csv` contains monthly observations for 12 fictional partners across 21 months (January 2025–September 2026). Fields include month, partner, channel, target premium, actual premium, leads, policies issued, and persistency rate.
+The test suite covers core analytics behavior, data preparation, and alert logic. GitHub Actions is configured to run tests automatically on pushes and pull requests.
 
-## Metric definitions
-- **Premium attainment:** sum(actual premium) / sum(target premium)
-- **Conversion:** total policies issued / total leads
-- **Average persistency:** unweighted mean of row-level persistency rates in the filtered sample
-- **Underperformance alert:** cumulative partner attainment below the configurable threshold
-- **Monthly anomaly alert:** partner premium drops by at least 30% vs its previous observed month
+Project Structure
 
-Alerts are investigation prompts, not causal conclusions. For a production system, validate definitions with Finance/Actuarial/Distribution stakeholders, add data lineage, and use cohort-weighted persistency where appropriate.
-
-## Project structure
-```text
 app.py
-src/analytics.py
-data/synthetic_distribution_performance.csv
-tests/test_analytics.py
-.github/workflows/tests.yml
+src/
+  __init__.py
+  analytics.py
+data/
+  synthetic_distribution_performance.csv
+tests/
+  test_analytics.py
+.github/
+  workflows/
+    tests.yml
 requirements.txt
-```
+README.md
+LICENSE
 
-## Roadmap
-1. Add CSV upload with schema validation.
-2. Add partner-level monthly targets and configurable KPI definitions.
-3. Add exportable partner business review pack.
-4. Add a documented deployment (e.g. Streamlit Community Cloud).
-5. Add privacy-safe real-data adapter only when authorized data access is available.
+Future Improvements
 
-## Portfolio framing
-Describe this as a **synthetic-data prototype** demonstrating analytics design and decision support. Do not claim simulated uplift, savings, or revenue as real-world impact.
+Potential extensions include CSV upload with schema validation, configurable KPI definitions, partner business review exports, and additional monitoring rules. Any connection to real business data should only be added with appropriate authorization and privacy safeguards.
+
+Portfolio Positioning
+
+This project demonstrates a practical combination of distribution performance analysis, KPI design, partner scorecards, transparent business rules, data validation, testing, and dashboard delivery.
+
+It is a synthetic-data decision-support prototype, not a production insurance system. No real-world revenue uplift, savings, or business impact is claimed.
