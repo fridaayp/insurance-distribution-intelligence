@@ -8,7 +8,7 @@ An interactive portfolio project for business development, strategic partnership
 
 Insurance Distribution Intelligence is a Streamlit dashboard designed to explore how a distribution leader might monitor partner performance, compare premium production against targets, identify signals that merit investigation, and prioritize follow-up actions.
 
-«Data disclaimer: The bundled dataset is entirely synthetic. Partner names, metrics, and results are fictional and must not be interpreted as actual performance from any insurer or business.»
+**Data disclaimer:** The bundled dataset is entirely synthetic. Partner names, metrics, and results are fictional and must not be interpreted as actual performance from any insurer or business.
 
 ## Business Questions
 
@@ -31,7 +31,7 @@ Insurance Distribution Intelligence is a Streamlit dashboard designed to explore
 
 ## Dataset
 
-File: "data/synthetic_distribution_performance.csv"
+File: data/synthetic_distribution_performance.csv
 
 The dataset contains monthly observations for 12 fictional partners across 21 months, from January 2025 to September 2026. Fields include reporting month, partner, channel, target premium, actual premium, leads, policies issued, and persistency rate.
 
@@ -56,7 +56,7 @@ Alerts are investigation prompts, not proof of cause. In a production environmen
 
 ## Run Locally
 
-Requires Python 3.10 or newer and the packages listed in "requirements.txt".
+Requires Python 3.10 or newer and the packages listed in requirements.txt.
 
 1. Clone or download this repository.
 2. Open a terminal in the project folder and create a virtual environment:
