@@ -1036,38 +1036,52 @@ if page == "Executive Overview":
         st.markdown(f'<div class="exec-section-note">Rule-based screen: attainment below {threshold:.0%}.</div>', unsafe_allow_html=True)
         attention = partner_view[partner_view["attainment_rate"] < threshold].sort_values("attainment_rate").head(5).copy()
         if not attention.empty:
-            attention["Target attainment"] = attention["attainment_rate"].map(lambda v: f"{v:.0%}" if pd.notna(v) else "N/A")
-            attention["Gap to target"] = attention["gap_to_target"].map(lambda v: money(v) if v >= 0 else f"{money(abs(v))} surplus")
-            attention = attention.rename(columns={"partner":"Partner"})
+            attention["Target attainment"] = attention["attainment_rate"].map(
+                lambda v: f"{v:.0%}" if pd.notna(v) else "N/A"
+            )
+            attention["Gap to target"] = attention["gap_to_target"].map(
+                lambda v: money(v) if v >= 0
+                else f"{money(abs(v))} surplus"
+            )
+            attention = attention.rename(columns={"partner": "Partner"})
             rows_html = []
 
-for rank, (_, row) in enumerate(attention.iterrows(), start=1):
-    pct = float(row["attainment_rate"]) if pd.notna(row["attainment_rate"]) else 0
-    bar_width = min(100, max(0, pct * 100))
-    gap = float(row["gap_to_target"])
-    gap_text = money(gap) if gap >= 0 else f"{money(abs(gap))} surplus"
-    gap_color = "#bd514b" if gap > 0 else "#247b62"
+            for rank, (_, row) in enumerate(attention.iterrows(), start=1):
+                pct = (
+                    float(row["attainment_rate"])
+                    if pd.notna(row["attainment_rate"])
+                    else 0
+                )
+                bar_width = min(100, max(0, pct * 100))
+                gap = float(row["gap_to_target"])
+                gap_text = (
+                    money(gap) if gap >= 0
+                    else f"{money(abs(gap))} surplus"
+                )
+                gap_color = "#bd514b" if gap > 0 else "#247b62"
 
-    rows_html.append(
-        f'<tr><td><span class="exec-rank">{rank}</span></td>'
-        f'<td><strong>{row["Partner"]}</strong></td>'
-        f'<td><strong style="color:#bd514b">{pct:.0%}</strong>'
-        f'<div class="exec-bar-track" style="margin-top:6px">'
-        f'<div class="exec-bar-fill" style="width:{bar_width:.1f}%;'
-        f'background:#c87976"></div></div></td>'
-        f'<td><strong style="color:{gap_color}">{gap_text}</strong></td></tr>'
-    )
+                rows_html.append(
+                    f'<tr><td><span class="exec-rank">{rank}</span></td>'
+                    f'<td><strong>{row["Partner"]}</strong></td>'
+                    f'<td><strong style="color:#bd514b">{pct:.0%}</strong>'
+                    f'<div class="exec-bar-track" style="margin-top:6px">'
+                    f'<div class="exec-bar-fill" style="width:{bar_width:.1f}%;'
+                    f'background:#c87976"></div></div></td>'
+                    f'<td><strong style="color:{gap_color}">{gap_text}</strong></td></tr>'
+                )
 
-st.markdown(
-    '<div class="exec-table-wrap"><table class="exec-table">'
-    '<thead><tr><th>#</th><th>Partner</th><th>Attainment</th>'
-    '<th>Gap to target</th></tr></thead><tbody>'
-    + "".join(rows_html)
-    + '</tbody></table></div>',
-    unsafe_allow_html=True,
-)
-    else:
+            st.markdown(
+                '<div class="exec-table-wrap"><table class="exec-table">'
+                '<thead><tr><th>#</th><th>Partner</th><th>Attainment</th>'
+                '<th>Gap to target</th></tr></thead><tbody>'
+                + "".join(rows_html)
+                + '</tbody></table></div>',
+                unsafe_allow_html=True,
+            )
+        else:
             st.success("No partners fall below the selected threshold.")
+
+    insight_col, action_col = st.columns([1.25, 1], gap="medium")
 
     insight_col, action_col = st.columns([1.25, 1], gap="medium")
     with insight_col:
