@@ -281,8 +281,8 @@ with st.sidebar:
           src="data:image/png;base64,{logo_base64}"
           alt="Distribution Strategy Intelligence"
           style="
-              width:60px;
-              height:64px;
+              width:58px;
+              height:62px;
               object-fit:contain;
               flex:0 0 58px;
               display:block;
@@ -294,7 +294,7 @@ with st.sidebar:
             font-size:18px;
             font-weight:750;
             line-height:1.3;
-            letter-spacing:-0.15px;
+            letter-spacing:-0.25px;
         ">
           <div>Distribution</div>
           <div>Strategy Intelligence</div>
