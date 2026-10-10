@@ -31,18 +31,99 @@ st.markdown("""
   padding-bottom: 3rem;
 }
 [data-testid="stSidebar"] {
-  background: linear-gradient(165deg, #0d1d34, #132d4d 58%, #1a426a);
+  background: linear-gradient(
+    180deg,
+    #0b1930 0%,
+    #102744 55%,
+    #0d2039 100%
+  );
   border-right: 1px solid rgba(255,255,255,.08);
 }
-[data-testid="stSidebar"] * { color: #f5f8fc; }
-[data-testid="stSidebar"] [data-testid="stRadio"] label {
-  padding: 9px 11px;
+
+[data-testid="stSidebar"] > div:first-child {
+  padding: 1.15rem .9rem 1rem;
+}
+
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
+  color: #e8effa;
+}
+
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
+  color: #b6c5dc;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] > label {
+  color: #91a5c2;
+  font-size: .68rem;
+  font-weight: 750;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin: .8rem 0 .45rem;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] > div {
+  gap: .3rem;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] label[data-testid="stWidgetLabel"] {
+  margin-bottom: .5rem;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label {
+  display: flex;
+  align-items: center;
+  min-height: 43px;
+  padding: .55rem .7rem;
+  margin: 0;
   border: 1px solid transparent;
   border-radius: 10px;
+  color: #c0cee1;
+  font-size: .86rem;
+  font-weight: 550;
+  transition: background .18s ease, border-color .18s ease;
 }
-[data-testid="stSidebar"] [data-testid="stRadio"] label:hover {
-  background: rgba(255,255,255,.09);
+
+[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label:hover {
+  background: rgba(255,255,255,.07);
+  border-color: rgba(255,255,255,.08);
+  color: #fff;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked) {
+  background: linear-gradient(100deg, #214c91, #193d75);
+  border-color: rgba(143,180,255,.2);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(0,0,0,.15);
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked) p {
+  color: #fff;
+  font-weight: 700;
+}
+
+[data-testid="stSidebar"] [data-testid="stSelectbox"] > label,
+[data-testid="stSidebar"] [data-testid="stDateInput"] > label,
+[data-testid="stSidebar"] [data-testid="stSlider"] > label {
+  color: #aebed5;
+  font-size: .75rem;
+  font-weight: 600;
+}
+
+[data-testid="stSidebar"] [data-testid="stSelectbox"] div[data-baseweb="select"] > div {
+  background: rgba(255,255,255,.07);
   border-color: rgba(255,255,255,.12);
+  border-radius: 9px;
+}
+
+[data-testid="stSidebar"] [data-testid="stDateInput"] input {
+  background: rgba(255,255,255,.07);
+  border-color: rgba(255,255,255,.12);
+  border-radius: 9px;
+}
+
+[data-testid="stSidebar"] hr {
+  border-color: rgba(255,255,255,.12);
+  margin: 1rem 0;
 }
 h1 {
   color: #122844;
@@ -122,20 +203,166 @@ raw = load_data()
 data = prepare_data(raw)
 
 with st.sidebar:
-    st.markdown("# ▥ Distribution")
-    st.markdown("## Strategy Intelligence")
-    st.caption("From data to decisions")
-    page = st.radio("NAVIGATION", [
-        "Executive Overview", "Performance Analysis", "Partnership Intelligence",
-        "Scenario Lab", "Project Portfolio & Execution",
-    ])
+    st.markdown(
+        """
+        <div style="padding:8px 5px 15px;">
+            <div style="
+                display:flex;
+                align-items:center;
+                gap:10px;
+                margin-bottom:17px;
+            ">
+                <div style="
+                    width:43px;
+                    height:43px;
+                    border-radius:12px;
+                    background:linear-gradient(145deg,#35c6b0,#4387f5);
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    color:white;
+                    font-size:25px;
+                    font-weight:800;
+                    box-shadow:0 5px 18px rgba(38,139,210,.22);
+                ">▥</div>
+                <div>
+                    <div style="
+                        color:#f4f7fc;
+                        font-size:16px;
+                        font-weight:800;
+                        letter-spacing:-.4px;
+                        line-height:1.25;
+                    ">Distribution</div>
+                    <div style="
+                        color:#f4f7fc;
+                        font-size:16px;
+                        font-weight:800;
+                        letter-spacing:-.4px;
+                        line-height:1.25;
+                    ">Strategy Intelligence</div>
+                </div>
+            </div>
+            <div style="
+                color:#9eb2cf;
+                font-size:11px;
+                line-height:1.6;
+                letter-spacing:.2px;
+            ">From data to decisions</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     st.divider()
-    st.markdown("### Global filters")
-    partner = st.selectbox("Partner", ["All partners"] + sorted(data.partner.dropna().unique().tolist()))
-    channel = st.selectbox("Distribution channel", ["All channels"] + sorted(data.channel.dropna().unique().tolist()))
+
+    pages = [
+        "Executive Overview",
+        "Performance Analysis",
+        "Partnership Intelligence",
+        "Scenario Lab",
+        "Project Portfolio & Execution",
+    ]
+
+    page_labels = {
+        "Executive Overview": "◈   Executive Overview",
+        "Performance Analysis": "▤   Performance Analysis",
+        "Partnership Intelligence": "♧   Partnership Intelligence",
+        "Scenario Lab": "◉   Scenario Lab",
+        "Project Portfolio & Execution": "▣   Project Portfolio & Execution",
+    }
+
+    page = st.radio(
+        "Navigation",
+        pages,
+        format_func=lambda value: page_labels[value],
+        label_visibility="visible",
+    )
+
+    st.divider()
+
+    st.markdown(
+        """
+        <div style="
+            color:#dce7f7;
+            font-size:12px;
+            font-weight:750;
+            letter-spacing:.8px;
+            margin:0 0 12px 2px;
+        ">GLOBAL FILTERS</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    partner = st.selectbox(
+        "Partner",
+        ["All partners"] + sorted(data.partner.dropna().unique().tolist()),
+    )
+
+    channel = st.selectbox(
+        "Distribution channel",
+        ["All channels"] + sorted(data.channel.dropna().unique().tolist()),
+    )
+
     min_date, max_date = data.month.min().date(), data.month.max().date()
-    dates = st.date_input("Period", value=(min_date, max_date), min_value=min_date, max_value=max_date)
-    threshold = st.slider("Underperformance threshold (%)", 50, 110, 85, 5) / 100
+
+    dates = st.date_input(
+        "Period",
+        value=(min_date, max_date),
+        min_value=min_date,
+        max_value=max_date,
+    )
+
+    threshold = st.slider(
+        "Underperformance threshold (%)",
+        50, 110, 85, 5,
+    ) / 100
+
+    st.divider()
+
+    st.markdown(
+        """
+        <div style="
+            display:flex;
+            align-items:center;
+            gap:11px;
+            padding:7px 2px 4px;
+        ">
+            <div style="
+                width:39px;
+                height:39px;
+                flex-shrink:0;
+                border-radius:50%;
+                background:#263f68;
+                border:1px solid #46618a;
+                color:#ffffff;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-size:13px;
+                font-weight:800;
+            ">FA</div>
+            <div>
+                <div style="
+                    color:#f4f7fc;
+                    font-size:13px;
+                    font-weight:750;
+                ">Frida A.</div>
+                <div style="
+                    color:#9eb2cf;
+                    font-size:10px;
+                    line-height:1.5;
+                ">Business Strategy & Analytics</div>
+            </div>
+        </div>
+        <div style="
+            color:#7f94b2;
+            font-size:10px;
+            margin:13px 2px 0;
+            line-height:1.5;
+        ">Portfolio prototype · Synthetic data</div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.divider()
     st.caption("Independent portfolio prototype • synthetic data only")
 
