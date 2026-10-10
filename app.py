@@ -14,6 +14,36 @@ from src.analytics import (
 st.set_page_config(page_title="Distribution Strategy Intelligence", page_icon="📊", layout="wide")
 st.markdown("""
 <style>
+/* Sidebar navigation buttons */
+[data-testid="stSidebar"] [data-testid="stButton"] > button {
+  width: 100%;
+  min-height: 42px;
+  text-align: left;
+  justify-content: flex-start;
+  border-radius: 9px;
+  padding: .55rem .7rem;
+  margin: 0;
+  font-size: .83rem;
+  font-weight: 600;
+  background: transparent;
+  color: #c5d5e9;
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+
+[data-testid="stSidebar"] [data-testid="stButton"] > button:hover {
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  border-color: rgba(255,255,255,.1);
+  transform: none;
+}
+
+[data-testid="stSidebar"] [data-testid="stButton"] > button[kind="primary"] {
+  background: linear-gradient(105deg, #2053a0, #173c77);
+  color: #fff;
+  border-color: rgba(132,177,255,.25);
+  font-weight: 750;
+}
 :root {
   --navy: #10233f;
   --blue: #2563eb;
@@ -278,12 +308,24 @@ with st.sidebar:
         "Project Portfolio & Execution": "▤   Project Portfolio & Execution",
     }
 
-    page = st.radio(
-        "NAVIGATION",
-        pages,
-        format_func=lambda value: page_labels[value],
-        label_visibility="visible",
-    )
+    if "selected_page" not in st.session_state:
+        st.session_state["selected_page"] = "Executive Overview"
+
+    for target_page in pages:
+        if st.button(
+            page_labels[target_page],
+            key=f"nav_{target_page}",
+            type=(
+                "primary"
+                if st.session_state["selected_page"] == target_page
+                else "secondary"
+            ),
+            use_container_width=True,
+        ):
+            st.session_state["selected_page"] = target_page
+            st.rerun()
+
+    page = st.session_state["selected_page"]
 
     st.divider()
 
