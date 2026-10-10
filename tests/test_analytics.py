@@ -85,6 +85,9 @@ class AnalyticsTests(unittest.TestCase):
 
     def test_rejects_infinite_numeric_value(self):
         bad = self.df.copy()
+        bad["premium_actual_idr"] = (
+        bad["premium_actual_idr"].astype(float)
+        )
         bad.loc[0, "premium_actual_idr"] = float("inf")
         with self.assertRaises(ValueError):
             prepare_data(bad)
