@@ -674,19 +674,191 @@ if page == "Executive Overview":
     # Restrained navy / blue / neutral palette. Sidebar styling is untouched.
     st.markdown("""
     <style>
-      .exec-kpi{background:#fff;border:1px solid #e1e8f1;border-radius:14px;
-        padding:16px 17px 12px;min-height:164px;box-shadow:0 3px 12px rgba(16,35,63,.035)}
-      .exec-kpi-label{color:#62758f;font-size:12px;font-weight:750;letter-spacing:.045em;text-transform:uppercase}
-      .exec-kpi-value{color:#10233f;font-size:clamp(22px,2vw,29px);font-weight:800;
-        letter-spacing:-.04em;line-height:1.25;margin:7px 0 13px;overflow-wrap:anywhere}
-      .exec-kpi-comparisons{border-top:1px solid #edf1f6;padding-top:7px}
-      .comparison-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
-        color:#7b8ba1;font-size:10px;padding:4px 0}
-      .comparison-row strong{font-size:10px;font-weight:750;text-align:right}
-      .exec-section-note{color:#71829a;font-size:12px;margin-top:-6px;margin-bottom:8px}
-      .exec-insight{border:1px solid #e1e8f1;background:#fff;border-radius:12px;padding:13px 15px;margin-bottom:9px}
-      .exec-insight-title{color:#183452;font-size:13px;font-weight:750;margin-bottom:4px}
-      .exec-insight-body{color:#536781;font-size:12px;line-height:1.5}
+      /* Executive Overview — refined visual system */
+.exec-kpi {
+    position: relative;
+    background: linear-gradient(145deg, #ffffff, #f9fbfe);
+    border: 1px solid #e1e9f3;
+    border-radius: 14px;
+    padding: 17px 18px 13px;
+    min-height: 165px;
+    box-shadow: 0 4px 14px rgba(16, 35, 63, 0.045);
+}
+
+.exec-kpi:before {
+    content: "";
+    position: absolute;
+    top: 15px;
+    bottom: 15px;
+    left: 0;
+    width: 3px;
+    border-radius: 0 4px 4px 0;
+    background: #3978b8;
+}
+
+.exec-kpi-label {
+    color: #647791;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.exec-kpi-value {
+    color: #10233f;
+    font-size: clamp(23px, 2vw, 30px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.25;
+    margin: 9px 0 14px;
+    overflow-wrap: anywhere;
+}
+
+.exec-kpi-comparisons {
+    border-top: 1px solid #eaf0f6;
+    padding-top: 7px;
+}
+
+.comparison-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    color: #77879c;
+    font-size: 10px;
+    padding: 4px 0;
+}
+
+.comparison-row strong {
+    font-size: 10px;
+    font-weight: 800;
+    text-align: right;
+}
+
+.exec-section-note {
+    color: #7a8ba1;
+    font-size: 11px;
+    line-height: 1.5;
+    margin-top: -6px;
+    margin-bottom: 10px;
+}
+
+.exec-insight {
+    border: 1px solid #e1e9f2;
+    background: linear-gradient(135deg, #ffffff, #f9fbfe);
+    border-radius: 12px;
+    padding: 13px 15px;
+    margin-bottom: 9px;
+    box-shadow: 0 2px 8px rgba(16, 35, 63, 0.025);
+}
+
+.exec-insight-title {
+    color: #183452;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.exec-insight-body {
+    color: #536781;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.exec-table-wrap {
+    border: 1px solid #e1e9f2;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.exec-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.exec-table th {
+    background: #f3f7fb;
+    color: #61748d;
+    font-size: 10px;
+    font-weight: 800;
+    text-align: left;
+    text-transform: uppercase;
+    padding: 11px 10px;
+    border-bottom: 1px solid #e5ebf3;
+}
+
+.exec-table td {
+    padding: 10px;
+    border-bottom: 1px solid #edf1f6;
+    color: #344b67;
+    vertical-align: middle;
+}
+
+.exec-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.exec-rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background: #edf4fc;
+    color: #2e6fae;
+    font-weight: 800;
+}
+
+.exec-bar-track {
+    height: 6px;
+    background: #eaf0f6;
+    border-radius: 20px;
+    overflow: hidden;
+    min-width: 45px;
+}
+
+.exec-bar-fill {
+    height: 100%;
+    background: #5a91c9;
+    border-radius: 20px;
+}
+
+.exec-action {
+    display: flex;
+    gap: 11px;
+    padding: 12px 0;
+    border-bottom: 1px solid #edf1f6;
+}
+
+.exec-action:last-child {
+    border-bottom: 0;
+}
+
+.exec-action-number {
+    flex: 0 0 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #e9f1fa;
+    color: #2e6fae;
+    font-weight: 800;
+    font-size: 12px;
+}
+
+.exec-action-copy {
+    color: #536781;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.exec-action-copy strong {
+    color: #183452;
+}
     </style>""", unsafe_allow_html=True)
 
     st.caption("PORTFOLIO SNAPSHOT · CURRENT FILTER SELECTION")
@@ -803,7 +975,37 @@ if page == "Executive Overview":
             top["Actual premium"] = top["premium_actual_idr"].map(money)
             top["Target attainment"] = top["attainment_rate"].map(lambda v: f"{v:.0%}" if pd.notna(v) else "N/A")
             top = top.rename(columns={"partner":"Partner"})
-            st.dataframe(top[["Partner", "Actual premium", "Target attainment"]], use_container_width=True, hide_index=True)
+            rows_html = []
+max_premium = max(float(v) for v in top["premium_actual_idr"]) or 1
+
+for rank, (_, row) in enumerate(top.iterrows(), start=1):
+    pct = float(row["attainment_rate"]) if pd.notna(row["attainment_rate"]) else 0
+    premium_width = min(
+        100,
+        max(0, float(row["premium_actual_idr"]) / max_premium * 100)
+    )
+    pct_color = "#247b62" if pct >= 1 else (
+        "#bd514b" if pct < threshold else "#536781"
+    )
+
+    rows_html.append(
+        f'<tr><td><span class="exec-rank">{rank}</span></td>'
+        f'<td><strong>{row["Partner"]}</strong></td>'
+        f'<td><strong>{money(float(row["premium_actual_idr"]))}</strong>'
+        f'<div class="exec-bar-track" style="margin-top:6px">'
+        f'<div class="exec-bar-fill" style="width:{premium_width:.1f}%"></div>'
+        f'</div></td>'
+        f'<td><strong style="color:{pct_color}">{pct:.0%}</strong></td></tr>'
+    )
+
+st.markdown(
+    '<div class="exec-table-wrap"><table class="exec-table">'
+    '<thead><tr><th>#</th><th>Partner</th><th>Actual premium</th>'
+    '<th>Attainment</th></tr></thead><tbody>'
+    + "".join(rows_html)
+    + '</tbody></table></div>',
+    unsafe_allow_html=True,
+)
         else:
             st.info("No partner records in this selection.")
 
@@ -815,7 +1017,33 @@ if page == "Executive Overview":
             attention["Target attainment"] = attention["attainment_rate"].map(lambda v: f"{v:.0%}" if pd.notna(v) else "N/A")
             attention["Gap to target"] = attention["gap_to_target"].map(lambda v: money(v) if v >= 0 else f"{money(abs(v))} surplus")
             attention = attention.rename(columns={"partner":"Partner"})
-            st.dataframe(attention[["Partner", "Target attainment", "Gap to target"]], use_container_width=True, hide_index=True)
+            rows_html = []
+
+for rank, (_, row) in enumerate(attention.iterrows(), start=1):
+    pct = float(row["attainment_rate"]) if pd.notna(row["attainment_rate"]) else 0
+    bar_width = min(100, max(0, pct * 100))
+    gap = float(row["gap_to_target"])
+    gap_text = money(gap) if gap >= 0 else f"{money(abs(gap))} surplus"
+    gap_color = "#bd514b" if gap > 0 else "#247b62"
+
+    rows_html.append(
+        f'<tr><td><span class="exec-rank">{rank}</span></td>'
+        f'<td><strong>{row["Partner"]}</strong></td>'
+        f'<td><strong style="color:#bd514b">{pct:.0%}</strong>'
+        f'<div class="exec-bar-track" style="margin-top:6px">'
+        f'<div class="exec-bar-fill" style="width:{bar_width:.1f}%;'
+        f'background:#c87976"></div></div></td>'
+        f'<td><strong style="color:{gap_color}">{gap_text}</strong></td></tr>'
+    )
+
+st.markdown(
+    '<div class="exec-table-wrap"><table class="exec-table">'
+    '<thead><tr><th>#</th><th>Partner</th><th>Attainment</th>'
+    '<th>Gap to target</th></tr></thead><tbody>'
+    + "".join(rows_html)
+    + '</tbody></table></div>',
+    unsafe_allow_html=True,
+)
         else:
             st.success("No partners fall below the selected threshold.")
 
@@ -852,7 +1080,42 @@ if page == "Executive Overview":
         if actions:
             action_df = pd.DataFrame(actions)
             columns = [c for c in ["priority", "partner", "signal", "suggested_action"] if c in action_df.columns]
-            st.dataframe(action_df[columns].head(6), use_container_width=True, hide_index=True)
+            action_rows = []
+
+for i, (_, row) in enumerate(action_df[columns].head(6).iterrows(), start=1):
+    priority = str(row.get("priority", "Review"))
+    partner_name = str(row.get("partner", "Portfolio"))
+    signal = str(row.get("signal", "Review performance signal"))
+    recommendation = str(
+        row.get("suggested_action", "Validate the data and agree next steps.")
+    )
+
+    priority_color = (
+        "#bd514b" if priority.lower() == "high"
+        else "#9a6b24" if priority.lower() == "medium"
+        else "#3978b8"
+    )
+
+    action_rows.append(
+        f'<div class="exec-action">'
+        f'<div class="exec-action-number">{i}</div>'
+        f'<div class="exec-action-copy">'
+        f'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+        f'<strong>{partner_name}</strong>'
+        f'<span style="font-size:10px;font-weight:800;color:{priority_color};'
+        f'background:#f3f6fa;padding:3px 8px;border-radius:20px">'
+        f'{priority}</span></div>'
+        f'<div style="margin-top:5px">{signal}</div>'
+        f'<div style="margin-top:5px;color:#71829a">{recommendation}</div>'
+        f'</div></div>'
+    )
+
+st.markdown(
+    '<div class="exec-table-wrap" style="padding:2px 14px">'
+    + "".join(action_rows)
+    + '</div>',
+    unsafe_allow_html=True,
+)
         else:
             st.success("No rule-based actions were triggered for this selection.")
         if not anomalies.empty:
