@@ -14,51 +14,62 @@ from src.analytics import (
 st.set_page_config(page_title="Distribution Strategy Intelligence", page_icon="📊", layout="wide")
 st.markdown("""
 <style>
-/* Sidebar navigation buttons */
-[data-testid="stSidebar"] [data-testid="stButton"] > button {
+/* Clean, aligned sidebar navigation */
+[data-testid="stSidebar"] [data-testid="stButton"] {
   width: 100%;
-  min-height: 42px;
-  text-align: left;
-  justify-content: flex-start;
-  border-radius: 9px;
-  padding: .55rem .7rem;
-  margin: 0;
-  font-size: .83rem;
-  font-weight: 600;
-  background: transparent;
-  color: #c5d5e9;
-  border: 1px solid transparent;
-  box-shadow: none;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stButton"] > button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  min-height: 39px !important;
+  height: 39px !important;
+  padding: 0 12px !important;
+  margin: 0 !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: #c5d5e9 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  text-align: left !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stButton"] > button > div {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  gap: 10px !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stButton"] > button p {
+  text-align: left !important;
+  font-size: 13px !important;
+  font-weight: 550 !important;
+  line-height: 1.25 !important;
+  margin: 0 !important;
 }
 
 [data-testid="stSidebar"] [data-testid="stButton"] > button:hover {
-  background: rgba(255,255,255,.08);
-  color: #fff;
-  border-color: rgba(255,255,255,.1);
-  transform: none;
+  background: rgba(255,255,255,.07) !important;
+  color: #fff !important;
+  border-color: rgba(255,255,255,.08) !important;
 }
 
 [data-testid="stSidebar"] [data-testid="stButton"] > button[kind="primary"] {
-  background: linear-gradient(105deg, #2053a0, #173c77);
-  color: #fff;
-  border-color: rgba(132,177,255,.25);
-  font-weight: 750;
+  background: #1e467f !important;
+  color: #fff !important;
+  border-color: rgba(132,177,255,.18) !important;
 }
-:root {
-  --navy: #10233f;
-  --blue: #2563eb;
-  --ink: #172b49;
-  --muted: #687a93;
-  --line: #e4ebf4;
-}
-.stApp {
-  background: radial-gradient(ellipse at 10% 0%, #e8f1ff 0%, transparent 32%), #f3f6fb;
-  color: var(--ink);
-}
-.block-container {
-  max-width: 1560px;
-  padding-top: 1.4rem;
-  padding-bottom: 3rem;
+
+[data-testid="stSidebar"] [data-testid="stButton"] > button[kind="primary"] p {
+  color: #fff !important;
+  font-weight: 700 !important;
 }
 /* Sidebar: sticky viewport layout, without fighting Streamlit */
 [data-testid="stSidebar"] {
@@ -280,10 +291,8 @@ with st.sidebar:
               <div style="font-size:15px;font-weight:800;color:#f6f9ff;line-height:1.3;">
                 Strategy Intelligence
               </div>
-            </div>
-          </div>
-          <div style="color:#9fb8d8;font-size:11px;margin-top:12px;">
-            From data to decisions
+              <div style="color:#9fb8d8;font-size:11px;margin-top:12px;">
+                From data to decisions
           </div>
         </div>
         """,
@@ -312,9 +321,19 @@ with st.sidebar:
         st.session_state["selected_page"] = "Executive Overview"
 
     for target_page in pages:
+        nav_icons = {
+        "Executive Overview": ":material/dashboard:",
+        "Performance Analysis": ":material/analytics:",
+        "Partnership Intelligence": ":material/handshake:",
+        "Scenario Lab": ":material/trending_up:",
+        "Project Portfolio & Execution": ":material/assignment:",
+    }
+
+    for target_page in pages:
         if st.button(
-            page_labels[target_page],
+            target_page,
             key=f"nav_{target_page}",
+            icon=nav_icons[target_page],
             type=(
                 "primary"
                 if st.session_state["selected_page"] == target_page
