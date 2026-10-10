@@ -1064,9 +1064,6 @@ if page == "Executive Overview":
         )
 
 elif page == "Performance Analysis":
-    # Keep the existing Performance Analysis block below this line unchanged.
-
-elif page == "Performance Analysis":
     header("Performance Analysis", "Explore detailed performance metrics across partners, channels, and product outcomes.")
     tabs = st.tabs(["Premium", "New Business", "Productivity", "Persistency", "Channel Mix"])
     with tabs[0]:
