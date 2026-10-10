@@ -263,7 +263,7 @@ data = prepare_data(raw)
 
 with st.sidebar:
     # Brand header: shield + rising bars
-    # Brand header: stable logo + aligned title
+    # Compact stable logo + aligned title
     st.html(
         """
         <div style="
