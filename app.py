@@ -381,53 +381,55 @@ with st.sidebar:
         ["All channels"] + sorted(data.channel.dropna().unique().tolist()),
     )
 
-    min_date = data.month.min().date()
-    max_date = data.month.max().date()
-
-    period_choice = st.selectbox(
-        "Period",
-        [
-            "Last 3 months",
-            "Last 6 months",
-            "Last 12 months",
-            "Year to date",
-            "All available data",
-            "Custom range",
-        ],
-        index=2,
-        help="Choose a preset period or select a custom date range.",
+    # Month-level global filter: defaults to all available data.
+    month_keys = sorted(
+        data["month"].dropna().dt.to_period("M").astype(str).unique().tolist()
     )
 
-    if period_choice == "Last 3 months":
-        period_start = (pd.Timestamp(max_date) - pd.DateOffset(months=2)).date()
-        period_end = max_date
-    elif period_choice == "Last 6 months":
-        period_start = (pd.Timestamp(max_date) - pd.DateOffset(months=5)).date()
-        period_end = max_date
-    elif period_choice == "Last 12 months":
-        period_start = (pd.Timestamp(max_date) - pd.DateOffset(months=11)).date()
-        period_end = max_date
-    elif period_choice == "Year to date":
-        period_start = max_date.replace(month=1, day=1)
-        period_end = max_date
-    elif period_choice == "All available data":
-        period_start = min_date
-        period_end = max_date
-    else:
-        custom_dates = st.date_input(
-            "Custom date range",
-            value=(min_date, max_date),
-            min_value=min_date,
-            max_value=max_date,
-            format="DD/MM/YYYY",
+    month_labels = {
+        key: pd.Period(key, freq="M").strftime("%b %Y")
+        for key in month_keys
+    }
+
+    if not month_keys:
+        st.error("No valid month values are available in the dataset.")
+        st.stop()
+
+    period_cols = st.columns(2, gap="small")
+
+    with period_cols[0]:
+        period_start_key = st.selectbox(
+            "Period from",
+            options=month_keys,
+            index=0,
+            format_func=lambda value: month_labels[value],
+            key="period_start_month",
+            help="First month included in the analysis.",
         )
 
-        if isinstance(custom_dates, (tuple, list)) and len(custom_dates) == 2:
-            period_start, period_end = custom_dates
-        elif isinstance(custom_dates, (tuple, list)) and len(custom_dates) == 1:
-            period_start = period_end = custom_dates[0]
-        else:
-            period_start = period_end = custom_dates
+    end_options = [
+        key for key in month_keys
+        if key >= period_start_key
+    ]
+
+    if st.session_state.get("period_end_month") not in end_options:
+        st.session_state["period_end_month"] = end_options[-1]
+
+    with period_cols[1]:
+        period_end_key = st.selectbox(
+            "Period to",
+            options=end_options,
+            format_func=lambda value: month_labels[value],
+            key="period_end_month",
+            help="Last month included in the analysis.",
+        )
+
+    period_start = (
+        pd.Period(period_start_key, freq="M").start_time.date()
+    )
+    period_end = (
+        pd.Period(period_end_key, freq="M").end_time.date()
+    )
 
     dates = (period_start, period_end)
 
