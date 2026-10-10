@@ -3,6 +3,7 @@ import sys
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+import base64
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
@@ -261,32 +262,39 @@ def load_data():
 raw = load_data()
 data = prepare_data(raw)
 
-ROOT = Path(_file_).resolve().parent
+logo_path = ROOT / "assets" / "logo.png"
+logo_base64 = base64.b64encode(logo_path.read_bytes()).decode("utf-8")
 
 with st.sidebar:
-    st.html("""
+    st.html(f"""
     <div style="
         padding: 8px 0 14px;
         margin-bottom: 14px;
         border-bottom: 1px solid rgba(180,205,240,.14);
     ">
       <div style="
-          display: flex;
-          align-items: center;
-          gap: 10px;
+          display:flex;
+          align-items:center;
+          gap:10px;
       ">
-        <div style="width:44px; flex:0 0 44px;">
-          <img
-            src="app/static/logo.png"
-            style="width:44px; height:auto; display:block;"
-            alt="Distribution Strategy Intelligence logo"
-          />
-        </div>
+        <img
+          src="data:image/png;base64,{logo_base64}"
+          alt="Distribution Strategy Intelligence"
+          style="
+              width:44px;
+              height:48px;
+              object-fit:contain;
+              flex:0 0 44px;
+              display:block;
+          "
+        />
         <div style="
+            min-width:0;
             color:#f6f9ff;
             font-size:13px;
             font-weight:700;
             line-height:1.4;
+            letter-spacing:-0.15px;
         ">
           <div>Distribution</div>
           <div>Strategy Intelligence</div>
@@ -297,6 +305,7 @@ with st.sidebar:
           color:#9fb8d8;
           font-size:10px;
           line-height:1.4;
+          letter-spacing:.15px;
       ">From data to decisions</div>
     </div>
     """)
