@@ -668,523 +668,641 @@ def _kpi_card(title, value, help_text, metric, current, previous_period, previou
 if page == "Executive Overview":
     header(
         "Executive Overview",
-        "Distribution performance, target delivery, partner contribution, and management priorities."
+        "Distribution performance, target delivery, partner contribution, "
+        "and management priorities."
     )
 
-    # Restrained navy / blue / neutral palette. Sidebar styling is untouched.
+    # Executive Overview only — sidebar styling and navigation stay unchanged.
     st.markdown("""
     <style>
-      /* Executive Overview — refined visual system */
-.exec-kpi {
-    position: relative;
-    background: linear-gradient(145deg, #ffffff, #f9fbfe);
-    border: 1px solid #e1e9f3;
-    border-radius: 14px;
-    padding: 17px 18px 13px;
-    min-height: 165px;
-    box-shadow: 0 4px 14px rgba(16, 35, 63, 0.045);
-}
-
-.exec-kpi:before {
-    content: "";
-    position: absolute;
-    top: 15px;
-    bottom: 15px;
-    left: 0;
-    width: 3px;
-    border-radius: 0 4px 4px 0;
-    background: #3978b8;
-}
-
-.exec-kpi-label {
-    color: #647791;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-}
-
-.exec-kpi-value {
-    color: #10233f;
-    font-size: clamp(23px, 2vw, 30px);
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    line-height: 1.25;
-    margin: 9px 0 14px;
-    overflow-wrap: anywhere;
-}
-
-.exec-kpi-comparisons {
-    border-top: 1px solid #eaf0f6;
-    padding-top: 7px;
-}
-
-.comparison-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    color: #77879c;
-    font-size: 10px;
-    padding: 4px 0;
-}
-
-.comparison-row strong {
-    font-size: 10px;
-    font-weight: 800;
-    text-align: right;
-}
-
-.exec-section-note {
-    color: #7a8ba1;
-    font-size: 11px;
-    line-height: 1.5;
-    margin-top: -6px;
-    margin-bottom: 10px;
-}
-
-.exec-insight {
-    border: 1px solid #e1e9f2;
-    background: linear-gradient(135deg, #ffffff, #f9fbfe);
-    border-radius: 12px;
-    padding: 13px 15px;
-    margin-bottom: 9px;
-    box-shadow: 0 2px 8px rgba(16, 35, 63, 0.025);
-}
-
-.exec-insight-title {
-    color: #183452;
-    font-size: 12px;
-    font-weight: 800;
-    margin-bottom: 5px;
-}
-
-.exec-insight-body {
-    color: #536781;
-    font-size: 12px;
-    line-height: 1.55;
-}
-
-.exec-table-wrap {
-    border: 1px solid #e1e9f2;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #fff;
-}
-
-.exec-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-}
-
-.exec-table th {
-    background: #f3f7fb;
-    color: #61748d;
-    font-size: 10px;
-    font-weight: 800;
-    text-align: left;
-    text-transform: uppercase;
-    padding: 11px 10px;
-    border-bottom: 1px solid #e5ebf3;
-}
-
-.exec-table td {
-    padding: 10px;
-    border-bottom: 1px solid #edf1f6;
-    color: #344b67;
-    vertical-align: middle;
-}
-
-.exec-table tr:last-child td {
-    border-bottom: 0;
-}
-
-.exec-rank {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    border-radius: 7px;
-    background: #edf4fc;
-    color: #2e6fae;
-    font-weight: 800;
-}
-
-.exec-bar-track {
-    height: 6px;
-    background: #eaf0f6;
-    border-radius: 20px;
-    overflow: hidden;
-    min-width: 45px;
-}
-
-.exec-bar-fill {
-    height: 100%;
-    background: #5a91c9;
-    border-radius: 20px;
-}
-
-.exec-action {
-    display: flex;
-    gap: 11px;
-    padding: 12px 0;
-    border-bottom: 1px solid #edf1f6;
-}
-
-.exec-action:last-child {
-    border-bottom: 0;
-}
-
-.exec-action-number {
-    flex: 0 0 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: #e9f1fa;
-    color: #2e6fae;
-    font-weight: 800;
-    font-size: 12px;
-}
-
-.exec-action-copy {
-    color: #536781;
-    font-size: 12px;
-    line-height: 1.5;
-}
-
-.exec-action-copy strong {
-    color: #183452;
-}
-    </style>""", unsafe_allow_html=True)
-
-    st.caption("PORTFOLIO SNAPSHOT · CURRENT FILTER SELECTION")
-    st.caption(
-        f"Selected window: {pd.Period(period_start_key, freq='M').strftime('%b %Y')} — "
-        f"{pd.Period(period_end_key, freq='M').strftime('%b %Y')} · {partner} · {channel}"
-    )
-
-    # Build comparison data using the same partner/channel filters as the current view.
-    comparison_base = data.copy()
-    if partner != "All partners":
-        comparison_base = comparison_base[comparison_base["partner"] == partner]
-    if channel != "All channels":
-        comparison_base = comparison_base[comparison_base["channel"] == channel]
-
-    start_p, end_p = pd.Period(period_start_key, "M"), pd.Period(period_end_key, "M")
-    month_count = end_p.ordinal - start_p.ordinal + 1
-    available_months = set(data["month"].dropna().dt.to_period("M").astype(str))
-    pp_start, pp_end = start_p - month_count, start_p - 1
-    py_start, py_end = start_p - 12, end_p - 12
-
-    previous_period = (
-        _comparison_summary(_month_window(comparison_base, pp_start, pp_end))
-        if _window_is_available(pp_start, pp_end, available_months) else None
-    )
-    previous_year = (
-        _comparison_summary(_month_window(comparison_base, py_start, py_end))
-        if _window_is_available(py_start, py_end, available_months) else None
-    )
-    current = {
-        "actual": actual,
-        "attainment": attainment if target else None,
-        "gap": target - actual,
-        "partners": int(df["partner"].nunique()),
+    .block-container {
+        padding-top: 1.6rem;
+        padding-bottom: 2rem;
     }
+    .exec-eyebrow {
+        color: #637894;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .13em;
+        text-transform: uppercase;
+        margin: 0 0 5px;
+    }
+    .exec-muted {
+        color: #71829a;
+        font-size: 11px;
+        line-height: 1.5;
+    }
+    .exec-panel {
+        background: #ffffff;
+        border: 1px solid #e3eaf2;
+        border-radius: 14px;
+        padding: 16px;
+        box-shadow: 0 3px 12px rgba(16,35,63,.035);
+        margin-bottom: 8px;
+    }
+    .exec-panel-title {
+        color: #10233f;
+        font-size: 15px;
+        font-weight: 780;
+        margin-bottom: 4px;
+    }
+    .exec-panel-subtitle {
+        color: #71829a;
+        font-size: 11px;
+        margin-bottom: 12px;
+    }
+    .exec-kpi {
+        background: linear-gradient(145deg,#ffffff,#f9fbfe);
+        border: 1px solid #e2eaf3;
+        border-radius: 13px;
+        padding: 16px 15px 13px;
+        min-height: 126px;
+        box-shadow: 0 3px 12px rgba(16,35,63,.035);
+    }
+    .exec-kpi-label {
+        color: #667b95;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+    }
+    .exec-kpi-value {
+        color: #10233f;
+        font-size: clamp(22px, 2vw, 30px);
+        font-weight: 820;
+        letter-spacing: -.045em;
+        line-height: 1.25;
+        margin-top: 12px;
+        overflow-wrap: anywhere;
+    }
+    .exec-kpi-note {
+        color: #7889a0;
+        font-size: 10px;
+        margin-top: 8px;
+        line-height: 1.45;
+    }
+    .exec-signal {
+        border: 1px solid #e4ebf3;
+        background: linear-gradient(135deg,#ffffff,#f8fbff);
+        border-radius: 11px;
+        padding: 12px;
+        min-height: 100px;
+        margin-bottom: 8px;
+    }
+    .exec-signal-title {
+        color: #183452;
+        font-size: 11px;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+    .exec-signal-body {
+        color: #5c708a;
+        font-size: 11px;
+        line-height: 1.55;
+    }
+    .exec-callout {
+        background: #fff8e7;
+        border: 1px solid #f3e4b5;
+        border-radius: 11px;
+        padding: 13px 15px;
+        color: #80591b;
+        font-size: 12px;
+        line-height: 1.6;
+        margin: 7px 0 12px;
+    }
+    .exec-status {
+        background: #edf8f1;
+        border: 1px solid #d1ead9;
+        color: #26734f;
+        border-radius: 10px;
+        padding: 12px;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+    [data-testid="stPlotlyChart"] {
+        border: 1px solid #e3eaf2;
+        border-radius: 13px;
+        background: #ffffff;
+        padding: 5px;
+        box-shadow: 0 3px 12px rgba(16,35,63,.025);
+    }
+    [data-testid="stDataFrame"] {
+        border: 1px solid #e3eaf2;
+        border-radius: 11px;
+        overflow: hidden;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
+    # ---------------------------------------------------------
+    # 1. PORTFOLIO CONTEXT
+    # ---------------------------------------------------------
+    st.markdown(
+        '<div class="exec-eyebrow">Portfolio snapshot</div>',
+        unsafe_allow_html=True
+    )
+    st.caption(
+        f"Selected window: "
+        f"{pd.Period(period_start_key, freq='M').strftime('%b %Y')} — "
+        f"{pd.Period(period_end_key, freq='M').strftime('%b %Y')} "
+        f" · {partner} · {channel}"
+    )
+
+    # All KPI cards use the same filtered dataframe as the charts below.
+    actual = float(df["premium_actual_idr"].sum())
+    target = float(df["premium_target_idr"].sum())
+    gap_value = target - actual
+    attainment = actual / target if target > 0 else 0.0
+    active_partners = int(df["partner"].nunique())
+    policies = int(df["policies_issued"].sum())
+
+    # ---------------------------------------------------------
+    # 2. EXECUTIVE KPI CARDS
+    # ---------------------------------------------------------
     kpi_cols = st.columns(4, gap="medium")
-    cards = [
-        _kpi_card("Total Premium", money(actual), "Actual premium in the selected window.",
-                  "actual", current, previous_period, previous_year),
-        _kpi_card("Target Attainment", f"{attainment:.1%}", "Actual premium divided by target premium.",
-                  "attainment", current, previous_period, previous_year),
-        _kpi_card("Premium Gap", f"{money(abs(target-actual))} {'shortfall' if target > actual else 'surplus'}",
-                  "Target minus actual premium; positive means a shortfall.",
-                  "gap", current, previous_period, previous_year),
-        _kpi_card("Active Partners", f"{df['partner'].nunique():,}", "Unique partners in the selected window.",
-                  "partners", current, previous_period, previous_year),
-    ]
-    for col, card in zip(kpi_cols, cards):
-        with col:
-            st.markdown(card, unsafe_allow_html=True)
 
-    st.write("")
+    kpi_cards = [
+        (
+            "Total Premium",
+            money(actual),
+            "Actual premium in the selected filters."
+        ),
+        (
+            "Target Attainment",
+            f"{attainment:.1%}",
+            "Actual premium divided by target premium."
+        ),
+        (
+            "Premium Gap",
+            f"{money(abs(gap_value))}",
+            "Shortfall" if gap_value > 0
+            else "Surplus" if gap_value < 0
+            else "Target achieved"
+        ),
+        (
+            "Active Partners",
+            f"{active_partners:,}",
+            f"{policies:,} policies issued in the selected window."
+        ),
+    ]
+
+    for col, (label, value, note) in zip(kpi_cols, kpi_cards):
+        with col:
+            st.markdown(
+                f'<div class="exec-kpi">'
+                f'<div class="exec-kpi-label">{label}</div>'
+                f'<div class="exec-kpi-value">{value}</div>'
+                f'<div class="exec-kpi-note">{note}</div>'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+
+    # Show the gap status separately so red/green is used only for meaning.
+    if target > 0 and gap_value > 0:
+        st.markdown(
+            f'<div class="exec-callout"><b>Portfolio signal</b> · '
+            f'Attainment is {attainment:.1%}; premium remains '
+            f'{money(gap_value)} below target.</div>',
+            unsafe_allow_html=True
+        )
+    elif target > 0 and gap_value < 0:
+        st.success(
+            f"Portfolio is above target by {money(abs(gap_value))} "
+            f"({attainment:.1%} attainment)."
+        )
+    elif target == 0:
+        st.warning(
+            "Target premium is zero in this selection. "
+            "Attainment is shown as 0% because the ratio is undefined."
+        )
+
+    # ---------------------------------------------------------
+    # 3. TREND AND CHANNEL PERFORMANCE
+    # ---------------------------------------------------------
     chart_left, chart_right = st.columns([1.55, 1], gap="medium")
+
     with chart_left:
-        st.subheader("Premium vs target over time")
-        st.markdown('<div class="exec-section-note">Monthly actual premium against target; hover for exact values.</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="exec-panel-title">Premium vs target over time</div>'
+            '<div class="exec-panel-subtitle">'
+            'Monthly actual premium against target; hover for exact values.'
+            '</div>',
+            unsafe_allow_html=True
+        )
+
         if not trend.empty:
             trend_view = trend.copy()
-            trend_view["Actual premium"] = trend_view["premium_actual_idr"]
-            trend_view["Target premium"] = trend_view["premium_target_idr"]
+            trend_view["month"] = pd.to_datetime(trend_view["month"])
+
             fig = px.line(
-                trend_view, x="month", y=["Actual premium", "Target premium"], markers=True,
-                color_discrete_map={"Actual premium":"#3978B8", "Target premium":"#A8BCD4"},
-                labels={"value":"Premium (IDR)", "month":"Month", "variable":""},
+                trend_view,
+                x="month",
+                y=["premium_actual_idr", "premium_target_idr"],
+                markers=True,
+                color_discrete_map={
+                    "premium_actual_idr": "#286bb2",
+                    "premium_target_idr": "#9bb8d8",
+                },
+                labels={
+                    "value": "Premium (IDR)",
+                    "month": "Month",
+                    "variable": "",
+                    "premium_actual_idr": "Actual premium",
+                    "premium_target_idr": "Target premium",
+                },
             )
             fig.update_traces(line=dict(width=2.7), marker=dict(size=5))
-            fig.update_yaxes(tickprefix="Rp ", tickformat="~s", rangemode="tozero")
+            fig.update_yaxes(
+                tickprefix="Rp ",
+                tickformat="~s",
+                rangemode="tozero"
+            )
             fig.update_xaxes(tickformat="%b %Y", dtick="M2")
-            fig.update_layout(hovermode="x unified", showlegend=True)
-            st.plotly_chart(style(fig, 365), use_container_width=True)
+            fig.update_layout(
+                hovermode="x unified",
+                height=340,
+                margin=dict(l=12, r=18, t=25, b=12),
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=1.02,
+                    x=0,
+                    font=dict(size=10),
+                ),
+            )
+            st.plotly_chart(
+                style(fig, 340),
+                use_container_width=True
+            )
         else:
-            st.info("Not enough monthly data to draw the trend.")
+            st.info("No monthly trend is available for this selection.")
 
     with chart_right:
-        st.subheader("Target attainment by channel")
-        st.markdown('<div class="exec-section-note">Actual premium ÷ target premium.</div>', unsafe_allow_html=True)
-        channel_view = df.groupby("channel", as_index=False).agg(
-            premium_actual_idr=("premium_actual_idr", "sum"),
-            premium_target_idr=("premium_target_idr", "sum"),
+        st.markdown(
+            '<div class="exec-panel-title">Target attainment by channel</div>'
+            '<div class="exec-panel-subtitle">'
+            'Actual premium as a percentage of target.'
+            '</div>',
+            unsafe_allow_html=True
         )
-        channel_view["attainment"] = channel_view["premium_actual_idr"] / channel_view["premium_target_idr"].replace(0, float("nan"))
-        channel_view = channel_view.dropna(subset=["attainment"]).sort_values("attainment")
+
+        channel_view = (
+            df.groupby("channel", as_index=False)
+            .agg(
+                premium_actual_idr=("premium_actual_idr", "sum"),
+                premium_target_idr=("premium_target_idr", "sum"),
+            )
+        )
+        channel_view["attainment"] = (
+            channel_view["premium_actual_idr"]
+            / channel_view["premium_target_idr"].replace(0, float("nan"))
+        )
+        channel_view = (
+            channel_view.dropna(subset=["attainment"])
+            .sort_values("attainment", ascending=True)
+        )
+
         if not channel_view.empty:
             fig = px.bar(
-                channel_view, x="attainment", y="channel", orientation="h",
-                text=channel_view["attainment"].map(lambda x: f"{x:.0%}"),
-                labels={"attainment":"Target attainment", "channel":""},
-                color_discrete_sequence=["#3978B8"],
+                channel_view,
+                x="attainment",
+                y="channel",
+                orientation="h",
+                text=channel_view["attainment"].map(
+                    lambda value: f"{value:.0%}"
+                ),
+                labels={
+                    "attainment": "Target attainment",
+                    "channel": "",
+                },
+                color_discrete_sequence=["#3978b8"],
             )
-            fig.update_traces(textposition="outside", cliponaxis=False)
-            fig.add_vline(x=1, line_dash="dash", line_color="#91A8C4", annotation_text="Target 100%")
-            fig.update_xaxes(tickformat=".0%", range=[0, max(1.15, float(channel_view["attainment"].max())*1.15)])
-            fig.update_layout(showlegend=False)
-            st.plotly_chart(style(fig, 365), use_container_width=True)
+            fig.update_traces(
+                textposition="outside",
+                cliponaxis=False,
+                marker_line_width=0,
+            )
+            max_attainment = float(channel_view["attainment"].max())
+            fig.update_xaxes(
+                tickformat=".0%",
+                range=[0, max(1.12, max_attainment * 1.15)]
+            )
+            fig.add_vline(
+                x=1,
+                line_dash="dash",
+                line_color="#91a8c4",
+                line_width=1.3
+            )
+            fig.update_layout(
+                showlegend=False,
+                height=340,
+                margin=dict(l=8, r=35, t=20, b=12),
+            )
+            st.plotly_chart(
+                style(fig, 340),
+                use_container_width=True
+            )
         else:
-            st.info("No channel attainment values are available for this selection.")
+            st.info(
+                "Channel attainment cannot be calculated because "
+                "no positive targets are available."
+            )
 
-    # Aggregate by partner to avoid duplicate partner rows across channels.
-    partner_view = df.groupby("partner", as_index=False).agg(
-        premium_actual_idr=("premium_actual_idr", "sum"),
-        premium_target_idr=("premium_target_idr", "sum"),
-        policies_issued=("policies_issued", "sum"),
+    # ---------------------------------------------------------
+    # 4. PARTNER-LEVEL PERFORMANCE
+    # ---------------------------------------------------------
+    partner_view = (
+        df.groupby("partner", as_index=False)
+        .agg(
+            premium_actual_idr=("premium_actual_idr", "sum"),
+            premium_target_idr=("premium_target_idr", "sum"),
+            policies_issued=("policies_issued", "sum"),
+        )
     )
-    partner_view["attainment_rate"] = partner_view["premium_actual_idr"] / partner_view["premium_target_idr"].replace(0, float("nan"))
-    partner_view["gap_to_target"] = partner_view["premium_target_idr"] - partner_view["premium_actual_idr"]
+
+    partner_view["attainment_rate"] = (
+        partner_view["premium_actual_idr"]
+        / partner_view["premium_target_idr"].replace(0, float("nan"))
+    )
+    partner_view["gap_to_target"] = (
+        partner_view["premium_target_idr"]
+        - partner_view["premium_actual_idr"]
+    )
 
     table_left, table_right = st.columns(2, gap="medium")
+
     with table_left:
-        st.subheader("Top partners by actual premium")
         st.markdown(
-            '<div class="exec-section-note">'
+            '<div class="exec-panel-title">Top partners by actual premium</div>'
+            '<div class="exec-panel-subtitle">'
             'Ranked by actual premium in the current selection.'
             '</div>',
-            unsafe_allow_html=True,
+            unsafe_allow_html=True
         )
 
         top = partner_view.nlargest(5, "premium_actual_idr").copy()
 
         if not top.empty:
+            top["Rank"] = range(1, len(top) + 1)
+            top["Partner"] = top["partner"]
             top["Actual premium"] = top["premium_actual_idr"].map(money)
             top["Target attainment"] = top["attainment_rate"].map(
-                lambda v: f"{v:.0%}" if pd.notna(v) else "N/A"
+                lambda value: f"{value:.0%}"
+                if pd.notna(value) else "N/A"
             )
-            top = top.rename(columns={"partner": "Partner"})
-            rows_html = []
-
-            max_premium = max(
-                float(v) for v in top["premium_actual_idr"]
-            ) or 1
-
-            for rank, (_, row) in enumerate(top.iterrows(), start=1):
-                pct = (
-                    float(row["attainment_rate"])
-                    if pd.notna(row["attainment_rate"])
-                    else 0
-                )
-                premium_width = min(
-                    100,
-                    max(
-                        0,
-                        float(row["premium_actual_idr"])
-                        / max_premium * 100,
+            top_display = top[
+                ["Rank", "Partner", "Actual premium", "Target attainment"]
+            ]
+            st.dataframe(
+                top_display,
+                use_container_width=True,
+                hide_index=True,
+                column_config={
+                    "Rank": st.column_config.NumberColumn(
+                        "Rank", width="small"
                     ),
-                )
-                pct_color = (
-                    "#247b62" if pct >= 1
-                    else "#bd514b" if pct < threshold
-                    else "#536781"
-                )
-
-                rows_html.append(
-                    f'<tr><td><span class="exec-rank">{rank}</span></td>'
-                    f'<td><strong>{row["Partner"]}</strong></td>'
-                    f'<td><strong>{money(float(row["premium_actual_idr"]))}</strong>'
-                    f'<div class="exec-bar-track" style="margin-top:6px">'
-                    f'<div class="exec-bar-fill" style="width:{premium_width:.1f}%"></div>'
-                    f'</div></td>'
-                    f'<td><strong style="color:{pct_color}">{pct:.0%}</strong></td></tr>'
-                )
-
-            st.markdown(
-                '<div class="exec-table-wrap"><table class="exec-table">'
-                '<thead><tr><th>#</th><th>Partner</th>'
-                '<th>Actual premium</th><th>Attainment</th></tr></thead><tbody>'
-                + "".join(rows_html)
-                + '</tbody></table></div>',
-                unsafe_allow_html=True,
+                    "Partner": st.column_config.TextColumn(
+                        "Partner", width="medium"
+                    ),
+                    "Actual premium": st.column_config.TextColumn(
+                        "Actual premium", width="medium"
+                    ),
+                    "Target attainment": st.column_config.TextColumn(
+                        "Attainment", width="small"
+                    ),
+                },
             )
         else:
             st.info("No partner records in this selection.")
 
     with table_right:
-        st.subheader("Partners requiring attention")
-        st.markdown(f'<div class="exec-section-note">Rule-based screen: attainment below {threshold:.0%}.</div>', unsafe_allow_html=True)
-        attention = partner_view[partner_view["attainment_rate"] < threshold].sort_values("attainment_rate").head(5).copy()
+        st.markdown(
+            '<div class="exec-panel-title">Partners requiring attention</div>'
+            f'<div class="exec-panel-subtitle">'
+            f'Rule-based screen: attainment below {threshold:.0%}.'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+        attention = (
+            partner_view[
+                partner_view["attainment_rate"] < threshold
+            ]
+            .sort_values("attainment_rate", na_position="last")
+            .head(5)
+            .copy()
+        )
+
         if not attention.empty:
+            attention["Rank"] = range(1, len(attention) + 1)
+            attention["Partner"] = attention["partner"]
             attention["Target attainment"] = attention["attainment_rate"].map(
-                lambda v: f"{v:.0%}" if pd.notna(v) else "N/A"
+                lambda value: f"{value:.0%}"
+                if pd.notna(value) else "N/A"
             )
             attention["Gap to target"] = attention["gap_to_target"].map(
-                lambda v: money(v) if v >= 0
-                else f"{money(abs(v))} surplus"
+                lambda value: (
+                    money(value) if value >= 0
+                    else f"{money(abs(value))} surplus"
+                )
             )
-            attention = attention.rename(columns={"partner": "Partner"})
-            rows_html = []
-
-            for rank, (_, row) in enumerate(attention.iterrows(), start=1):
-                pct = (
-                    float(row["attainment_rate"])
-                    if pd.notna(row["attainment_rate"])
-                    else 0
-                )
-                bar_width = min(100, max(0, pct * 100))
-                gap = float(row["gap_to_target"])
-                gap_text = (
-                    money(gap) if gap >= 0
-                    else f"{money(abs(gap))} surplus"
-                )
-                gap_color = "#bd514b" if gap > 0 else "#247b62"
-
-                rows_html.append(
-                    f'<tr><td><span class="exec-rank">{rank}</span></td>'
-                    f'<td><strong>{row["Partner"]}</strong></td>'
-                    f'<td><strong style="color:#bd514b">{pct:.0%}</strong>'
-                    f'<div class="exec-bar-track" style="margin-top:6px">'
-                    f'<div class="exec-bar-fill" style="width:{bar_width:.1f}%;'
-                    f'background:#c87976"></div></div></td>'
-                    f'<td><strong style="color:{gap_color}">{gap_text}</strong></td></tr>'
-                )
-
+            attention_display = attention[
+                [
+                    "Rank",
+                    "Partner",
+                    "Target attainment",
+                    "Gap to target",
+                ]
+            ]
+            st.dataframe(
+                attention_display,
+                use_container_width=True,
+                hide_index=True,
+            )
+        else:
             st.markdown(
-                '<div class="exec-table-wrap"><table class="exec-table">'
-                '<thead><tr><th>#</th><th>Partner</th><th>Attainment</th>'
-                '<th>Gap to target</th></tr></thead><tbody>'
-                + "".join(rows_html)
-                + '</tbody></table></div>',
-                unsafe_allow_html=True,
+                '<div class="exec-status">'
+                '✓ No partners fall below the selected threshold.'
+                '</div>',
+                unsafe_allow_html=True
             )
-        else:
-            st.success("No partners fall below the selected threshold.")
 
-    insight_col, action_col = st.columns([1.25, 1], gap="medium")
+    # ---------------------------------------------------------
+    # 5. KEY INSIGHTS
+    # ---------------------------------------------------------
+    insight_col, action_col = st.columns([1.15, 1], gap="medium")
 
-    insight_col, action_col = st.columns([1.25, 1], gap="medium")
     with insight_col:
-        st.subheader("Key Insights")
-        st.markdown('<div class="exec-section-note">What the current data indicates.</div>', unsafe_allow_html=True)
-        gap_value = target - actual
-        if target > 0:
-            if gap_value > 0:
-                st.warning(f"Portfolio attainment is **{attainment:.1%}**, with a premium shortfall of **{money(gap_value)}**.")
-            else:
-                st.success(f"Portfolio is above target by **{money(abs(gap_value))}** ({attainment:.1%} attainment).")
-        if previous_period is not None:
-            st.caption(f"Previous period: premium {_comparison_delta(current, previous_period, 'actual')}; attainment {_comparison_delta(current, previous_period, 'attainment')}.")
-        else:
-            st.caption("Previous period: N/A — the full comparison window is not available.")
-        if previous_year is not None:
-            st.caption(f"Previous year: premium {_comparison_delta(current, previous_year, 'actual')}; attainment {_comparison_delta(current, previous_year, 'attainment')}.")
-        else:
-            st.caption("Previous year: N/A — the full comparison window is not available.")
+        st.markdown(
+            '<div class="exec-panel-title">Key Insights</div>'
+            '<div class="exec-panel-subtitle">'
+            'What the selected data indicates.'
+            '</div>',
+            unsafe_allow_html=True
+        )
 
+        strongest = None
         if not channel_view.empty:
-            strongest = channel_view.sort_values("attainment", ascending=False).iloc[0]
-            st.markdown(f'<div class="exec-insight"><div class="exec-insight-title">Channel signal</div><div class="exec-insight-body"><b>{strongest["channel"]}</b> has the highest attainment at <b>{strongest["attainment"]:.0%}</b> in this selection.</div></div>', unsafe_allow_html=True)
+            strongest = channel_view.sort_values(
+                "attainment", ascending=False
+            ).iloc[0]
+
+        weakest = None
         if not attention.empty:
             weakest = attention.iloc[0]
-            st.markdown(f'<div class="exec-insight"><div class="exec-insight-title">Partner attention</div><div class="exec-insight-body"><b>{weakest["Partner"]}</b> has the lowest attainment ({weakest["attainment_rate"]:.0%}); review target, funnel, and recent activity before drawing causal conclusions.</div></div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="exec-insight"><div class="exec-insight-title">Operational signals</div><div class="exec-insight-body">{int(under["partner"].nunique()) if not under.empty else 0} partner(s) below threshold · {len(anomalies)} monthly anomaly alert(s) · {int(df["policies_issued"].sum()):,} policies issued.</div></div>', unsafe_allow_html=True)
 
-    with action_col:
-        st.subheader("Recommended Actions")
+        signal_cols = st.columns(2, gap="small")
+
+        with signal_cols[0]:
+            if strongest is not None:
+                st.markdown(
+                    f'<div class="exec-signal">'
+                    f'<div class="exec-signal-title">Channel signal</div>'
+                    f'<div class="exec-signal-body">'
+                    f'<b>{strongest["channel"]}</b> has the highest '
+                    f'attainment at <b>{strongest["attainment"]:.0%}</b>.'
+                    f'</div></div>',
+                    unsafe_allow_html=True
+                )
+            else:
+                st.markdown(
+                    '<div class="exec-signal">'
+                    '<div class="exec-signal-title">Channel signal</div>'
+                    '<div class="exec-signal-body">'
+                    'No valid channel target is available.'
+                    '</div></div>',
+                    unsafe_allow_html=True
+                )
+
+        with signal_cols[1]:
+            if weakest is not None:
+                st.markdown(
+                    f'<div class="exec-signal">'
+                    f'<div class="exec-signal-title">Partner attention</div>'
+                    f'<div class="exec-signal-body">'
+                    f'<b>{weakest["partner"]}</b> is the lowest-attainment '
+                    f'partner below the configured threshold '
+                    f'({weakest["attainment_rate"]:.0%}).'
+                    f'</div></div>',
+                    unsafe_allow_html=True
+                )
+            else:
+                st.markdown(
+                    '<div class="exec-signal">'
+                    '<div class="exec-signal-title">Partner attention</div>'
+                    '<div class="exec-signal-body">'
+                    'No partner is below the selected threshold.'
+                    '</div></div>',
+                    unsafe_allow_html=True
+                )
+
         st.markdown(
-            '<div class="exec-section-note">'
+            f'<div class="exec-signal">'
+            f'<div class="exec-signal-title">Operational signal</div>'
+            f'<div class="exec-signal-body">'
+            f'{int(under["partner"].nunique()) if not under.empty else 0} '
+            f'partner/channel scorecard(s) below threshold · '
+            f'{len(anomalies)} monthly anomaly alert(s) · '
+            f'{policies:,} policies issued.'
+            f'</div></div>',
+            unsafe_allow_html=True
+        )
+
+    # ---------------------------------------------------------
+    # 6. RECOMMENDED ACTIONS
+    # ---------------------------------------------------------
+    with action_col:
+        st.markdown(
+            '<div class="exec-panel-title">Recommended Actions</div>'
+            '<div class="exec-panel-subtitle">'
             'Rule-based prompts for management review, not causal conclusions.'
             '</div>',
-            unsafe_allow_html=True,
+            unsafe_allow_html=True
         )
 
         if actions:
             action_df = pd.DataFrame(actions)
-            columns = [
-                c for c in [
-                    "priority", "partner", "signal", "suggested_action"
+
+            preferred_columns = [
+                column for column in [
+                    "priority",
+                    "partner",
+                    "signal",
+                    "suggested_action",
                 ]
-                if c in action_df.columns
+                if column in action_df.columns
             ]
-            action_rows = []
 
-            for i, (_, row) in enumerate(
-                action_df[columns].head(6).iterrows(), start=1
-            ):
-                priority = str(row.get("priority", "Review"))
-                partner_name = str(row.get("partner", "Portfolio"))
-                signal = str(
-                    row.get("signal", "Review performance signal")
-                )
-                recommendation = str(
-                    row.get(
-                        "suggested_action",
-                        "Validate the data and agree next steps."
-                    )
-                )
+            action_df = action_df[preferred_columns].copy()
+            action_df = action_df.head(5).rename(
+                columns={
+                    "priority": "Priority",
+                    "partner": "Partner",
+                    "signal": "Signal",
+                    "suggested_action": "Recommended action",
+                }
+            )
 
-                priority_color = (
-                    "#bd514b" if priority.lower() == "high"
-                    else "#9a6b24" if priority.lower() == "medium"
-                    else "#3978b8"
-                )
-
-                action_rows.append(
-                    f'<div class="exec-action">'
-                    f'<div class="exec-action-number">{i}</div>'
-                    f'<div class="exec-action-copy">'
-                    f'<div style="display:flex;gap:8px;'
-                    f'flex-wrap:wrap;align-items:center">'
-                    f'<strong>{partner_name}</strong>'
-                    f'<span style="font-size:10px;font-weight:800;'
-                    f'color:{priority_color};background:#f3f6fa;'
-                    f'padding:3px 8px;border-radius:20px">'
-                    f'{priority}</span></div>'
-                    f'<div style="margin-top:5px">{signal}</div>'
-                    f'<div style="margin-top:5px;color:#71829a">'
-                    f'{recommendation}</div>'
-                    f'</div></div>'
-                )
-
-            st.markdown(
-                '<div class="exec-table-wrap" style="padding:2px 14px">'
-                + "".join(action_rows)
-                + '</div>',
-                unsafe_allow_html=True,
+            st.dataframe(
+                action_df,
+                use_container_width=True,
+                hide_index=True,
+                column_config={
+                    "Priority": st.column_config.TextColumn(
+                        "Priority", width="small"
+                    ),
+                    "Partner": st.column_config.TextColumn(
+                        "Partner", width="medium"
+                    ),
+                    "Signal": st.column_config.TextColumn(
+                        "Signal", width="medium"
+                    ),
+                    "Recommended action": st.column_config.TextColumn(
+                        "Recommended action", width="large"
+                    ),
+                },
             )
         else:
-            st.success(
-                "No rule-based actions were triggered for this selection."
+            st.markdown(
+                '<div class="exec-status">'
+                'No rule-based actions were triggered for this selection.'
+                '</div>',
+                unsafe_allow_html=True
             )
 
         if not anomalies.empty:
-            st.info(
+            st.caption(
                 f"{len(anomalies)} monthly premium-drop alert(s) detected. "
-                "Validate the underlying records before acting."
+                "Validate underlying records before taking action."
             )
 
-# Keep the existing `elif page == "Performance Analysis":` and every later page unchanged.
+    # ---------------------------------------------------------
+    # 7. TRANSPARENCY AND DATA EXPORT
+    # ---------------------------------------------------------
+    with st.expander("Data transparency and definitions"):
+        st.markdown(
+            """
+            - *Actual premium:* sum of premium recorded in the filtered data.
+            - *Target attainment:* actual premium divided by target premium.
+            - *Premium gap:* target minus actual; positive means shortfall.
+            - *Partner attention:* partner-level attainment below the
+              selected threshold.
+            - *Recommended actions:* rule-based prompts for review, not
+              proof of cause or guaranteed business outcomes.
+            - *Data status:* synthetic portfolio data for demonstration;
+              figures do not represent actual insurer performance.
+            """
+        )
+
+        export_df = df.copy()
+        export_df["month"] = export_df["month"].dt.strftime("%Y-%m-%d")
+        st.download_button(
+            "Download filtered data (CSV)",
+            data=export_df.to_csv(index=False).encode("utf-8"),
+            file_name="distribution_overview_filtered.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
 
 elif page == "Performance Analysis":
     header("Performance Analysis", "Explore detailed performance metrics across partners, channels, and product outcomes.")
