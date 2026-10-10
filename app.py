@@ -25,7 +25,7 @@ st.markdown("""
   display: flex !important;
   align-items: center !important;
   justify-content: flex-start !important;
-  width: 100% !important;
+  : 100% !important;
   min-height: 39px !important;
   height: 39px !important;
   padding: 0 12px !important;
@@ -283,36 +283,35 @@ with st.sidebar:
                 min-width: 52px;
                 flex: 0 0 52px;
             ">
-              <svg
-                viewBox="0 0 52 56"
-                width="52"
-                height="56"
-                xmlns="http://www.w3.org/2000/svg"
-                style="display:block;"
-              >
-                <defs>
-                  <linearGradient
-                    id="brandShield"
-                    x1="0" y1="0" x2="1" y2="1"
-                  >
-                    <stop offset="0%" stop-color="#42d6ce"/>
-                    <stop offset="100%" stop-color="#2369e8"/>
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M26 2 L48 11 V27 C48 40 38 49 26 54
-                     C14 49 4 40 4 27 V11 Z"
-                  fill="url(#brandShield)"
-                  stroke="#74e5ed"
-                  stroke-width="1.2"
-                />
-                <rect x="14" y="29" width="5.5" height="11"
-                  rx="2" fill="#ffffff"/>
-                <rect x="23" y="21" width="5.5" height="19"
-                  rx="2" fill="#ffffff"/>
-                <rect x="32" y="13" width="5.5" height="27"
-                  rx="2" fill="#ffffff"/>
-              </svg>
+              <div style="
+    width:52px;
+    height:56px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+">
+  <div style="
+      width:48px;
+      height:52px;
+      flex-shrink:0;
+      background:linear-gradient(145deg,#42d6ce,#2369e8);
+      clip-path:polygon(50% 0%,96% 17%,92% 62%,76% 84%,50% 100%,24% 84%,8% 62%,4% 17%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+  ">
+    <div style="
+        display:flex;
+        align-items:flex-end;
+        gap:4px;
+        height:27px;
+    ">
+      <span style="display:block;width:5px;height:10px;background:white;border-radius:2px;"></span>
+      <span style="display:block;width:5px;height:17px;background:white;border-radius:2px;"></span>
+      <span style="display:block;width:5px;height:24px;background:white;border-radius:2px;"></span>
+    </div>
+  </div>
+</div>
             </div>
 
             <div style="
