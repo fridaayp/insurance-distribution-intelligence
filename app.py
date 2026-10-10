@@ -217,12 +217,36 @@ def score_display(frame):
     return out
 
 if page == "Executive Overview":
-    header("Executive Overview", "A unified view of distribution performance, partnership growth, and execution signals.")
-    a,b,c,d = st.columns(4)
-    a.metric("Total premium", money(actual))
-    b.metric("Active partners", int(df.partner.nunique()))
-    c.metric("Policies issued", f'{int(df.policies_issued.sum()):,}')
-    d.metric("Target attainment", f"{attainment:.1%}")
+    header(
+        "Executive Overview",
+        "A unified view of distribution performance, partnership growth, and execution signals."
+    )
+
+    st.caption("PORTFOLIO SNAPSHOT · CURRENT FILTER SELECTION")
+
+    a, b, c, d = st.columns(4, gap="medium")
+
+    a.metric(
+        "TOTAL PREMIUM",
+        money(actual),
+        help="Total actual premium for the selected period and filters."
+    )
+    b.metric(
+        "ACTIVE PARTNERS",
+        f"{df.partner.nunique():,}",
+        help="Unique partners represented in the filtered data."
+    )
+    c.metric(
+        "POLICIES ISSUED",
+        f"{int(df.policies_issued.sum()):,}",
+        help="Total policies issued in the current selection."
+    )
+    d.metric(
+        "TARGET ATTAINMENT",
+        f"{attainment:.1%}",
+        help="Total actual premium divided by total target premium."
+    )
+
     st.divider()
     left,right = st.columns([1.45,1])
     with left:
