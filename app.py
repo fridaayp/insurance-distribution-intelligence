@@ -378,27 +378,129 @@ elif page == "Performance Analysis":
         st.plotly_chart(style(fig,300),use_container_width=True)
 
 elif page == "Partnership Intelligence":
-    header("Partnership Intelligence", "Evaluate partner performance, identify growth opportunities, and prioritize engagement.")
-    a,b,c=st.columns(3)
-    a.metric("Partners in view",int(df.partner.nunique()))
-    b.metric("Below threshold",int(under.partner.nunique()) if not under.empty else 0)
-    c.metric("Monthly anomaly alerts",len(anomalies))
-    left,right=st.columns([1.1,1])
+    header(
+        "Partnership Intelligence",
+        "Evaluate partner performance, identify attention areas, and prioritize engagement."
+    )
+
+    below_count = int(under["partner"].nunique()) if not under.empty else 0
+    top_partner = (
+        score.sort_values("premium_actual_idr", ascending=False).iloc[0]
+        if not score.empty else None
+    )
+
+    a, b, c, d = st.columns(4, gap="medium")
+    a.metric("PARTNERS IN VIEW", f"{df['partner'].nunique():,}")
+    b.metric("BELOW THRESHOLD", f"{below_count:,}")
+    c.metric("ANOMALY ALERTS", f"{len(anomalies):,}")
+    d.metric(
+        "TOP PARTNER",
+        str(top_partner["partner"]) if top_partner is not None else "N/A"
+    )
+
+    st.divider()
+
+    left, right = st.columns([1.2, 1], gap="medium")
+
     with left:
         st.subheader("Partner performance matrix")
-        fig=px.scatter(score,x="premium_actual_idr",y="attainment_rate",size="leads",color="channel",hover_name="partner")
-        fig.add_hline(y=threshold,line_dash="dash",line_color="#dc6b4e")
+        st.caption(
+            "Premium vs. target attainment. Bubble size represents leads; "
+            "use hover to inspect individual partners."
+        )
+
+        fig = px.scatter(
+            score,
+            x="premium_actual_idr",
+            y="attainment_rate",
+            size="leads",
+            color="channel",
+            hover_name="partner",
+            labels={
+                "premium_actual_idr": "Actual premium (IDR)",
+                "attainment_rate": "Target attainment",
+                "leads": "Leads",
+                "channel": "Channel",
+            },
+            color_discrete_sequence=[
+                "#2563eb", "#39a8a0", "#f5ad42", "#8b9bb4"
+            ],
+        )
+        fig.add_hline(
+            y=1,
+            line_dash="dash",
+            line_color="#64748b",
+            annotation_text="100% target"
+        )
+        fig.add_hline(
+            y=threshold,
+            line_dash="dot",
+            line_color="#dc6b4e",
+            annotation_text=f"{threshold:.0%} threshold"
+        )
         fig.update_yaxes(tickformat=".0%")
-        st.plotly_chart(style(fig,390),use_container_width=True)
+        st.plotly_chart(style(fig, 410), use_container_width=True)
+
     with right:
         st.subheader("Top partners by premium")
-        top=score.sort_values("premium_actual_idr").tail(10)
-        st.plotly_chart(style(px.bar(top,x="premium_actual_idr",y="partner",color="channel",orientation="h"),390),use_container_width=True)
+        st.caption("Ranked by total actual premium in the selected filters.")
+
+        top = score.nlargest(10, "premium_actual_idr").sort_values(
+            "premium_actual_idr", ascending=True
+        )
+        fig = px.bar(
+            top,
+            x="premium_actual_idr",
+            y="partner",
+            color="channel",
+            orientation="h",
+            labels={
+                "premium_actual_idr": "Actual premium (IDR)",
+                "partner": "Partner",
+                "channel": "Channel",
+            },
+            color_discrete_sequence=[
+                "#2563eb", "#39a8a0", "#f5ad42", "#8b9bb4"
+            ],
+        )
+        st.plotly_chart(style(fig, 410), use_container_width=True)
+
+    st.divider()
     st.subheader("Partner scorecard")
-    st.dataframe(score_display(score),use_container_width=True,hide_index=True)
-    st.subheader("Growth opportunities")
-    if not under.empty: st.dataframe(under,use_container_width=True,hide_index=True)
-    else: st.success("No scorecards below the selected threshold.")
+    st.caption(
+        "Use this table to compare premium, attainment, conversion, "
+        "persistency, and contribution across partners."
+    )
+
+    display = score_display(score)
+    preferred = [
+        "partner", "channel", "premium_actual_idr", "premium_target_idr",
+        "attainment_rate", "conversion_rate", "persistency_rate", "premium_share"
+    ]
+    columns = [col for col in preferred if col in display.columns]
+    st.dataframe(
+        display[columns],
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.divider()
+    st.subheader("Partners requiring review")
+    st.caption(
+        "Rule-based screening only. Validate the context with partner owners "
+        "before making commercial decisions."
+    )
+
+    if not under.empty:
+        st.dataframe(
+            under,
+            use_container_width=True,
+            hide_index=True
+        )
+    else:
+        st.success(
+            "No partner scorecards are below the selected attainment threshold."
+        )
 
 elif page == "Scenario Lab":
     header("Scenario Lab", "Adjust assumptions to compare illustrative premium scenarios—not a forecast.")
