@@ -842,7 +842,7 @@ if page == "Executive Overview":
             strongest = channel_view.sort_values("attainment", ascending=False).iloc[0]
             st.markdown(f'<div class="exec-insight"><div class="exec-insight-title">Channel signal</div><div class="exec-insight-body"><b>{strongest["channel"]}</b> has the highest attainment at <b>{strongest["attainment"]:.0%}</b> in this selection.</div></div>', unsafe_allow_html=True)
         if not attention.empty:
-             = attention.iloc[0]
+            weakest = attention.iloc[0]
             st.markdown(f'<div class="exec-insight"><div class="exec-insight-title">Partner attention</div><div class="exec-insight-body"><b>{weakest["Partner"]}</b> has the lowest attainment ({weakest["attainment_rate"]:.0%}); review target, funnel, and recent activity before drawing causal conclusions.</div></div>', unsafe_allow_html=True)
         st.markdown(f'<div class="exec-insight"><div class="exec-insight-title">Operational signals</div><div class="exec-insight-body">{int(under["partner"].nunique()) if not under.empty else 0} partner(s) below threshold · {len(anomalies)} monthly anomaly alert(s) · {int(df["policies_issued"].sum()):,} policies issued.</div></div>', unsafe_allow_html=True)
 
