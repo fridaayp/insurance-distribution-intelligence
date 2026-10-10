@@ -263,74 +263,83 @@ data = prepare_data(raw)
 
 with st.sidebar:
     # Brand header: shield + rising bars
-    # Compact, aligned brand header
+    # Brand header: stable logo + aligned title
     st.html(
         """
         <div style="
-            padding: 5px 2px 15px;
-            border-bottom: 1px solid rgba(180,205,240,.16);
+            padding: 8px 0 16px;
             margin-bottom: 16px;
+            border-bottom: 1px solid rgba(180,205,240,.16);
         ">
           <div style="
               display: flex;
               align-items: center;
               gap: 12px;
+              width: 100%;
           ">
             <div style="
                 width: 52px;
                 height: 56px;
                 min-width: 52px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                flex: 0 0 52px;
             ">
-             <svg viewBox="0 0 52 56" width="52" height="56"
-                xmlns="http://www.w3.org/2000/svg">    
+              <svg
+                viewBox="0 0 52 56"
+                width="52"
+                height="56"
+                xmlns="http://www.w3.org/2000/svg"
+                style="display:block;"
+              >
                 <defs>
-                  <linearGradient id="brandShield" x1="0" y1="0" x2="1" y2="1">
+                  <linearGradient
+                    id="brandShield"
+                    x1="0" y1="0" x2="1" y2="1"
+                  >
                     <stop offset="0%" stop-color="#42d6ce"/>
                     <stop offset="100%" stop-color="#2369e8"/>
                   </linearGradient>
                 </defs>
-                <path d="M26 2 L48 11 V27 C48 40 38 49 26 54
-                         C14 49 4 40 4 27 V11 Z"
-                      fill="url(#brandShield)"
-                      stroke="#74e5ed" stroke-width="1.2"/>
-                <rect x="14" y="29" width="5.5" height="11" rx="2" fill="white"/>
-                <rect x="23" y="21" width="5.5" height="19" rx="2" fill="white"/>
-                <rect x="32" y="13" width="5.5" height="27" rx="2" fill="white"/>
+                <path
+                  d="M26 2 L48 11 V27 C48 40 38 49 26 54
+                     C14 49 4 40 4 27 V11 Z"
+                  fill="url(#brandShield)"
+                  stroke="#74e5ed"
+                  stroke-width="1.2"
+                />
+                <rect x="14" y="29" width="5.5" height="11"
+                  rx="2" fill="#ffffff"/>
+                <rect x="23" y="21" width="5.5" height="19"
+                  rx="2" fill="#ffffff"/>
+                <rect x="32" y="13" width="5.5" height="27"
+                  rx="2" fill="#ffffff"/>
               </svg>
             </div>
 
-            <div style="min-width:0;">
-              <div style="
-                  color:#f6f9ff;
-                  font-size:14px;
-                  font-weight:750;
-                  line-height:1.35;
-                  letter-spacing:-.2px;
-              ">Distribution</div>
-              <div style="
-                  color:#f6f9ff;
-                  font-size:14px;
-                  font-weight:750;
-                  line-height:1.35;
-                  letter-spacing:-.2px;
-              ">Strategy Intelligence</div>
+            <div style="
+                min-width: 0;
+                flex: 1;
+                color: #f6f9ff;
+                font-size: 14px;
+                font-weight: 750;
+                line-height: 1.35;
+                letter-spacing: -0.2px;
+                overflow-wrap: normal;
+            ">
+              <div>Distribution</div>
+              <div>Strategy Intelligence</div>
             </div>
           </div>
 
           <div style="
-              color:#9fb8d8;
-              font-size:11px;
-              line-height:1.4;
-              margin:9px 0 0 64px;
-              letter-spacing:.1px;
+              color: #9fb8d8;
+              font-size: 11px;
+              line-height: 1.4;
+              margin: 9px 0 0 64px;
+              letter-spacing: 0.1px;
           ">From data to decisions</div>
         </div>
-        """,
+        """
     )
-    st.divider()
 
     pages = [
         "Executive Overview",
