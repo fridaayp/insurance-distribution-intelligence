@@ -264,67 +264,49 @@ data = prepare_data(raw)
 with st.sidebar:
     st.html("""
     <div style="
-        padding: 8px 0 16px;
-        margin-bottom: 16px;
-        border-bottom: 1px solid rgba(180,205,240,.16);
+        padding: 6px 0 14px;
+        margin-bottom: 14px;
+        border-bottom: 1px solid rgba(180,205,240,.12);
     ">
       <div style="
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 10px;
       ">
         <div style="
-            width: 52px;
-            height: 56px;
-            min-width: 52px;
-            position: relative;
+            width: 44px;
+            height: 48px;
+            min-width: 44px;
+            flex: 0 0 44px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: linear-gradient(145deg, #42d6ce, #2369e8);
             clip-path: polygon(
-                50% 0%, 92% 16%, 92% 48%,
-                78% 76%, 50% 100%,
-                22% 76%, 8% 48%, 8% 16%
+                50% 0%, 94% 16%, 94% 49%,
+                79% 77%, 50% 100%,
+                21% 77%, 6% 49%, 6% 16%
             );
         ">
           <div style="
               display: flex;
               align-items: flex-end;
               gap: 4px;
-              height: 28px;
+              height: 25px;
           ">
-            <span style="
-                display: block;
-                width: 5px;
-                height: 11px;
-                border-radius: 2px;
-                background: white;
-            "></span>
-            <span style="
-                display: block;
-                width: 5px;
-                height: 19px;
-                border-radius: 2px;
-                background: white;
-            "></span>
-            <span style="
-                display: block;
-                width: 5px;
-                height: 27px;
-                border-radius: 2px;
-                background: white;
-            "></span>
+            <span style="width:5px;height:9px;border-radius:2px;background:#fff;"></span>
+            <span style="width:5px;height:16px;border-radius:2px;background:#fff;"></span>
+            <span style="width:5px;height:23px;border-radius:2px;background:#fff;"></span>
           </div>
         </div>
 
         <div style="
             min-width: 0;
             color: #f6f9ff;
-            font-size: 14px;
-            font-weight: 750;
-            line-height: 1.35;
-            letter-spacing: -0.2px;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.4;
+            letter-spacing: -0.15px;
         ">
           <div>Distribution</div>
           <div>Strategy Intelligence</div>
@@ -332,11 +314,11 @@ with st.sidebar:
       </div>
 
       <div style="
+          margin: 7px 0 0 54px;
           color: #9fb8d8;
-          font-size: 11px;
+          font-size: 10px;
           line-height: 1.4;
-          margin: 9px 0 0 64px;
-          letter-spacing: 0.1px;
+          letter-spacing: 0.15px;
       ">From data to decisions</div>
     </div>
     """)
