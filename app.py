@@ -263,7 +263,9 @@ raw = load_data()
 data = prepare_data(raw)
 
 logo_path = ROOT / "assets" / "logo.png"
-logo_base64 = base64.b64encode(logo_path.read_bytes()).decode("utf-8")
+logo_base64 = base64.b64encode(
+    logo_path.read_bytes()
+).decode("utf-8")
 
 with st.sidebar:
     st.html(f"""
@@ -273,39 +275,41 @@ with st.sidebar:
         border-bottom: 1px solid rgba(180,205,240,.14);
     ">
       <div style="
-          display:flex;
-          align-items:center;
-          gap:10px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
       ">
-        <
+        <img
           src="data:image/png;base64,{logo_base64}"
           alt="Distribution Strategy Intelligence"
           style="
-              width:58px;
-              height:62px;
-              object-fit:contain;
-              flex:0 0 58px;
-              display:block;
+              width: 58px;
+              height: 62px;
+              object-fit: contain;
+              flex: 0 0 58px;
+              display: block;
           "
         />
+
         <div style="
-            min-width:0;
-            color:#f6f9ff;
-            font-size:18px;
-            font-weight:750;
-            line-height:1.3;
-            letter-spacing:-0.25px;
+            min-width: 0;
+            color: #f6f9ff;
+            font-size: 18px;
+            font-weight: 750;
+            line-height: 1.3;
+            letter-spacing: -0.25px;
         ">
           <div>Distribution</div>
           <div>Strategy Intelligence</div>
         </div>
       </div>
+
       <div style="
-          margin:8px 0 0 68px;
-          color:#9fb8d8;
-          font-size:11px;
-          line-height:1.4;
-          letter-spacing:.15px;
+          margin: 8px 0 0 68px;
+          color: #9fb8d8;
+          font-size: 11px;
+          line-height: 1.4;
+          letter-spacing: .15px;
       ">From data to decisions</div>
     </div>
     """)
