@@ -51,7 +51,7 @@ c1.metric("Premium written", f"Rp {k['premium_actual_idr']/1e9:,.2f}B")
 c2.metric("Target attainment", f"{k['attainment_rate']:.1%}")
 c3.metric("Leads", f"{k['leads']:,}")
 c4.metric("Policy conversion", f"{k['conversion_rate']:.1%}")
-c5.metric("Avg. persistency", f"{k['persistency_rate']:.1%}")
+c5.metric("Mean row persistency", f"{k['persistency_rate']:.1%}")
 
 st.divider()
 left,right = st.columns([1.5,1])
@@ -97,7 +97,7 @@ with st.expander(f"Underlying alerts · {len(under)} underperforming scorecards 
         st.dataframe(under[["partner","channel","attainment_rate","premium_actual_idr","premium_target_idr"]], hide_index=True, use_container_width=True)
     if not anoms.empty:
         st.markdown("**Large month-on-month premium drops**")
-        show = anoms[["month","partner","channel","premium_actual_idr","partner_mom_change"]].copy()
+        show = anoms[["month", "partner", "premium_actual_idr", "partner_mom_change"]].copy()
         show["month"] = show["month"].dt.strftime("%Y-%m")
         show["partner_mom_change"] = show["partner_mom_change"].map(lambda x:f"{x:.1%}")
         st.dataframe(show, hide_index=True, use_container_width=True)
