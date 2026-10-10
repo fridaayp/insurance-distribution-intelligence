@@ -1112,50 +1112,77 @@ if page == "Executive Overview":
 
     with action_col:
         st.subheader("Recommended Actions")
-        st.markdown('<div class="exec-section-note">Rule-based prompts for management review, not causal conclusions.</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="exec-section-note">'
+            'Rule-based prompts for management review, not causal conclusions.'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+
         if actions:
             action_df = pd.DataFrame(actions)
-            columns = [c for c in ["priority", "partner", "signal", "suggested_action"] if c in action_df.columns]
+            columns = [
+                c for c in [
+                    "priority", "partner", "signal", "suggested_action"
+                ]
+                if c in action_df.columns
+            ]
             action_rows = []
 
-for i, (_, row) in enumerate(action_df[columns].head(6).iterrows(), start=1):
-    priority = str(row.get("priority", "Review"))
-    partner_name = str(row.get("partner", "Portfolio"))
-    signal = str(row.get("signal", "Review performance signal"))
-    recommendation = str(
-        row.get("suggested_action", "Validate the data and agree next steps.")
-    )
+            for i, (_, row) in enumerate(
+                action_df[columns].head(6).iterrows(), start=1
+            ):
+                priority = str(row.get("priority", "Review"))
+                partner_name = str(row.get("partner", "Portfolio"))
+                signal = str(
+                    row.get("signal", "Review performance signal")
+                )
+                recommendation = str(
+                    row.get(
+                        "suggested_action",
+                        "Validate the data and agree next steps."
+                    )
+                )
 
-    priority_color = (
-        "#bd514b" if priority.lower() == "high"
-        else "#9a6b24" if priority.lower() == "medium"
-        else "#3978b8"
-    )
+                priority_color = (
+                    "#bd514b" if priority.lower() == "high"
+                    else "#9a6b24" if priority.lower() == "medium"
+                    else "#3978b8"
+                )
 
-    action_rows.append(
-        f'<div class="exec-action">'
-        f'<div class="exec-action-number">{i}</div>'
-        f'<div class="exec-action-copy">'
-        f'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
-        f'<strong>{partner_name}</strong>'
-        f'<span style="font-size:10px;font-weight:800;color:{priority_color};'
-        f'background:#f3f6fa;padding:3px 8px;border-radius:20px">'
-        f'{priority}</span></div>'
-        f'<div style="margin-top:5px">{signal}</div>'
-        f'<div style="margin-top:5px;color:#71829a">{recommendation}</div>'
-        f'</div></div>'
-    )
+                action_rows.append(
+                    f'<div class="exec-action">'
+                    f'<div class="exec-action-number">{i}</div>'
+                    f'<div class="exec-action-copy">'
+                    f'<div style="display:flex;gap:8px;'
+                    f'flex-wrap:wrap;align-items:center">'
+                    f'<strong>{partner_name}</strong>'
+                    f'<span style="font-size:10px;font-weight:800;'
+                    f'color:{priority_color};background:#f3f6fa;'
+                    f'padding:3px 8px;border-radius:20px">'
+                    f'{priority}</span></div>'
+                    f'<div style="margin-top:5px">{signal}</div>'
+                    f'<div style="margin-top:5px;color:#71829a">'
+                    f'{recommendation}</div>'
+                    f'</div></div>'
+                )
 
-st.markdown(
-    '<div class="exec-table-wrap" style="padding:2px 14px">'
-    + "".join(action_rows)
-    + '</div>',
-    unsafe_allow_html=True,
-)
+            st.markdown(
+                '<div class="exec-table-wrap" style="padding:2px 14px">'
+                + "".join(action_rows)
+                + '</div>',
+                unsafe_allow_html=True,
+            )
         else:
-            st.success("No rule-based actions were triggered for this selection.")
+            st.success(
+                "No rule-based actions were triggered for this selection."
+            )
+
         if not anomalies.empty:
-            st.info(f"{len(anomalies)} monthly premium-drop alert(s) detected. Validate the underlying records before acting.")
+            st.info(
+                f"{len(anomalies)} monthly premium-drop alert(s) detected. "
+                "Validate the underlying records before acting."
+            )
 
 # Keep the existing `elif page == "Performance Analysis":` and every later page unchanged.
 
