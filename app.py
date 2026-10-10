@@ -262,13 +262,14 @@ raw = load_data()
 data = prepare_data(raw)
 
 with st.sidebar:
-    # Brand header: shield + rising bars
-    # Compact stable logo + aligned title
+    # Brand header: refined shield logo + aligned typography
     st.html(
         """
         <div style="
-            padding: 8px 0 16px;
-            margin-bottom: 16px;
+            box-sizing: border-box;
+            width: 100%;
+            padding: 8px 0 18px;
+            margin: 0 0 16px 0;
             border-bottom: 1px solid rgba(180,205,240,.16);
         ">
           <div style="
@@ -283,46 +284,55 @@ with st.sidebar:
                 min-width: 52px;
                 flex: 0 0 52px;
             ">
-              <div style="
-    width:52px;
-    height:56px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-">
-  <div style="
-      width:48px;
-      height:52px;
-      flex-shrink:0;
-      background:linear-gradient(145deg,#42d6ce,#2369e8);
-      clip-path:polygon(50% 0%,96% 17%,92% 62%,76% 84%,50% 100%,24% 84%,8% 62%,4% 17%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-  ">
-    <div style="
-        display:flex;
-        align-items:flex-end;
-        gap:4px;
-        height:27px;
-    ">
-      <span style="display:block;width:5px;height:10px;background:white;border-radius:2px;"></span>
-      <span style="display:block;width:5px;height:17px;background:white;border-radius:2px;"></span>
-      <span style="display:block;width:5px;height:24px;background:white;border-radius:2px;"></span>
-    </div>
-  </div>
-</div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 52 56"
+                width="52"
+                height="56"
+                style="display:block; overflow:visible;"
+                aria-label="Distribution Strategy Intelligence logo"
+                role="img"
+              >
+                <defs>
+                  <linearGradient
+                    id="dsiShieldGradient"
+                    x1="0" y1="0" x2="1" y2="1"
+                  >
+                    <stop offset="0%" stop-color="#39D6D0"/>
+                    <stop offset="100%" stop-color="#1675E8"/>
+                  </linearGradient>
+                </defs>
+
+                <path
+                  d="M26 2.5
+                     L47 11
+                     L47 26
+                     C47 38.5 37.5 48.5 26 53.5
+                     C14.5 48.5 5 38.5 5 26
+                     L5 11 Z"
+                  fill="url(#dsiShieldGradient)"
+                  stroke="#61DCEB"
+                  stroke-width="1.2"
+                  stroke-linejoin="round"
+                />
+
+                <g fill="#FFFFFF">
+                  <rect x="14" y="30" width="6" height="11" rx="2"/>
+                  <rect x="23" y="22" width="6" height="19" rx="2"/>
+                  <rect x="32" y="14" width="6" height="27" rx="2"/>
+                </g>
+              </svg>
             </div>
 
             <div style="
-                min-width: 0;
                 flex: 1;
-                color: #f6f9ff;
+                min-width: 0;
+                color: #F6F9FF;
+                font-family: inherit;
                 font-size: 14px;
                 font-weight: 750;
                 line-height: 1.35;
                 letter-spacing: -0.2px;
-                overflow-wrap: normal;
             ">
               <div>Distribution</div>
               <div>Strategy Intelligence</div>
@@ -330,10 +340,12 @@ with st.sidebar:
           </div>
 
           <div style="
-              color: #9fb8d8;
+              margin: 10px 0 0 64px;
+              color: #9FB8D8;
+              font-family: inherit;
               font-size: 11px;
+              font-weight: 400;
               line-height: 1.4;
-              margin: 9px 0 0 64px;
               letter-spacing: 0.1px;
           ">From data to decisions</div>
         </div>
