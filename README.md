@@ -41,7 +41,7 @@ The dataset contains monthly observations for 12 fictional partners across 21 mo
 - Policy conversion: Total policies issued divided by total leads.
 - Average persistency: Unweighted mean of row-level persistency rates in the selected sample.
 - Underperformance alert: Flags a partner when cumulative premium attainment falls below the selected threshold.
-- Monthly anomaly alert: Flags a premium decline of at least 30% compared with the partner's previous observed month.
+- Monthly anomaly alert:  Flags a partner's premium decline of at least 30% compared with the immediately preceding calendar month. Months with missing    observations are not treated as consecutive, and percentage changes are not calculated when the previous month's premium is zero.
 
 Alerts are investigation prompts, not proof of cause. In a production environment, KPI definitions should be agreed with Distribution, Finance, and Actuarial stakeholders. Data lineage and quality checks should be strengthened, and persistency may need cohort- or exposure-weighted treatment depending on the business definition.
 
@@ -105,6 +105,13 @@ Potential extensions include CSV upload with schema validation, configurable KPI
 
 ## Portfolio Positioning
 
-This project demonstrates a practical combination of distribution performance analysis, KPI design, partner scorecards, transparent business rules, data validation, testing, and dashboard delivery.
+This project demonstrates how distribution performance data can be translated into structured partner monitoring and decision support.
 
-It is a synthetic-data decision-support prototype, not a production insurance system. No real-world revenue uplift, savings, or business impact is claimed.
+It brings together:
+
+- Partnership and distribution strategy: Partner scorecards, channel contribution, and target-attainment monitoring.
+- Commercial analytics: KPI definitions, monthly performance trends, and rule-based anomaly detection.
+- Business decision support: Prioritized action signals with transparent, explainable rules.
+- Project execution: Data validation, automated tests, version control, and an interactive dashboard.
+
+Scope and limitations: This is a portfolio prototype built entirely with synthetic data. It demonstrates analytical design and implementation, not validated business outcomes or production deployment. No real-world revenue uplift, cost savings, or insurer performance is claimed.
