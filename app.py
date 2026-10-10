@@ -277,7 +277,7 @@ with st.sidebar:
           align-items:center;
           gap:10px;
       ">
-        <img
+        <
           src="data:image/png;base64,{logo_base64}"
           alt="Distribution Strategy Intelligence"
           style="
@@ -291,7 +291,7 @@ with st.sidebar:
         <div style="
             min-width:0;
             color:#f6f9ff;
-            font-size:25px;
+            font-size:18px;
             font-weight:750;
             line-height:1.3;
             letter-spacing:-0.15px;
