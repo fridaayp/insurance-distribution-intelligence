@@ -264,7 +264,7 @@ data = prepare_data(raw)
 with st.sidebar:
     # Brand header: shield + rising bars
     # Compact, aligned brand header
-    st.markdown(
+    st.html(
         """
         <div style="
             padding: 5px 2px 15px;
@@ -329,7 +329,6 @@ with st.sidebar:
           ">From data to decisions</div>
         </div>
         """,
-        unsafe_allow_html=True,
     )
     st.divider()
 
