@@ -6,6 +6,10 @@ An interactive portfolio project for business development, strategic partnership
 
 [💻 View Source Code](https://github.com/fridaayp/insurance-distribution-intelligence)
 
+## Dashboard Preview
+
+![Insurance Distribution Intelligence dashboard](assets/dashboard-overview.png)
+
 Insurance Distribution Intelligence is a Streamlit dashboard designed to explore how a distribution leader might monitor partner performance, compare premium production against targets, identify signals that merit investigation, and prioritize follow-up actions.
 
 **Data disclaimer:** The bundled dataset is entirely synthetic. Partner names, metrics, and results are fictional and must not be interpreted as actual performance from any insurer or business.
