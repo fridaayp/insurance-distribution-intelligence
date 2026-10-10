@@ -263,42 +263,74 @@ data = prepare_data(raw)
 
 with st.sidebar:
     # Brand header: shield + rising bars
+    # Compact, aligned brand header
     st.markdown(
         """
-        <div style="padding:8px 4px 17px;">
-          <div style="display:flex;align-items:center;gap:11px;">
-            <div style="width:48px;min-width:48px;height:52px;">
-              <svg viewBox="0 0 52 56" width="48" height="52"
+        <div style="
+            padding: 5px 2px 15px;
+            border-bottom: 1px solid rgba(180,205,240,.16);
+            margin-bottom: 16px;
+        ">
+          <div style="
+              display: flex;
+              align-items: center;
+              gap: 12px;
+          ">
+            <div style="
+                width: 42px;
+                height: 46px;
+                min-width: 42px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            ">
+              <svg viewBox="0 0 52 56" width="42" height="46"
                    xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                  <linearGradient id="shieldGradient" x1="0" y1="0" x2="1" y2="1">
+                  <linearGradient id="brandShield" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0%" stop-color="#42d6ce"/>
                     <stop offset="100%" stop-color="#2369e8"/>
                   </linearGradient>
                 </defs>
                 <path d="M26 2 L48 11 V27 C48 40 38 49 26 54
                          C14 49 4 40 4 27 V11 Z"
-                      fill="url(#shieldGradient)" stroke="#74e5ed" stroke-width="1.2"/>
+                      fill="url(#brandShield)"
+                      stroke="#74e5ed" stroke-width="1.2"/>
                 <rect x="14" y="29" width="5.5" height="11" rx="2" fill="white"/>
                 <rect x="23" y="21" width="5.5" height="19" rx="2" fill="white"/>
                 <rect x="32" y="13" width="5.5" height="27" rx="2" fill="white"/>
               </svg>
             </div>
-            <div>
-              <div style="font-size:15px;font-weight:800;color:#f6f9ff;line-height:1.3;">
-                Distribution
-              </div>
-              <div style="font-size:15px;font-weight:800;color:#f6f9ff;line-height:1.3;">
-                Strategy Intelligence
-              </div>
-              <div style="color:#9fb8d8;font-size:11px;margin-top:12px;">
-                From data to decisions
+
+            <div style="min-width:0;">
+              <div style="
+                  color:#f6f9ff;
+                  font-size:14px;
+                  font-weight:750;
+                  line-height:1.35;
+                  letter-spacing:-.2px;
+              ">Distribution</div>
+              <div style="
+                  color:#f6f9ff;
+                  font-size:14px;
+                  font-weight:750;
+                  line-height:1.35;
+                  letter-spacing:-.2px;
+              ">Strategy Intelligence</div>
+            </div>
           </div>
+
+          <div style="
+              color:#9fb8d8;
+              font-size:11px;
+              line-height:1.4;
+              margin:9px 0 0 54px;
+              letter-spacing:.1px;
+          ">From data to decisions</div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-
     st.divider()
 
     pages = [
