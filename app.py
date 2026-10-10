@@ -53,6 +53,51 @@ c3.metric("Leads", f"{k['leads']:,}")
 c4.metric("Policy conversion", f"{k['conversion_rate']:.1%}")
 c5.metric("Mean row persistency", f"{k['persistency_rate']:.1%}")
 
+# Executive insights based on the active filters
+st.subheader("Executive Insights")
+
+insight_score = partner_scorecard(filtered)
+premium_gap = (
+    k["premium_actual_idr"] - k["premium_target_idr"]
+)
+below_target = int(
+    (insight_score["attainment_rate"] < threshold).sum()
+)
+
+top_partner = insight_score.sort_values(
+    "premium_actual_idr", ascending=False
+).iloc[0]
+
+i1, i2, i3 = st.columns(3)
+
+i1.metric(
+    "Premium gap vs target",
+    f"Rp {premium_gap / 1e9:+,.2f}B",
+)
+
+i2.metric(
+    "Partners below threshold",
+    below_target,
+)
+
+i3.metric(
+    "Top partner by premium",
+    top_partner["partner"],
+    f"Rp {top_partner['premium_actual_idr'] / 1e9:,.2f}B",
+)
+
+if premium_gap < 0:
+    st.warning(
+        "Premium is below target for the current selection. "
+        "Review partner-level gaps and action signals."
+    )
+elif premium_gap > 0:
+    st.success(
+        "Premium is above target for the current selection."
+    )
+else:
+    st.info("Premium is exactly on target.")
+
 st.divider()
 left,right = st.columns([1.5,1])
 trend = monthly_trend(filtered)
