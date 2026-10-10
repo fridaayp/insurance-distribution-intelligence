@@ -718,31 +718,275 @@ elif page == "Scenario Lab":
     )
 
 else:
-    header("Project Portfolio & Execution", "Track strategic initiatives, progress, milestones, and execution risks.")
-    st.caption("Illustrative sample projects only; no real internal project status is represented.")
-    projects=pd.DataFrame([
-        {"Project":"Partner expansion","Workstream":"Distribution growth","Status":"On track","Progress":75,"Risk":"Medium","Next milestone":"Partner shortlist"},
-        {"Project":"Product launch readiness","Workstream":"Product implementation","Status":"At risk","Progress":48,"Risk":"High","Next milestone":"Readiness review"},
-        {"Project":"Digital channel enablement","Workstream":"Digital distribution","Status":"On track","Progress":62,"Risk":"Medium","Next milestone":"Pilot validation"},
-        {"Project":"Partner productivity","Workstream":"Performance improvement","Status":"Delayed","Progress":30,"Risk":"High","Next milestone":"Recovery plan"},
-        {"Project":"Operational efficiency","Workstream":"Process improvement","Status":"Completed","Progress":100,"Risk":"Low","Next milestone":"Benefits review"},
+    header(
+        "Project Portfolio & Execution",
+        "Monitor strategic initiatives, execution health, delivery progress, and management priorities."
+    )
+
+    st.caption("PROJECT GOVERNANCE · EXECUTION TRACKING · ILLUSTRATIVE DATA ONLY")
+
+    projects = pd.DataFrame([
+        {
+            "Project": "Partner expansion",
+            "Workstream": "Distribution growth",
+            "Owner": "Partnerships",
+            "Status": "On track",
+            "Progress": 75,
+            "Risk": "Medium",
+            "Next milestone": "Partner shortlist",
+            "Days to milestone": 14,
+        },
+        {
+            "Project": "Product launch readiness",
+            "Workstream": "Product implementation",
+            "Owner": "Product",
+            "Status": "At risk",
+            "Progress": 48,
+            "Risk": "High",
+            "Next milestone": "Readiness review",
+            "Days to milestone": 7,
+        },
+        {
+            "Project": "Digital channel enablement",
+            "Workstream": "Digital distribution",
+            "Owner": "Digital",
+            "Status": "On track",
+            "Progress": 62,
+            "Risk": "Medium",
+            "Next milestone": "Pilot validation",
+            "Days to milestone": 21,
+        },
+        {
+            "Project": "Partner productivity",
+            "Workstream": "Performance improvement",
+            "Owner": "Distribution",
+            "Status": "Delayed",
+            "Progress": 30,
+            "Risk": "High",
+            "Next milestone": "Recovery plan",
+            "Days to milestone": 3,
+        },
+        {
+            "Project": "Operational efficiency",
+            "Workstream": "Process improvement",
+            "Owner": "Operations",
+            "Status": "Completed",
+            "Progress": 100,
+            "Risk": "Low",
+            "Next milestone": "Benefits review",
+            "Days to milestone": 30,
+        },
     ])
-    a,b,c,d=st.columns(4)
-    a.metric("Total projects",len(projects)); b.metric("On track",int((projects.Status=="On track").sum()))
-    c.metric("At risk / delayed",int(projects.Status.isin(["At risk","Delayed"]).sum()))
-    d.metric("Completed",int((projects.Status=="Completed").sum()))
-    left,right=st.columns([1.2,1])
+
+    # --- Portfolio-level indicators ---
+    total_projects = len(projects)
+    on_track = int((projects["Status"] == "On track").sum())
+    attention = int(projects["Status"].isin(["At risk", "Delayed"]).sum())
+    completed = int((projects["Status"] == "Completed").sum())
+    avg_progress = float(projects["Progress"].mean())
+    high_risk = int((projects["Risk"] == "High").sum())
+
+    k1, k2, k3, k4 = st.columns(4, gap="medium")
+
+    k1.metric("TOTAL INITIATIVES", f"{total_projects}")
+    k2.metric("ON TRACK", f"{on_track}")
+    k3.metric("NEEDS ATTENTION", f"{attention}")
+    k4.metric("AVERAGE PROGRESS", f"{avg_progress:.0f}%")
+
+    st.divider()
+
+    # --- Executive project health ---
+    left, right = st.columns([1.2, 1], gap="medium")
+
     with left:
-        st.subheader("Project tracker")
-        edited=st.data_editor(projects,use_container_width=True,hide_index=True,num_rows="dynamic")
-        st.download_button("Download project tracker CSV",edited.to_csv(index=False).encode("utf-8"),"project_tracker.csv","text/csv")
+        st.subheader("Execution progress")
+        st.caption("Progress by initiative, grouped by delivery status.")
+
+        progress_data = projects.sort_values("Progress", ascending=True)
+
+        fig = px.bar(
+            progress_data,
+            x="Progress",
+            y="Project",
+            color="Status",
+            orientation="h",
+            range_x=[0, 100],
+            text="Progress",
+            color_discrete_map={
+                "On track": "#39a8a0",
+                "At risk": "#f5ad42",
+                "Delayed": "#dc6b4e",
+                "Completed": "#2563eb",
+            },
+            labels={
+                "Progress": "Completion (%)",
+                "Project": "Initiative",
+                "Status": "Delivery status",
+            },
+        )
+        fig.update_traces(texttemplate="%{text}%", textposition="outside")
+        st.plotly_chart(style(fig, 390), use_container_width=True)
+
     with right:
-        st.subheader("Project progress")
-        st.plotly_chart(style(px.bar(projects.sort_values("Progress"),x="Progress",y="Project",color="Status",orientation="h",range_x=[0,100]),380),use_container_width=True)
+        st.subheader("Portfolio risk profile")
+        st.caption("Number of initiatives by current illustrative risk rating.")
+
+        risk_order = ["Low", "Medium", "High"]
+        risk_data = (
+            projects["Risk"]
+            .value_counts()
+            .reindex(risk_order, fill_value=0)
+            .rename_axis("Risk")
+            .reset_index(name="Projects")
+        )
+
+        fig = px.bar(
+            risk_data,
+            x="Risk",
+            y="Projects",
+            color="Risk",
+            category_orders={"Risk": risk_order},
+            color_discrete_map={
+                "Low": "#39a8a0",
+                "Medium": "#f5ad42",
+                "High": "#dc6b4e",
+            },
+            text="Projects",
+            labels={"Projects": "Initiative count"},
+        )
+        fig.update_traces(textposition="outside")
+        fig.update_layout(showlegend=False)
+        st.plotly_chart(style(fig, 390), use_container_width=True)
+
+    st.divider()
+
+    # --- Management attention queue ---
+    st.subheader("Management attention queue")
+    st.caption(
+        "Illustrative prioritization based on delivery status, risk, "
+        "and milestone proximity. Confirm ownership and actual status before acting."
+    )
+
+    priority = projects[
+        projects["Status"].isin(["At risk", "Delayed"])
+        | (projects["Risk"] == "High")
+    ].copy()
+
+    if not priority.empty:
+        priority["Priority"] = priority.apply(
+            lambda row: (
+                "Critical"
+                if row["Status"] == "Delayed" and row["Risk"] == "High"
+                else "High"
+                if row["Risk"] == "High"
+                else "Monitor"
+            ),
+            axis=1,
+        )
+        priority = priority.sort_values(
+            ["Days to milestone", "Progress"],
+            ascending=[True, True],
+        )
+        st.dataframe(
+            priority[
+                [
+                    "Project",
+                    "Owner",
+                    "Status",
+                    "Risk",
+                    "Progress",
+                    "Next milestone",
+                    "Days to milestone",
+                    "Priority",
+                ]
+            ],
+            use_container_width=True,
+            hide_index=True,
+        )
+    else:
+        st.success("No initiatives currently meet the attention-screening rules.")
+
+    st.divider()
+
+    # --- Editable project tracker ---
+    st.subheader("Project tracker")
+    st.caption(
+        "Edit the sample tracker below to demonstrate portfolio monitoring. "
+        "Changes remain in the current app session; download the CSV to retain a copy."
+    )
+
+    edited = st.data_editor(
+        projects,
+        use_container_width=True,
+        hide_index=True,
+        num_rows="dynamic",
+        column_config={
+            "Progress": st.column_config.ProgressColumn(
+                "Progress",
+                min_value=0,
+                max_value=100,
+                format="%d%%",
+            ),
+            "Days to milestone": st.column_config.NumberColumn(
+                "Days to milestone",
+                min_value=0,
+                step=1,
+            ),
+        },
+    )
+
+    st.download_button(
+        "Download project tracker CSV",
+        edited.to_csv(index=False).encode("utf-8"),
+        "project_tracker.csv",
+        "text/csv",
+    )
+
+    st.divider()
+
+    # --- Decision log ---
     st.subheader("Decision log")
-    note=st.text_area("Record a decision or next action",placeholder="Decision, owner, due date, evidence...")
-    if note.strip():
-        st.download_button("Download decision note",note.encode("utf-8"),"decision_log.txt","text/plain")
+    st.caption("Capture a decision, accountable owner, due date, and supporting evidence.")
+
+    decision = st.text_area(
+        "Decision or next action",
+        placeholder="Describe the decision, action, dependency, or issue...",
+    )
+
+    log_col1, log_col2 = st.columns(2)
+
+    with log_col1:
+        decision_owner = st.text_input(
+            "Accountable owner",
+            placeholder="Role or team",
+        )
+
+    with log_col2:
+        decision_due = st.date_input(
+            "Target date",
+            value=None,
+            format="DD/MM/YYYY",
+        )
+
+    if decision.strip():
+        decision_record = pd.DataFrame([{
+            "Decision or next action": decision.strip(),
+            "Owner": decision_owner.strip(),
+            "Target date": str(decision_due) if decision_due else "",
+        }])
+
+        st.download_button(
+            "Download decision log CSV",
+            decision_record.to_csv(index=False).encode("utf-8"),
+            "decision_log.csv",
+            "text/csv",
+        )
+
+    st.info(
+        "Prototype limitation: project records are illustrative examples, not "
+        "live project-management data. Editing the table does not persist changes "
+        "to a database or synchronize them with another system."
+    )
 
 st.divider()
 with st.expander("Data dictionary & methodology"):
