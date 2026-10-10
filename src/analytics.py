@@ -144,12 +144,7 @@ def detect_underperformance(df: pd.DataFrame, threshold: float = 0.85) -> pd.Dat
 def detect_monthly_anomalies(
     df: pd.DataFrame, drop_threshold: float = -0.30
 ) -> pd.DataFrame:
-    """Flag partner-months where total premium drops versus the prior month.
-
-    Premium is aggregated across channels first, so channel row ordering cannot
-    create false month-on-month comparisons. The returned rows are partner-month
-    aggregates and include the percentage change from the previous observed month.
-    """
+    """Flag partner-month premium drops versus the immediately prior calendar month."""
     if not -1 <= drop_threshold <= 0:
         raise ValueError("drop_threshold must be between -1 and 0")
 
@@ -159,12 +154,28 @@ def detect_monthly_anomalies(
         .agg(premium_actual_idr=("premium_actual_idr", "sum"))
         .sort_values(["partner", "month"])
     )
-    partner_month["partner_mom_change"] = (
-        partner_month.groupby("partner")["premium_actual_idr"].pct_change()
+
+    # Compare only consecutive calendar months, not merely consecutive observations.
+    partner_month["previous_month"] = (
+        partner_month.groupby("partner")["month"].shift(1)
     )
+    partner_month["previous_premium"] = (
+        partner_month.groupby("partner")["premium_actual_idr"].shift(1)
+    )
+
+    consecutive = (
+        partner_month["month"].dt.to_period("M")
+        - partner_month["previous_month"].dt.to_period("M")
+    ).eq(1)
+
+    partner_month["partner_mom_change"] = (
+        partner_month["premium_actual_idr"] / partner_month["previous_premium"] - 1
+    ).where(consecutive & partner_month["previous_premium"].gt(0))
+
     flagged = partner_month[
         partner_month["partner_mom_change"] <= drop_threshold
     ].copy()
+
     return flagged.sort_values("partner_mom_change").reset_index(drop=True)
 
 
