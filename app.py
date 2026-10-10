@@ -3,6 +3,7 @@ import sys
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+import base64
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
@@ -261,64 +262,50 @@ def load_data():
 raw = load_data()
 data = prepare_data(raw)
 
+logo_path = ROOT / "assets" / "logo.png"
+logo_base64 = base64.b64encode(logo_path.read_bytes()).decode("utf-8")
+
 with st.sidebar:
-    st.html("""
+    st.html(f"""
     <div style="
-        padding: 6px 0 14px;
+        padding: 8px 0 14px;
         margin-bottom: 14px;
-        border-bottom: 1px solid rgba(180,205,240,.12);
+        border-bottom: 1px solid rgba(180,205,240,.14);
     ">
       <div style="
-          display: flex;
-          align-items: center;
-          gap: 10px;
+          display:flex;
+          align-items:center;
+          gap:10px;
       ">
+        <img
+          src="data:image/png;base64,{logo_base64}"
+          alt="Distribution Strategy Intelligence"
+          style="
+              width:44px;
+              height:48px;
+              object-fit:contain;
+              flex:0 0 44px;
+              display:block;
+          "
+        />
         <div style="
-            width: 44px;
-            height: 48px;
-            min-width: 44px;
-            flex: 0 0 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(145deg, #42d6ce, #2369e8);
-            clip-path: polygon(
-                50% 0%, 94% 16%, 94% 49%,
-                79% 77%, 50% 100%,
-                21% 77%, 6% 49%, 6% 16%
-            );
-        ">
-          <div style="
-              display: flex;
-              align-items: flex-end;
-              gap: 4px;
-              height: 25px;
-          ">
-            <span style="width:5px;height:9px;border-radius:2px;background:#fff;"></span>
-            <span style="width:5px;height:16px;border-radius:2px;background:#fff;"></span>
-            <span style="width:5px;height:23px;border-radius:2px;background:#fff;"></span>
-          </div>
-        </div>
-
-        <div style="
-            min-width: 0;
-            color: #f6f9ff;
-            font-size: 13px;
-            font-weight: 700;
-            line-height: 1.4;
-            letter-spacing: -0.15px;
+            min-width:0;
+            color:#f6f9ff;
+            font-size:13px;
+            font-weight:700;
+            line-height:1.4;
+            letter-spacing:-0.15px;
         ">
           <div>Distribution</div>
           <div>Strategy Intelligence</div>
         </div>
       </div>
-
       <div style="
-          margin: 7px 0 0 54px;
-          color: #9fb8d8;
-          font-size: 10px;
-          line-height: 1.4;
-          letter-spacing: 0.15px;
+          margin:7px 0 0 54px;
+          color:#9fb8d8;
+          font-size:10px;
+          line-height:1.4;
+          letter-spacing:.15px;
       ">From data to decisions</div>
     </div>
     """)
