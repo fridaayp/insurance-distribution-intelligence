@@ -188,6 +188,50 @@ h3 { color: #25405f; font-weight: 700; }
 [data-testid="stAlert"] { border-radius: 12px; }
 hr { border-color: #e0e8f2; }
 #MainMenu, footer { visibility: hidden; }
+/* Fixed sidebar layout */
+[data-testid="stSidebar"] {
+  position: relative;
+  height: 100vh;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #081a30 0%, #102b49 58%, #081a2e 100%);
+}
+
+[data-testid="stSidebar"] > div:first-child {
+  height: 100vh;
+  max-height: 100vh;
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+  padding: 1rem .85rem;
+  box-sizing: border-box;
+}
+
+/* Remove radio circles and reserve no space for them */
+[data-testid="stSidebar"] div[role="radiogroup"] label > div:first-child {
+  display: none !important;
+  width: 0 !important;
+  margin: 0 !important;
+}
+
+/* Stable, compact navigation */
+[data-testid="stSidebar"] div[role="radiogroup"] label {
+  min-height: 42px;
+  padding: .5rem .65rem;
+  margin: 0;
+  border-radius: 9px;
+}
+
+/* Prevent decorative animations */
+[data-testid="stSidebar"] *,
+[data-testid="stSidebar"] *::before,
+[data-testid="stSidebar"] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Keep the brand and profile visually anchored */
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
+  overflow-wrap: anywhere;
+}
 </style>
 """, unsafe_allow_html=True)
 
