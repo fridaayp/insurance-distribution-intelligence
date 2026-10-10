@@ -20,7 +20,7 @@ Insurance Distribution Intelligence is a Streamlit dashboard designed to explore
 
 ## Key Capabilities
 
-- Executive KPI overview: Written premium, target attainment, leads, policy conversion, and average persistency.
+- Executive KPI overview: Written premium, target attainment, leads, policy conversion, and mean row persistency.
 - Performance monitoring: Monthly actual-versus-target trends and partner contribution analysis.
 - Partner scorecards: Compare partner performance using consistent metrics.
 - Rule-based alerts: Flag cumulative underperformance and sharp month-over-month premium declines for investigation.
@@ -73,12 +73,12 @@ Requires Python 3.10 or newer and the packages listed in requirements.txt.
    
    source .venv/bin/activate
 
-5. Install dependencies and launch the app:
+4. Install dependencies and launch the app:
    
    pip install -r requirements.txt
    streamlit run app.py
 
-6. Open the local URL displayed in the terminal.
+5. Open the local URL displayed in the terminal.
 
 ## Run Tests
 
