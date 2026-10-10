@@ -199,10 +199,16 @@ hr { border-color: #e0e8f2; }
 [data-testid="stSidebar"] > div:first-child {
   height: 100vh;
   max-height: 100vh;
-  overflow-y: hidden !important;
+  overflow-y: auto !important;
   overflow-x: hidden !important;
   padding: 1rem .85rem;
+  padding-bottom: 1.5rem;
   box-sizing: border-box;
+  scrollbar-width: none;
+}
+
+[data-testid="stSidebar"] > div:first-child::-webkit-scrollbar {
+  display: none;
 }
 
 /* Remove radio circles and reserve no space for them */
