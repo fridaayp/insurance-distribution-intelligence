@@ -503,28 +503,219 @@ elif page == "Partnership Intelligence":
         )
 
 elif page == "Scenario Lab":
-    header("Scenario Lab", "Adjust assumptions to compare illustrative premium scenarios—not a forecast.")
-    left,right=st.columns([1,1.5])
+    header(
+        "Scenario Lab",
+        "Model illustrative growth assumptions and compare their potential premium impact."
+    )
+
+    st.caption("SCENARIO PLANNING · ASSUMPTION-DRIVEN · NOT A FORECAST")
+
+    # --- Assumption controls ---
+    st.subheader("Scenario assumptions")
+    st.caption(
+        "Adjust the inputs to explore alternative growth paths. "
+        "All results are illustrative and use the current filtered portfolio as the baseline."
+    )
+
+    base = float(actual)
+    partner_count = max(int(df["partner"].nunique()), 1)
+
+    controls = st.columns(4, gap="medium")
+
+    with controls[0]:
+        growth = st.slider(
+            "Annual growth (%)",
+            min_value=0, max_value=30, value=5, step=1,
+            help="Annual growth applied to both scenarios."
+        ) / 100
+
+    with controls[1]:
+        uplift = st.slider(
+            "Productivity uplift (%)",
+            min_value=0, max_value=50, value=15, step=5,
+            help="Illustrative uplift applied to baseline premium."
+        ) / 100
+
+    with controls[2]:
+        new_partners = st.slider(
+            "New partner equivalents",
+            min_value=0, max_value=100, value=20, step=5,
+            help="Illustrative number of additional partner equivalents."
+        )
+
+    with controls[3]:
+        contribution = st.slider(
+            "New-partner contribution (%)",
+            min_value=0, max_value=60, value=30, step=5,
+            help="Assumed contribution relative to current average partner premium."
+        ) / 100
+
+    years = st.slider(
+        "Projection horizon",
+        min_value=1, max_value=5, value=4,
+        format="%d years"
+    )
+
+    # --- Scenario calculations ---
+    incremental_productivity = base * uplift
+    incremental_partners = (base / partner_count) * new_partners * contribution
+    scenario_increment = incremental_productivity + incremental_partners
+
+    projection_years = list(range(0, years + 1))
+    projection = pd.DataFrame({
+        "Year": [f"Year {i}" for i in projection_years],
+        "Base case": [
+            base * ((1 + growth) ** i) for i in projection_years
+        ],
+        "Growth scenario": [
+            (base + scenario_increment) * ((1 + growth) ** i)
+            for i in projection_years
+        ],
+    })
+    projection["Incremental premium"] = (
+        projection["Growth scenario"] - projection["Base case"]
+    )
+
+    base_horizon = float(projection["Base case"].iloc[-1])
+    scenario_horizon = float(projection["Growth scenario"].iloc[-1])
+    incremental_horizon = scenario_horizon - base_horizon
+    uplift_horizon = (
+        incremental_horizon / base_horizon if base_horizon else 0
+    )
+
+    st.divider()
+
+    # --- Executive scenario summary ---
+    st.subheader("Scenario impact")
+    k1, k2, k3, k4 = st.columns(4, gap="medium")
+
+    k1.metric(
+        "CURRENT BASELINE",
+        money(base),
+        help="Actual premium in the selected filters and period."
+    )
+    k2.metric(
+        "BASE CASE AT HORIZON",
+        money(base_horizon),
+        help="Baseline premium compounded by the assumed annual growth rate."
+    )
+    k3.metric(
+        "GROWTH SCENARIO",
+        money(scenario_horizon),
+        help="Illustrative scenario including the selected productivity and partner assumptions."
+    )
+    k4.metric(
+        "INCREMENTAL PREMIUM",
+        money(incremental_horizon),
+        delta=f"{uplift_horizon:.1%} vs. base case",
+        help="Difference between the scenario and base case at the selected horizon."
+    )
+
+    st.divider()
+
+    # --- Visual comparison ---
+    left, right = st.columns([1.45, 1], gap="medium")
+
     with left:
-        growth=st.slider("Annual premium growth (%)",0,30,5)/100
-        new_partners=st.slider("New partner equivalents",0,100,20,5)
-        uplift=st.slider("Productivity increase (%)",0,50,15)/100
-        contribution=st.slider("New-partner contribution (%)",0,60,30)/100
-        years=st.slider("Projection horizon (years)",1,5,4)
-    base=actual
-    partner_count=max(int(df.partner.nunique()),1)
-    increment=base*uplift+(base/partner_count)*new_partners*contribution
-    projection=pd.DataFrame({"Year":list(range(2026,2027+years)),
-        "Base case":[base*(1+growth)**i for i in range(years+1)],
-        "Scenario":[(base+increment)*(1+growth)**i for i in range(years+1)]})
+        st.subheader("Premium trajectory")
+        st.caption(
+            "Compare the base case with the scenario over the selected horizon."
+        )
+
+        fig = px.line(
+            projection,
+            x="Year",
+            y=["Base case", "Growth scenario"],
+            markers=True,
+            color_discrete_map={
+                "Base case": "#9abce9",
+                "Growth scenario": "#2563eb",
+            },
+            labels={
+                "value": "Projected premium (IDR)",
+                "variable": "Scenario",
+                "Year": "Projection horizon",
+            },
+        )
+        fig.update_traces(line=dict(width=3))
+        st.plotly_chart(
+            style(fig, 390),
+            use_container_width=True
+        )
+
     with right:
-        st.subheader("Projected premium")
-        st.plotly_chart(style(px.line(projection,x="Year",y=["Base case","Scenario"],markers=True),360),use_container_width=True)
-    a,b,c=st.columns(3)
-    a.metric("Base case at horizon",money(projection["Base case"].iloc[-1]))
-    b.metric("Scenario at horizon",money(projection["Scenario"].iloc[-1]))
-    c.metric("Incremental premium",money(projection["Scenario"].iloc[-1]-projection["Base case"].iloc[-1]))
-    st.caption("Illustrative arithmetic only. This is not a business forecast or ROI guarantee.")
+        st.subheader("Incremental premium by year")
+        st.caption(
+            "Illustrative difference between the scenario and the base case."
+        )
+
+        incremental_chart = projection[["Year", "Incremental premium"]].copy()
+        fig = px.bar(
+            incremental_chart,
+            x="Year",
+            y="Incremental premium",
+            labels={
+                "Year": "Projection horizon",
+                "Incremental premium": "Incremental premium (IDR)",
+            },
+            color_discrete_sequence=["#39a8a0"],
+        )
+        fig.update_layout(showlegend=False)
+        st.plotly_chart(
+            style(fig, 390),
+            use_container_width=True
+        )
+
+    # --- Explain the scenario drivers ---
+    st.divider()
+    st.subheader("Contribution assumptions")
+
+    driver1, driver2 = st.columns(2, gap="medium")
+
+    with driver1:
+        st.markdown("*Productivity contribution*")
+        st.metric(
+            "Illustrative premium uplift",
+            money(incremental_productivity)
+        )
+        st.caption(
+            f"Calculated as {uplift:.0%} of the current premium baseline."
+        )
+
+    with driver2:
+        st.markdown("*New-partner contribution*")
+        st.metric(
+            "Illustrative premium contribution",
+            money(incremental_partners)
+        )
+        st.caption(
+            f"{new_partners} partner equivalents × "
+            f"{contribution:.0%} of average current partner premium."
+        )
+
+    st.divider()
+    st.subheader("Projection detail")
+    st.caption(
+        "Values are model outputs, not guaranteed business results."
+    )
+
+    detail = projection.copy()
+    for col in ["Base case", "Growth scenario", "Incremental premium"]:
+        detail[col] = detail[col].map(money)
+
+    st.dataframe(
+        detail,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.info(
+        "Interpretation note: this model applies a simplified one-time "
+        "incremental premium assumption and compounds both scenarios using "
+        "the same annual growth rate. It does not model costs, partner ramp-up, "
+        "capacity constraints, cannibalization, persistency changes, or probability "
+        "of execution. Validate assumptions before using the outputs in a business case."
+    )
 
 else:
     header("Project Portfolio & Execution", "Track strategic initiatives, progress, milestones, and execution risks.")
