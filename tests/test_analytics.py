@@ -45,10 +45,24 @@ class AnalyticsTests(unittest.TestCase):
         u = detect_underperformance(self.df, 0.7)
         self.assertEqual(u["partner"].tolist(), ["A"])
 
-    def test_anomaly_detects_drop(self):
-        a = detect_monthly_anomalies(self.df, -0.3)
-        self.assertIn("A", a["partner"].tolist())
-        self.assertAlmostEqual(float(a.iloc[0]["partner_mom_change"]), -0.5)
+    def test_anomaly_ignores_missing_calendar_month(self):
+        sparse = pd.DataFrame([
+            {
+                "month": "2026-01-01", "partner": "Gap",
+                "channel": "Bank", "premium_target_idr": 100,
+                "premium_actual_idr": 100, "leads": 10,
+                "policies_issued": 2, "persistency_rate": 0.8,
+            },
+            {
+                "month": "2026-03-01", "partner": "Gap",
+                "channel": "Bank", "premium_target_idr": 100,
+                "premium_actual_idr": 40, "leads": 10,
+                "policies_issued": 2, "persistency_rate": 0.8,
+            },
+        ])
+
+        anomalies = detect_monthly_anomalies(sparse, -0.3)
+        self.assertTrue(anomalies.empty)
 
     def test_anomaly_aggregates_multiple_channels_before_comparing(self):
         multi = pd.DataFrame([
@@ -97,6 +111,17 @@ class AnalyticsTests(unittest.TestCase):
         bad.loc[0, "partner"] = " "
         with self.assertRaises(ValueError):
             prepare_data(bad)
+
+    def test_zero_denominators_return_safe_kpis(self):
+        zero_df = self.df.copy()
+        zero_df["premium_target_idr"] = 0
+        zero_df["leads"] = 0
+        zero_df["policies_issued"] = 0
+
+        k = kpi_summary(zero_df)
+
+        self.assertEqual(k["attainment_rate"], 0.0)
+        self.assertEqual(k["conversion_rate"], 0.0)
 
 
 if __name__ == "__main__":
