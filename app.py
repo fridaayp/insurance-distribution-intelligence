@@ -969,43 +969,65 @@ if page == "Executive Overview":
     table_left, table_right = st.columns(2, gap="medium")
     with table_left:
         st.subheader("Top partners by actual premium")
-        st.markdown('<div class="exec-section-note">Ranked by actual premium in the current selection.</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="exec-section-note">'
+            'Ranked by actual premium in the current selection.'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+
         top = partner_view.nlargest(5, "premium_actual_idr").copy()
+
         if not top.empty:
             top["Actual premium"] = top["premium_actual_idr"].map(money)
-            top["Target attainment"] = top["attainment_rate"].map(lambda v: f"{v:.0%}" if pd.notna(v) else "N/A")
-            top = top.rename(columns={"partner":"Partner"})
+            top["Target attainment"] = top["attainment_rate"].map(
+                lambda v: f"{v:.0%}" if pd.notna(v) else "N/A"
+            )
+            top = top.rename(columns={"partner": "Partner"})
             rows_html = []
-max_premium = max(float(v) for v in top["premium_actual_idr"]) or 1
 
-for rank, (_, row) in enumerate(top.iterrows(), start=1):
-    pct = float(row["attainment_rate"]) if pd.notna(row["attainment_rate"]) else 0
-    premium_width = min(
-        100,
-        max(0, float(row["premium_actual_idr"]) / max_premium * 100)
-    )
-    pct_color = "#247b62" if pct >= 1 else (
-        "#bd514b" if pct < threshold else "#536781"
-    )
+            max_premium = max(
+                float(v) for v in top["premium_actual_idr"]
+            ) or 1
 
-    rows_html.append(
-        f'<tr><td><span class="exec-rank">{rank}</span></td>'
-        f'<td><strong>{row["Partner"]}</strong></td>'
-        f'<td><strong>{money(float(row["premium_actual_idr"]))}</strong>'
-        f'<div class="exec-bar-track" style="margin-top:6px">'
-        f'<div class="exec-bar-fill" style="width:{premium_width:.1f}%"></div>'
-        f'</div></td>'
-        f'<td><strong style="color:{pct_color}">{pct:.0%}</strong></td></tr>'
-    )
+            for rank, (_, row) in enumerate(top.iterrows(), start=1):
+                pct = (
+                    float(row["attainment_rate"])
+                    if pd.notna(row["attainment_rate"])
+                    else 0
+                )
+                premium_width = min(
+                    100,
+                    max(
+                        0,
+                        float(row["premium_actual_idr"])
+                        / max_premium * 100,
+                    ),
+                )
+                pct_color = (
+                    "#247b62" if pct >= 1
+                    else "#bd514b" if pct < threshold
+                    else "#536781"
+                )
 
-st.markdown(
-    '<div class="exec-table-wrap"><table class="exec-table">'
-    '<thead><tr><th>#</th><th>Partner</th><th>Actual premium</th>'
-    '<th>Attainment</th></tr></thead><tbody>'
-    + "".join(rows_html)
-    + '</tbody></table></div>',
-    unsafe_allow_html=True,
-)
+                rows_html.append(
+                    f'<tr><td><span class="exec-rank">{rank}</span></td>'
+                    f'<td><strong>{row["Partner"]}</strong></td>'
+                    f'<td><strong>{money(float(row["premium_actual_idr"]))}</strong>'
+                    f'<div class="exec-bar-track" style="margin-top:6px">'
+                    f'<div class="exec-bar-fill" style="width:{premium_width:.1f}%"></div>'
+                    f'</div></td>'
+                    f'<td><strong style="color:{pct_color}">{pct:.0%}</strong></td></tr>'
+                )
+
+            st.markdown(
+                '<div class="exec-table-wrap"><table class="exec-table">'
+                '<thead><tr><th>#</th><th>Partner</th>'
+                '<th>Actual premium</th><th>Attainment</th></tr></thead><tbody>'
+                + "".join(rows_html)
+                + '</tbody></table></div>',
+                unsafe_allow_html=True,
+            )
         else:
             st.info("No partner records in this selection.")
 
@@ -1044,7 +1066,7 @@ st.markdown(
     + '</tbody></table></div>',
     unsafe_allow_html=True,
 )
-        else:
+    else:
             st.success("No partners fall below the selected threshold.")
 
     insight_col, action_col = st.columns([1.25, 1], gap="medium")
