@@ -30,39 +30,37 @@ st.markdown("""
   padding-top: 1.4rem;
   padding-bottom: 3rem;
 }
+/* Sidebar: sticky viewport layout, without fighting Streamlit */
 [data-testid="stSidebar"] {
-  background: linear-gradient(180deg, #081a30 0%, #102b49 58%, #081a2e 100%);
-  border-right: 1px solid rgba(255,255,255,.08);
-}
-
-/* Keep the sidebar anchored to the viewport */
-[data-testid="stSidebar"] {
-  position: fixed !important;
+  position: sticky !important;
   top: 0 !important;
-  left: 0 !important;
+  align-self: flex-start !important;
   height: 100vh !important;
+  min-height: 100vh !important;
   max-height: 100vh !important;
-  z-index: 1000 !important;
+  box-sizing: border-box !important;
+  background: linear-gradient(
+    180deg,
+    #081a30 0%,
+    #102b49 58%,
+    #081a2e 100%
+  ) !important;
+  border-right: 1px solid rgba(255,255,255,.08);
+  overflow: hidden !important;
 }
 
-/* Allow the full sidebar content to fit */
 [data-testid="stSidebar"] > div:first-child {
   height: 100vh !important;
   max-height: 100vh !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
   box-sizing: border-box !important;
-  padding: 1rem .85rem 1.5rem !important;
+  padding: 1rem .85rem 1.25rem !important;
   scrollbar-width: none !important;
 }
 
 [data-testid="stSidebar"] > div:first-child::-webkit-scrollbar {
   display: none !important;
-}
-
-/* Avoid clipping the profile at the bottom */
-[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
-  padding-bottom: .5rem;
 }
 
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
@@ -75,7 +73,7 @@ st.markdown("""
 
 [data-testid="stSidebar"] hr {
   border-color: rgba(180,205,240,.16);
-  margin: 1rem 0;
+  margin: .85rem 0;
 }
 
 [data-testid="stSidebar"] [data-testid="stRadio"] > label {
@@ -84,7 +82,7 @@ st.markdown("""
   font-weight: 800;
   letter-spacing: .12em;
   text-transform: uppercase;
-  margin-bottom: .6rem;
+  margin-bottom: .55rem;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] {
@@ -94,18 +92,16 @@ st.markdown("""
 [data-testid="stSidebar"] div[role="radiogroup"] label {
   display: flex;
   align-items: center;
-  min-height: 43px;
-  padding: .55rem .7rem;
+  min-height: 40px;
+  padding: .45rem .65rem;
   margin: 0;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: 9px;
   color: #c5d5e9;
-  font-size: .83rem;
+  font-size: .82rem;
   font-weight: 550;
-  transition: background .18s ease, border-color .18s ease;
 }
 
-/* Hilangkan bulatan radio bawaan Streamlit */
 [data-testid="stSidebar"] div[role="radiogroup"] label > div:first-child {
   display: none !important;
 }
@@ -113,18 +109,17 @@ st.markdown("""
 [data-testid="stSidebar"] div[role="radiogroup"] label:hover {
   background: rgba(255,255,255,.07);
   border-color: rgba(255,255,255,.1);
-  color: #ffffff;
+  color: #fff;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
   background: linear-gradient(105deg, #2053a0, #173c77);
   border-color: rgba(132,177,255,.25);
-  color: #ffffff;
-  box-shadow: 0 5px 15px rgba(0,0,0,.14);
+  color: #fff;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) p {
-  color: #ffffff;
+  color: #fff;
   font-weight: 750;
 }
 
@@ -145,7 +140,7 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] [data-testid="stSlider"] {
-  padding-bottom: .3rem;
+  padding-bottom: .25rem;
 }
 h1 {
   color: #122844;
@@ -214,34 +209,6 @@ h3 { color: #25405f; font-weight: 700; }
 [data-testid="stAlert"] { border-radius: 12px; }
 hr { border-color: #e0e8f2; }
 #MainMenu, footer { visibility: hidden; }
-/* Sidebar viewport behavior */
-[data-testid="stSidebar"] {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  height: 100vh !important;
-  min-height: 100vh !important;
-  max-height: 100vh !important;
-  z-index: 1000 !important;
-}
-
-[data-testid="stSidebar"] > div:first-child {
-  height: 100vh !important;
-  max-height: 100vh !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  box-sizing: border-box !important;
-  padding: 1rem .85rem 1.5rem !important;
-  scrollbar-width: none !important;
-}
-
-[data-testid="stSidebar"] > div:first-child::-webkit-scrollbar {
-  display: none !important;
-}
-
-[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
-  overflow-wrap: anywhere;
-}
 
 </style>
 """, unsafe_allow_html=True)
