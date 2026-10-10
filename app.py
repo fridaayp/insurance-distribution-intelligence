@@ -31,45 +31,41 @@ st.markdown("""
   padding-bottom: 3rem;
 }
 [data-testid="stSidebar"] {
-  background: linear-gradient(
-    180deg,
-    #0b1930 0%,
-    #102744 55%,
-    #0d2039 100%
-  );
+  background: linear-gradient(180deg, #081a30 0%, #102b49 58%, #081a2e 100%);
   border-right: 1px solid rgba(255,255,255,.08);
 }
 
 [data-testid="stSidebar"] > div:first-child {
-  padding: 1.15rem .9rem 1rem;
+  padding: 1rem .85rem;
 }
 
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
-  color: #e8effa;
+  color: #eaf2ff;
 }
 
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
-  color: #b6c5dc;
+  color: #a8bdd8;
+}
+
+[data-testid="stSidebar"] hr {
+  border-color: rgba(180,205,240,.16);
+  margin: 1rem 0;
 }
 
 [data-testid="stSidebar"] [data-testid="stRadio"] > label {
-  color: #91a5c2;
+  color: #9db5d4;
   font-size: .68rem;
-  font-weight: 750;
+  font-weight: 800;
   letter-spacing: .12em;
   text-transform: uppercase;
-  margin: .8rem 0 .45rem;
+  margin-bottom: .6rem;
 }
 
-[data-testid="stSidebar"] [data-testid="stRadio"] > div {
+[data-testid="stSidebar"] div[role="radiogroup"] {
   gap: .3rem;
 }
 
-[data-testid="stSidebar"] [data-testid="stRadio"] label[data-testid="stWidgetLabel"] {
-  margin-bottom: .5rem;
-}
-
-[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label {
+[data-testid="stSidebar"] div[role="radiogroup"] label {
   display: flex;
   align-items: center;
   min-height: 43px;
@@ -77,53 +73,53 @@ st.markdown("""
   margin: 0;
   border: 1px solid transparent;
   border-radius: 10px;
-  color: #c0cee1;
-  font-size: .86rem;
+  color: #c5d5e9;
+  font-size: .83rem;
   font-weight: 550;
   transition: background .18s ease, border-color .18s ease;
 }
 
-[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label:hover {
+/* Hilangkan bulatan radio bawaan Streamlit */
+[data-testid="stSidebar"] div[role="radiogroup"] label > div:first-child {
+  display: none !important;
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
   background: rgba(255,255,255,.07);
-  border-color: rgba(255,255,255,.08);
-  color: #fff;
+  border-color: rgba(255,255,255,.1);
+  color: #ffffff;
 }
 
-[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked) {
-  background: linear-gradient(100deg, #214c91, #193d75);
-  border-color: rgba(143,180,255,.2);
-  color: #fff;
-  box-shadow: 0 4px 14px rgba(0,0,0,.15);
+[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
+  background: linear-gradient(105deg, #2053a0, #173c77);
+  border-color: rgba(132,177,255,.25);
+  color: #ffffff;
+  box-shadow: 0 5px 15px rgba(0,0,0,.14);
 }
 
-[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked) p {
-  color: #fff;
-  font-weight: 700;
+[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) p {
+  color: #ffffff;
+  font-weight: 750;
 }
 
 [data-testid="stSidebar"] [data-testid="stSelectbox"] > label,
 [data-testid="stSidebar"] [data-testid="stDateInput"] > label,
 [data-testid="stSidebar"] [data-testid="stSlider"] > label {
-  color: #aebed5;
-  font-size: .75rem;
-  font-weight: 600;
+  color: #b2c5de;
+  font-size: .74rem;
+  font-weight: 650;
 }
 
-[data-testid="stSidebar"] [data-testid="stSelectbox"] div[data-baseweb="select"] > div {
-  background: rgba(255,255,255,.07);
-  border-color: rgba(255,255,255,.12);
-  border-radius: 9px;
-}
-
+[data-testid="stSidebar"] [data-testid="stSelectbox"] div[data-baseweb="select"] > div,
 [data-testid="stSidebar"] [data-testid="stDateInput"] input {
-  background: rgba(255,255,255,.07);
-  border-color: rgba(255,255,255,.12);
+  background: #172f4a;
+  color: #f3f7ff;
+  border-color: #385574;
   border-radius: 9px;
 }
 
-[data-testid="stSidebar"] hr {
-  border-color: rgba(255,255,255,.12);
-  margin: 1rem 0;
+[data-testid="stSidebar"] [data-testid="stSlider"] {
+  padding-bottom: .3rem;
 }
 h1 {
   color: #122844;
@@ -203,51 +199,40 @@ raw = load_data()
 data = prepare_data(raw)
 
 with st.sidebar:
+    # Brand header: shield + rising bars
     st.markdown(
         """
-        <div style="padding:8px 5px 15px;">
-            <div style="
-                display:flex;
-                align-items:center;
-                gap:10px;
-                margin-bottom:17px;
-            ">
-                <div style="
-                    width:43px;
-                    height:43px;
-                    border-radius:12px;
-                    background:linear-gradient(145deg,#35c6b0,#4387f5);
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                    color:white;
-                    font-size:25px;
-                    font-weight:800;
-                    box-shadow:0 5px 18px rgba(38,139,210,.22);
-                ">▥</div>
-                <div>
-                    <div style="
-                        color:#f4f7fc;
-                        font-size:16px;
-                        font-weight:800;
-                        letter-spacing:-.4px;
-                        line-height:1.25;
-                    ">Distribution</div>
-                    <div style="
-                        color:#f4f7fc;
-                        font-size:16px;
-                        font-weight:800;
-                        letter-spacing:-.4px;
-                        line-height:1.25;
-                    ">Strategy Intelligence</div>
-                </div>
+        <div style="padding:8px 4px 17px;">
+          <div style="display:flex;align-items:center;gap:11px;">
+            <div style="width:48px;min-width:48px;height:52px;">
+              <svg viewBox="0 0 52 56" width="48" height="52"
+                   xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="shieldGradient" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#42d6ce"/>
+                    <stop offset="100%" stop-color="#2369e8"/>
+                  </linearGradient>
+                </defs>
+                <path d="M26 2 L48 11 V27 C48 40 38 49 26 54
+                         C14 49 4 40 4 27 V11 Z"
+                      fill="url(#shieldGradient)" stroke="#74e5ed" stroke-width="1.2"/>
+                <rect x="14" y="29" width="5.5" height="11" rx="2" fill="white"/>
+                <rect x="23" y="21" width="5.5" height="19" rx="2" fill="white"/>
+                <rect x="32" y="13" width="5.5" height="27" rx="2" fill="white"/>
+              </svg>
             </div>
-            <div style="
-                color:#9eb2cf;
-                font-size:11px;
-                line-height:1.6;
-                letter-spacing:.2px;
-            ">From data to decisions</div>
+            <div>
+              <div style="font-size:15px;font-weight:800;color:#f6f9ff;line-height:1.3;">
+                Distribution
+              </div>
+              <div style="font-size:15px;font-weight:800;color:#f6f9ff;line-height:1.3;">
+                Strategy Intelligence
+              </div>
+            </div>
+          </div>
+          <div style="color:#9fb8d8;font-size:11px;margin-top:12px;">
+            From data to decisions
+          </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -264,15 +249,15 @@ with st.sidebar:
     ]
 
     page_labels = {
-        "Executive Overview": "◈   Executive Overview",
-        "Performance Analysis": "▤   Performance Analysis",
+        "Executive Overview": "⌂   Executive Overview",
+        "Performance Analysis": "▥   Performance Analysis",
         "Partnership Intelligence": "♧   Partnership Intelligence",
-        "Scenario Lab": "◉   Scenario Lab",
-        "Project Portfolio & Execution": "▣   Project Portfolio & Execution",
+        "Scenario Lab": "↗️   Scenario Lab",
+        "Project Portfolio & Execution": "▤   Project Portfolio & Execution",
     }
 
     page = st.radio(
-        "Navigation",
+        "NAVIGATION",
         pages,
         format_func=lambda value: page_labels[value],
         label_visibility="visible",
@@ -282,13 +267,10 @@ with st.sidebar:
 
     st.markdown(
         """
-        <div style="
-            color:#dce7f7;
-            font-size:12px;
-            font-weight:750;
-            letter-spacing:.8px;
-            margin:0 0 12px 2px;
-        ">GLOBAL FILTERS</div>
+        <div style="color:#e1ebfa;font-size:11px;font-weight:800;
+                    letter-spacing:.9px;margin:0 0 12px;">
+          GLOBAL FILTERS
+        </div>
         """,
         unsafe_allow_html=True,
     )
@@ -303,63 +285,87 @@ with st.sidebar:
         ["All channels"] + sorted(data.channel.dropna().unique().tolist()),
     )
 
-    min_date, max_date = data.month.min().date(), data.month.max().date()
+    min_date = data.month.min().date()
+    max_date = data.month.max().date()
 
-    dates = st.date_input(
+    period_choice = st.selectbox(
         "Period",
-        value=(min_date, max_date),
-        min_value=min_date,
-        max_value=max_date,
+        [
+            "Last 3 months",
+            "Last 6 months",
+            "Last 12 months",
+            "Year to date",
+            "All available data",
+            "Custom range",
+        ],
+        index=2,
+        help="Choose a preset period or select a custom date range.",
     )
+
+    if period_choice == "Last 3 months":
+        period_start = (pd.Timestamp(max_date) - pd.DateOffset(months=2)).date()
+        period_end = max_date
+    elif period_choice == "Last 6 months":
+        period_start = (pd.Timestamp(max_date) - pd.DateOffset(months=5)).date()
+        period_end = max_date
+    elif period_choice == "Last 12 months":
+        period_start = (pd.Timestamp(max_date) - pd.DateOffset(months=11)).date()
+        period_end = max_date
+    elif period_choice == "Year to date":
+        period_start = max_date.replace(month=1, day=1)
+        period_end = max_date
+    elif period_choice == "All available data":
+        period_start = min_date
+        period_end = max_date
+    else:
+        custom_dates = st.date_input(
+            "Custom date range",
+            value=(min_date, max_date),
+            min_value=min_date,
+            max_value=max_date,
+            format="DD/MM/YYYY",
+        )
+
+        if isinstance(custom_dates, (tuple, list)) and len(custom_dates) == 2:
+            period_start, period_end = custom_dates
+        elif isinstance(custom_dates, (tuple, list)) and len(custom_dates) == 1:
+            period_start = period_end = custom_dates[0]
+        else:
+            period_start = period_end = custom_dates
+
+    dates = (period_start, period_end)
 
     threshold = st.slider(
         "Underperformance threshold (%)",
-        50, 110, 85, 5,
+        min_value=50,
+        max_value=110,
+        value=85,
+        step=5,
     ) / 100
 
     st.divider()
 
     st.markdown(
         """
-        <div style="
-            display:flex;
-            align-items:center;
-            gap:11px;
-            padding:7px 2px 4px;
-        ">
-            <div style="
-                width:39px;
-                height:39px;
-                flex-shrink:0;
-                border-radius:50%;
-                background:#263f68;
-                border:1px solid #46618a;
-                color:#ffffff;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                font-size:13px;
-                font-weight:800;
-            ">FA</div>
-            <div>
-                <div style="
-                    color:#f4f7fc;
-                    font-size:13px;
-                    font-weight:750;
-                ">Frida A.</div>
-                <div style="
-                    color:#9eb2cf;
-                    font-size:10px;
-                    line-height:1.5;
-                ">Business Strategy & Analytics</div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 2px;">
+          <div style="width:43px;height:43px;min-width:43px;border-radius:50%;
+                      background:linear-gradient(145deg,#315eb2,#203b75);
+                      border:1px solid #5e8eea;display:flex;align-items:center;
+                      justify-content:center;color:#fff;font-size:15px;font-weight:850;">
+            FY
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:#f5f8ff;">
+              Frida Yuniar Prastika
             </div>
+            <div style="font-size:10px;color:#9fb8d8;line-height:1.5;">
+              Business Strategy &amp; Analytics
+            </div>
+          </div>
         </div>
-        <div style="
-            color:#7f94b2;
-            font-size:10px;
-            margin:13px 2px 0;
-            line-height:1.5;
-        ">Portfolio prototype · Synthetic data</div>
+        <div style="font-size:10px;color:#7f99b9;margin:8px 2px 0;">
+          Portfolio prototype · Synthetic data
+        </div>
         """,
         unsafe_allow_html=True,
     )
@@ -367,12 +373,18 @@ with st.sidebar:
     st.caption("Independent portfolio prototype • synthetic data only")
 
 df = data.copy()
+
 if partner != "All partners":
     df = df[df.partner == partner]
+
 if channel != "All channels":
     df = df[df.channel == channel]
+
 if isinstance(dates, (tuple, list)) and len(dates) == 2:
-    df = df[(df.month.dt.date >= dates[0]) & (df.month.dt.date <= dates[1])]
+    df = df[
+        (df.month.dt.date >= dates[0])
+        & (df.month.dt.date <= dates[1])
+    ]
 if df.empty:
     st.warning("No records match the selected filters. Widen the period or change filters.")
     st.stop()
