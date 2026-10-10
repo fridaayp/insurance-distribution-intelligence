@@ -35,8 +35,34 @@ st.markdown("""
   border-right: 1px solid rgba(255,255,255,.08);
 }
 
+/* Keep the sidebar anchored to the viewport */
+[data-testid="stSidebar"] {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  z-index: 1000 !important;
+}
+
+/* Allow the full sidebar content to fit */
 [data-testid="stSidebar"] > div:first-child {
-  padding: 1rem .85rem;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
+  padding: 1rem .85rem 1.5rem !important;
+  scrollbar-width: none !important;
+}
+
+[data-testid="stSidebar"] > div:first-child::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Avoid clipping the profile at the bottom */
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+  padding-bottom: .5rem;
 }
 
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
