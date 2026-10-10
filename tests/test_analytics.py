@@ -112,6 +112,17 @@ class AnalyticsTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             prepare_data(bad)
 
+    def test_zero_denominators_return_safe_kpis(self):
+        zero_df = self.df.copy()
+        zero_df["premium_target_idr"] = 0
+        zero_df["leads"] = 0
+        zero_df["policies_issued"] = 0
+
+        k = kpi_summary(zero_df)
+
+        self.assertEqual(k["attainment_rate"], 0.0)
+        self.assertEqual(k["conversion_rate"], 0.0)
+
 
 if __name__ == "__main__":
     unittest.main()
