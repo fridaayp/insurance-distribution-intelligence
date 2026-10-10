@@ -268,18 +268,81 @@ if page == "Executive Overview":
     a.caption("Actual premium minus target premium")
     b.metric("Partners below threshold", int(under.partner.nunique()) if not under.empty else 0)
     c.metric("Monthly anomaly alerts", len(anomalies))
-    left,right = st.columns(2)
+    left, right = st.columns([1, 1], gap="medium")
+
     with left:
-        st.subheader("Key insights")
-        st.markdown(f"- Target attainment is **{attainment:.1%}** for the current selection.")
-        st.markdown(f"- Premium gap is **{money(gap)}**.")
-        st.markdown(f"- **{len(anomalies)}** monthly premium-drop alert(s) were detected.")
-        if gap < 0: st.warning("Premium is below target. Review partner-level gaps and action signals.")
-        else: st.success("Premium is at or above target for this selection.")
+        st.subheader("Key Insights")
+        st.caption("What the current selection tells us")
+
+        if target > 0:
+            if attainment < 1:
+                st.warning(
+                    f"Premium is {money(abs(gap))} below target. "
+                    f"Attainment stands at {attainment:.1%}."
+                )
+            else:
+                st.success(
+                    f"Premium is {money(gap)} above target. "
+                    f"Attainment stands at {attainment:.1%}."
+                )
+
+        st.markdown(
+            f"""
+            <div style="background:#ffffff;border:1px solid #e4ebf4;
+            border-radius:14px;padding:16px;margin:10px 0;">
+                <div style="font-size:12px;color:#687a93;font-weight:700;">
+                    PARTNER COVERAGE
+                </div>
+                <div style="font-size:25px;color:#172b49;font-weight:750;">
+                    {df.partner.nunique():,}
+                </div>
+                <div style="font-size:13px;color:#687a93;">
+                    unique partners in the current selection
+                </div>
+            </div>
+            <div style="background:#ffffff;border:1px solid #e4ebf4;
+            border-radius:14px;padding:16px;margin:10px 0;">
+                <div style="font-size:12px;color:#687a93;font-weight:700;">
+                    MONTHLY ANOMALY ALERTS
+                </div>
+                <div style="font-size:25px;color:#172b49;font-weight:750;">
+                    {len(anomalies):,}
+                </div>
+                <div style="font-size:13px;color:#687a93;">
+                    rule-based alerts requiring investigation
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
     with right:
-        st.subheader("Priority actions")
-        if actions: st.dataframe(pd.DataFrame(actions), use_container_width=True, hide_index=True)
-        else: st.success("No rule-based actions triggered for this selection.")
+        st.subheader("Priority Actions")
+        st.caption("Rule-based follow-up signals · not causal conclusions")
+
+        if actions:
+            action_df = pd.DataFrame(actions)
+            st.dataframe(
+                action_df,
+                use_container_width=True,
+                hide_index=True,
+            )
+        else:
+            st.success(
+                "No rule-based actions triggered for the current selection."
+            )
+
+        if not under.empty:
+            st.warning(
+                f"{under.partner.nunique()} partner(s) are below "
+                "the selected attainment threshold. Review their scorecards."
+            )
+
+        if not anomalies.empty:
+            st.info(
+                f"{len(anomalies)} monthly premium-drop alert(s) detected. "
+                "Validate the underlying records before taking action."
+            )
 
 elif page == "Performance Analysis":
     header("Performance Analysis", "Explore detailed performance metrics across partners, channels, and product outcomes.")
