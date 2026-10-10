@@ -165,10 +165,42 @@ def money(x):
     return f"Rp {x/1e9:,.2f}B"
 
 def style(fig, height=330):
-    fig.update_layout(height=height, paper_bgcolor="white", plot_bgcolor="white",
-                      margin=dict(l=12,r=12,t=35,b=12), font=dict(color="#253854"))
-    fig.update_xaxes(showgrid=False)
-    fig.update_yaxes(gridcolor="#edf1f7")
+    fig.update_layout(
+        height=height,
+        paper_bgcolor="rgba(255,255,255,0)",
+        plot_bgcolor="rgba(255,255,255,0)",
+        margin=dict(l=14, r=18, t=44, b=16),
+        font=dict(
+            family="Arial, sans-serif",
+            color="#526680",
+            size=12,
+        ),
+        title_font=dict(size=15, color="#1b3554"),
+        hoverlabel=dict(
+            bgcolor="#10233f",
+            font_color="#ffffff",
+            bordercolor="#10233f",
+        ),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="left",
+            x=0,
+            bgcolor="rgba(255,255,255,0)",
+            font=dict(size=11),
+        ),
+    )
+    fig.update_xaxes(
+        showgrid=False,
+        linecolor="#e5ebf3",
+        tickfont=dict(color="#71829a", size=10),
+    )
+    fig.update_yaxes(
+        gridcolor="#edf2f8",
+        zerolinecolor="#edf2f8",
+        tickfont=dict(color="#71829a", size=10),
+    )
     return fig
 
 def header(title, subtitle):
