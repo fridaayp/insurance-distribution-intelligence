@@ -51,7 +51,7 @@ c1.metric("Premium written", f"Rp {k['premium_actual_idr']/1e9:,.2f}B")
 c2.metric("Target attainment", f"{k['attainment_rate']:.1%}")
 c3.metric("Leads", f"{k['leads']:,}")
 c4.metric("Policy conversion", f"{k['conversion_rate']:.1%}")
-c5.metric("Avg. persistency", f"{k['persistency_rate']:.1%}")
+c5.metric("Mean row persistency", f"{k['persistency_rate']:.1%}")
 
 st.divider()
 left,right = st.columns([1.5,1])
