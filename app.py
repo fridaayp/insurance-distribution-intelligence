@@ -552,134 +552,313 @@ def score_display(frame):
         if col in out.columns:
             out[label] = out[col].map(lambda v: f"{v:.1%}")
     return out
+def _month_window(frame, start_period, end_period):
+    start_period = pd.Period(start_period, freq="M")
+    end_period = pd.Period(end_period, freq="M")
+    months = frame["month"].dt.to_period("M")
+    return frame.loc[
+        (months >= start_period) & (months <= end_period)
+    ].copy()
 
+
+def _window_is_available(start_period, end_period, available_months):
+    start_period = pd.Period(start_period, freq="M")
+    end_period = pd.Period(end_period, freq="M")
+    expected = {
+        str(p) for p in pd.period_range(
+            start_period, end_period, freq="M"
+        )
+    }
+    return expected.issubset(set(available_months))
+
+
+def _comparison_summary(frame):
+    if frame is None or frame.empty:
+        return None
+
+    actual_value = float(frame["premium_actual_idr"].sum())
+    target_value = float(frame["premium_target_idr"].sum())
+
+    return {
+        "actual": actual_value,
+        "target": target_value,
+        "attainment": (
+            actual_value / target_value if target_value else None
+        ),
+        "gap": target_value - actual_value,
+        "partners": int(frame["partner"].nunique()),
+        "policies": int(frame["policies_issued"].sum()),
+    }
+
+# EXECUTIVE OVERVIEW V3 PATCH FOR app.py
+# 1) Insert the helper functions below immediately before `if page == "Executive Overview":`.
+# 2) Replace the current Executive Overview block through (but not including)
+#    `elif page == "Performance Analysis":` with the section below.
+# Sidebar, global filters, data loading, and other pages remain unchanged.
+
+# ---------- HELPERS ----------
+def _month_window(frame, start_period, end_period):
+    months = frame["month"].dt.to_period("M")
+    return frame.loc[(months >= pd.Period(start_period, freq="M")) &
+                     (months <= pd.Period(end_period, freq="M"))].copy()
+
+
+def _window_is_available(start_period, end_period, available_months):
+    expected = {str(p) for p in pd.period_range(start_period, end_period, freq="M")}
+    return expected.issubset(set(available_months))
+
+
+def _comparison_summary(frame):
+    if frame is None or frame.empty:
+        return None
+    actual_value = float(frame["premium_actual_idr"].sum())
+    target_value = float(frame["premium_target_idr"].sum())
+    return {
+        "actual": actual_value,
+        "target": target_value,
+        "attainment": actual_value / target_value if target_value else None,
+        "gap": target_value - actual_value,  # positive = shortfall
+        "partners": int(frame["partner"].nunique()),
+    }
+
+
+def _comparison_delta(current, previous, metric):
+    if previous is None or current.get(metric) is None or previous.get(metric) is None:
+        return "N/A"
+    c, p = current[metric], previous[metric]
+    if metric == "attainment":
+        return f"{(c - p) * 100:+.1f} pp"
+    if metric == "partners":
+        return f"{int(c - p):+d}"
+    if metric == "gap":
+        change = p - c  # positive means the shortfall narrowed
+        return f"gap {'reduced' if change >= 0 else 'widened'} {money(abs(change))}"
+    if p == 0:
+        return "N/A"
+    return f"{(c / p - 1) * 100:+.1f}%"
+
+
+def _comparison_row(label, current, previous, metric):
+    delta = _comparison_delta(current, previous, metric)
+    if delta == "N/A":
+        color, arrow = "#7b8ba1", "—"
+    elif metric == "gap":
+        improved = previous is not None and current["gap"] <= previous["gap"]
+        color, arrow = ("#247b62", "↓") if improved else ("#bd514b", "↑")
+    else:
+        try:
+            numeric = float(delta.split()[0].replace("%", "").replace("pp", "").replace("+", ""))
+        except (ValueError, IndexError):
+            numeric = 0
+        color, arrow = ("#247b62", "↑") if numeric >= 0 else ("#bd514b", "↓")
+    return (f'<div class="comparison-row"><span>{label}</span>'
+            f'<strong style="color:{color}">{arrow} {delta}</strong></div>')
+
+
+def _kpi_card(title, value, help_text, metric, current, previous_period, previous_year):
+    return f'''<div class="exec-kpi" title="{help_text}">
+      <div class="exec-kpi-label">{title}</div><div class="exec-kpi-value">{value}</div>
+      <div class="exec-kpi-comparisons">
+        {_comparison_row("vs previous period", current, previous_period, metric)}
+        {_comparison_row("vs previous year", current, previous_year, metric)}
+      </div></div>'''
+
+
+# ---------- EXECUTIVE OVERVIEW SECTION ----------
 if page == "Executive Overview":
     header(
         "Executive Overview",
-        "A unified view of distribution performance, partnership growth, and execution signals."
+        "Distribution performance, target delivery, partner contribution, and management priorities."
     )
+
+    # Restrained navy / blue / neutral palette. Sidebar styling is untouched.
+    st.markdown("""
+    <style>
+      .exec-kpi{background:#fff;border:1px solid #e1e8f1;border-radius:14px;
+        padding:16px 17px 12px;min-height:164px;box-shadow:0 3px 12px rgba(16,35,63,.035)}
+      .exec-kpi-label{color:#62758f;font-size:12px;font-weight:750;letter-spacing:.045em;text-transform:uppercase}
+      .exec-kpi-value{color:#10233f;font-size:clamp(22px,2vw,29px);font-weight:800;
+        letter-spacing:-.04em;line-height:1.25;margin:7px 0 13px;overflow-wrap:anywhere}
+      .exec-kpi-comparisons{border-top:1px solid #edf1f6;padding-top:7px}
+      .comparison-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+        color:#7b8ba1;font-size:10px;padding:4px 0}
+      .comparison-row strong{font-size:10px;font-weight:750;text-align:right}
+      .exec-section-note{color:#71829a;font-size:12px;margin-top:-6px;margin-bottom:8px}
+      .exec-insight{border:1px solid #e1e8f1;background:#fff;border-radius:12px;padding:13px 15px;margin-bottom:9px}
+      .exec-insight-title{color:#183452;font-size:13px;font-weight:750;margin-bottom:4px}
+      .exec-insight-body{color:#536781;font-size:12px;line-height:1.5}
+    </style>""", unsafe_allow_html=True)
 
     st.caption("PORTFOLIO SNAPSHOT · CURRENT FILTER SELECTION")
-
-    a, b, c, d = st.columns(4, gap="medium")
-
-    a.metric(
-        "TOTAL PREMIUM",
-        money(actual),
-        help="Total actual premium for the selected period and filters."
-    )
-    b.metric(
-        "ACTIVE PARTNERS",
-        f"{df.partner.nunique():,}",
-        help="Unique partners represented in the filtered data."
-    )
-    c.metric(
-        "POLICIES ISSUED",
-        f"{int(df.policies_issued.sum()):,}",
-        help="Total policies issued in the current selection."
-    )
-    d.metric(
-        "TARGET ATTAINMENT",
-        f"{attainment:.1%}",
-        help="Total actual premium divided by total target premium."
+    st.caption(
+        f"Selected window: {pd.Period(period_start_key, freq='M').strftime('%b %Y')} — "
+        f"{pd.Period(period_end_key, freq='M').strftime('%b %Y')} · {partner} · {channel}"
     )
 
-    st.divider()
-    left,right = st.columns([1.45,1])
-    with left:
+    # Build comparison data using the same partner/channel filters as the current view.
+    comparison_base = data.copy()
+    if partner != "All partners":
+        comparison_base = comparison_base[comparison_base["partner"] == partner]
+    if channel != "All channels":
+        comparison_base = comparison_base[comparison_base["channel"] == channel]
+
+    start_p, end_p = pd.Period(period_start_key, "M"), pd.Period(period_end_key, "M")
+    month_count = end_p.ordinal - start_p.ordinal + 1
+    available_months = set(data["month"].dropna().dt.to_period("M").astype(str))
+    pp_start, pp_end = start_p - month_count, start_p - 1
+    py_start, py_end = start_p - 12, end_p - 12
+
+    previous_period = (
+        _comparison_summary(_month_window(comparison_base, pp_start, pp_end))
+        if _window_is_available(pp_start, pp_end, available_months) else None
+    )
+    previous_year = (
+        _comparison_summary(_month_window(comparison_base, py_start, py_end))
+        if _window_is_available(py_start, py_end, available_months) else None
+    )
+    current = {
+        "actual": actual,
+        "attainment": attainment if target else None,
+        "gap": target - actual,
+        "partners": int(df["partner"].nunique()),
+    }
+
+    kpi_cols = st.columns(4, gap="medium")
+    cards = [
+        _kpi_card("Total Premium", money(actual), "Actual premium in the selected window.",
+                  "actual", current, previous_period, previous_year),
+        _kpi_card("Target Attainment", f"{attainment:.1%}", "Actual premium divided by target premium.",
+                  "attainment", current, previous_period, previous_year),
+        _kpi_card("Premium Gap", f"{money(abs(target-actual))} {'shortfall' if target > actual else 'surplus'}",
+                  "Target minus actual premium; positive means a shortfall.",
+                  "gap", current, previous_period, previous_year),
+        _kpi_card("Active Partners", f"{df['partner'].nunique():,}", "Unique partners in the selected window.",
+                  "partners", current, previous_period, previous_year),
+    ]
+    for col, card in zip(kpi_cols, cards):
+        with col:
+            st.markdown(card, unsafe_allow_html=True)
+
+    st.write("")
+    chart_left, chart_right = st.columns([1.55, 1], gap="medium")
+    with chart_left:
         st.subheader("Premium vs target over time")
-        t = trend.melt(id_vars="month", value_vars=["premium_actual_idr","premium_target_idr"],
-                       var_name="series", value_name="premium")
-        t["series"] = t.series.map({"premium_actual_idr":"Actual premium","premium_target_idr":"Target premium"})
-        fig = px.line(t, x="month", y="premium", color="series", markers=True,
-                      color_discrete_map={"Actual premium":"#2563eb","Target premium":"#9abce9"})
-        st.plotly_chart(style(fig), use_container_width=True)
-    with right:
-        st.subheader("Partner contribution")
-        ch = df.groupby("partner", as_index=False).premium_actual_idr.sum().sort_values("premium_actual_idr").tail(10)
-        fig = px.bar(ch, x="premium_actual_idr", y="partner", orientation="h",
-                     labels={"premium_actual_idr":"Premium (IDR)","partner":"Partner"})
-        st.plotly_chart(style(fig), use_container_width=True)
-    a,b,c = st.columns(3)
-    a.metric("Premium gap vs target", money(gap))
-    a.caption("Actual premium minus target premium")
-    b.metric("Partners below threshold", int(under.partner.nunique()) if not under.empty else 0)
-    c.metric("Monthly anomaly alerts", len(anomalies))
-    left, right = st.columns([1, 1], gap="medium")
+        st.markdown('<div class="exec-section-note">Monthly actual premium against target; hover for exact values.</div>', unsafe_allow_html=True)
+        if not trend.empty:
+            trend_view = trend.copy()
+            trend_view["Actual premium"] = trend_view["premium_actual_idr"]
+            trend_view["Target premium"] = trend_view["premium_target_idr"]
+            fig = px.line(
+                trend_view, x="month", y=["Actual premium", "Target premium"], markers=True,
+                color_discrete_map={"Actual premium":"#3978B8", "Target premium":"#A8BCD4"},
+                labels={"value":"Premium (IDR)", "month":"Month", "variable":""},
+            )
+            fig.update_traces(line=dict(width=2.7), marker=dict(size=5))
+            fig.update_yaxes(tickprefix="Rp ", tickformat="~s", rangemode="tozero")
+            fig.update_xaxes(tickformat="%b %Y", dtick="M2")
+            fig.update_layout(hovermode="x unified", showlegend=True)
+            st.plotly_chart(style(fig, 365), use_container_width=True)
+        else:
+            st.info("Not enough monthly data to draw the trend.")
 
-    with left:
-        st.subheader("Key Insights")
-        st.caption("What the current selection tells us")
-
-        if target > 0:
-            if attainment < 1:
-                st.warning(
-                    f"Premium is {money(abs(gap))} below target. "
-                    f"Attainment stands at {attainment:.1%}."
-                )
-            else:
-                st.success(
-                    f"Premium is {money(gap)} above target. "
-                    f"Attainment stands at {attainment:.1%}."
-                )
-
-        st.markdown(
-            f"""
-            <div style="background:#ffffff;border:1px solid #e4ebf4;
-            border-radius:14px;padding:16px;margin:10px 0;">
-                <div style="font-size:12px;color:#687a93;font-weight:700;">
-                    PARTNER COVERAGE
-                </div>
-                <div style="font-size:25px;color:#172b49;font-weight:750;">
-                    {df.partner.nunique():,}
-                </div>
-                <div style="font-size:13px;color:#687a93;">
-                    unique partners in the current selection
-                </div>
-            </div>
-            <div style="background:#ffffff;border:1px solid #e4ebf4;
-            border-radius:14px;padding:16px;margin:10px 0;">
-                <div style="font-size:12px;color:#687a93;font-weight:700;">
-                    MONTHLY ANOMALY ALERTS
-                </div>
-                <div style="font-size:25px;color:#172b49;font-weight:750;">
-                    {len(anomalies):,}
-                </div>
-                <div style="font-size:13px;color:#687a93;">
-                    rule-based alerts requiring investigation
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
+    with chart_right:
+        st.subheader("Target attainment by channel")
+        st.markdown('<div class="exec-section-note">Actual premium ÷ target premium.</div>', unsafe_allow_html=True)
+        channel_view = df.groupby("channel", as_index=False).agg(
+            premium_actual_idr=("premium_actual_idr", "sum"),
+            premium_target_idr=("premium_target_idr", "sum"),
         )
+        channel_view["attainment"] = channel_view["premium_actual_idr"] / channel_view["premium_target_idr"].replace(0, float("nan"))
+        channel_view = channel_view.dropna(subset=["attainment"]).sort_values("attainment")
+        if not channel_view.empty:
+            fig = px.bar(
+                channel_view, x="attainment", y="channel", orientation="h",
+                text=channel_view["attainment"].map(lambda x: f"{x:.0%}"),
+                labels={"attainment":"Target attainment", "channel":""},
+                color_discrete_sequence=["#3978B8"],
+            )
+            fig.update_traces(textposition="outside", cliponaxis=False)
+            fig.add_vline(x=1, line_dash="dash", line_color="#91A8C4", annotation_text="Target 100%")
+            fig.update_xaxes(tickformat=".0%", range=[0, max(1.15, float(channel_view["attainment"].max())*1.15)])
+            fig.update_layout(showlegend=False)
+            st.plotly_chart(style(fig, 365), use_container_width=True)
+        else:
+            st.info("No channel attainment values are available for this selection.")
 
-    with right:
-        st.subheader("Priority Actions")
-        st.caption("Rule-based follow-up signals · not causal conclusions")
+    # Aggregate by partner to avoid duplicate partner rows across channels.
+    partner_view = df.groupby("partner", as_index=False).agg(
+        premium_actual_idr=("premium_actual_idr", "sum"),
+        premium_target_idr=("premium_target_idr", "sum"),
+        policies_issued=("policies_issued", "sum"),
+    )
+    partner_view["attainment_rate"] = partner_view["premium_actual_idr"] / partner_view["premium_target_idr"].replace(0, float("nan"))
+    partner_view["gap_to_target"] = partner_view["premium_target_idr"] - partner_view["premium_actual_idr"]
 
+    table_left, table_right = st.columns(2, gap="medium")
+    with table_left:
+        st.subheader("Top partners by actual premium")
+        st.markdown('<div class="exec-section-note">Ranked by actual premium in the current selection.</div>', unsafe_allow_html=True)
+        top = partner_view.nlargest(5, "premium_actual_idr").copy()
+        if not top.empty:
+            top["Actual premium"] = top["premium_actual_idr"].map(money)
+            top["Target attainment"] = top["attainment_rate"].map(lambda v: f"{v:.0%}" if pd.notna(v) else "N/A")
+            top = top.rename(columns={"partner":"Partner"})
+            st.dataframe(top[["Partner", "Actual premium", "Target attainment"]], use_container_width=True, hide_index=True)
+        else:
+            st.info("No partner records in this selection.")
+
+    with table_right:
+        st.subheader("Partners requiring attention")
+        st.markdown(f'<div class="exec-section-note">Rule-based screen: attainment below {threshold:.0%}.</div>', unsafe_allow_html=True)
+        attention = partner_view[partner_view["attainment_rate"] < threshold].sort_values("attainment_rate").head(5).copy()
+        if not attention.empty:
+            attention["Target attainment"] = attention["attainment_rate"].map(lambda v: f"{v:.0%}" if pd.notna(v) else "N/A")
+            attention["Gap to target"] = attention["gap_to_target"].map(lambda v: money(v) if v >= 0 else f"{money(abs(v))} surplus")
+            attention = attention.rename(columns={"partner":"Partner"})
+            st.dataframe(attention[["Partner", "Target attainment", "Gap to target"]], use_container_width=True, hide_index=True)
+        else:
+            st.success("No partners fall below the selected threshold.")
+
+    insight_col, action_col = st.columns([1.25, 1], gap="medium")
+    with insight_col:
+        st.subheader("Key Insights")
+        st.markdown('<div class="exec-section-note">What the current data indicates.</div>', unsafe_allow_html=True)
+        gap_value = target - actual
+        if target > 0:
+            if gap_value > 0:
+                st.warning(f"Portfolio attainment is **{attainment:.1%}**, with a premium shortfall of **{money(gap_value)}**.")
+            else:
+                st.success(f"Portfolio is above target by **{money(abs(gap_value))}** ({attainment:.1%} attainment).")
+        if previous_period is not None:
+            st.caption(f"Previous period: premium {_comparison_delta(current, previous_period, 'actual')}; attainment {_comparison_delta(current, previous_period, 'attainment')}.")
+        else:
+            st.caption("Previous period: N/A — the full comparison window is not available.")
+        if previous_year is not None:
+            st.caption(f"Previous year: premium {_comparison_delta(current, previous_year, 'actual')}; attainment {_comparison_delta(current, previous_year, 'attainment')}.")
+        else:
+            st.caption("Previous year: N/A — the full comparison window is not available.")
+
+        if not channel_view.empty:
+            strongest = channel_view.sort_values("attainment", ascending=False).iloc[0]
+            st.markdown(f'<div class="exec-insight"><div class="exec-insight-title">Channel signal</div><div class="exec-insight-body"><b>{strongest["channel"]}</b> has the highest attainment at <b>{strongest["attainment"]:.0%}</b> in this selection.</div></div>', unsafe_allow_html=True)
+        if not attention.empty:
+            weakest = attention.iloc[0]
+            st.markdown(f'<div class="exec-insight"><div class="exec-insight-title">Partner attention</div><div class="exec-insight-body"><b>{weakest["partner"]}</b> has the lowest attainment ({weakest["attainment_rate"]:.0%}); review target, funnel, and recent activity before drawing causal conclusions.</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="exec-insight"><div class="exec-insight-title">Operational signals</div><div class="exec-insight-body">{int(under["partner"].nunique()) if not under.empty else 0} partner(s) below threshold · {len(anomalies)} monthly anomaly alert(s) · {int(df["policies_issued"].sum()):,} policies issued.</div></div>', unsafe_allow_html=True)
+
+    with action_col:
+        st.subheader("Recommended Actions")
+        st.markdown('<div class="exec-section-note">Rule-based prompts for management review, not causal conclusions.</div>', unsafe_allow_html=True)
         if actions:
             action_df = pd.DataFrame(actions)
-            st.dataframe(
-                action_df,
-                use_container_width=True,
-                hide_index=True,
-            )
+            columns = [c for c in ["priority", "partner", "signal", "suggested_action"] if c in action_df.columns]
+            st.dataframe(action_df[columns].head(6), use_container_width=True, hide_index=True)
         else:
-            st.success(
-                "No rule-based actions triggered for the current selection."
-            )
-
-        if not under.empty:
-            st.warning(
-                f"{under.partner.nunique()} partner(s) are below "
-                "the selected attainment threshold. Review their scorecards."
-            )
-
+            st.success("No rule-based actions were triggered for this selection.")
         if not anomalies.empty:
-            st.info(
-                f"{len(anomalies)} monthly premium-drop alert(s) detected. "
-                "Validate the underlying records before taking action."
-            )
+            st.info(f"{len(anomalies)} monthly premium-drop alert(s) detected. Validate the underlying records before acting.")
+
+# Keep the existing `elif page == "Performance Analysis":` and every later page unchanged.
 
 elif page == "Performance Analysis":
     header("Performance Analysis", "Explore detailed performance metrics across partners, channels, and product outcomes.")
