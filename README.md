@@ -41,7 +41,7 @@ The dataset contains monthly observations for 12 fictional partners across 21 mo
 - Policy conversion: Total policies issued divided by total leads.
 - Average persistency: Unweighted mean of row-level persistency rates in the selected sample.
 - Underperformance alert: Flags a partner when cumulative premium attainment falls below the selected threshold.
-- Monthly anomaly alert: Flags a premium decline of at least 30% compared with the partner's previous observed month.
+- Monthly anomaly alert:  Flags a partner's premium decline of at least 30% compared with the immediately preceding calendar month. Months with missing    observations are not treated as consecutive, and percentage changes are not calculated when the previous month's premium is zero.
 
 Alerts are investigation prompts, not proof of cause. In a production environment, KPI definitions should be agreed with Distribution, Finance, and Actuarial stakeholders. Data lineage and quality checks should be strengthened, and persistency may need cohort- or exposure-weighted treatment depending on the business definition.
 
