@@ -281,29 +281,29 @@ with st.sidebar:
           src="data:image/png;base64,{logo_base64}"
           alt="Distribution Strategy Intelligence"
           style="
-              width:44px;
-              height:48px;
+              width:58px;
+              height:62px;
               object-fit:contain;
-              flex:0 0 44px;
+              flex:0 0 58px;
               display:block;
           "
         />
         <div style="
             min-width:0;
             color:#f6f9ff;
-            font-size:13px;
-            font-weight:700;
-            line-height:1.4;
-            letter-spacing:-0.15px;
+            font-size:16px;
+            font-weight:750;
+            line-height:1.3;
+            letter-spacing:-0.25px;
         ">
           <div>Distribution</div>
           <div>Strategy Intelligence</div>
         </div>
       </div>
       <div style="
-          margin:7px 0 0 54px;
+          margin:8px 0 0 68px;
           color:#9fb8d8;
-          font-size:10px;
+          font-size:11px;
           line-height:1.4;
           letter-spacing:.15px;
       ">From data to decisions</div>
