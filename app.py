@@ -60,13 +60,17 @@ insight_score = partner_scorecard(filtered)
 premium_gap = (
     k["premium_actual_idr"] - k["premium_target_idr"]
 )
-below_target = int(
-    (insight_score["attainment_rate"] < threshold).sum()
-)
 
-top_partner = insight_score.sort_values(
-    "premium_actual_idr", ascending=False
-).iloc[0]
+underperforming = detect_underperformance(filtered, threshold)
+below_target = underperforming["partner"].nunique()
+
+if not insight_score.empty:
+    top_partner = insight_score.iloc[0]
+    top_partner_name = top_partner["partner"]
+    top_partner_premium = top_partner["premium_actual_idr"]
+else:
+    top_partner_name = "No partner data"
+    top_partner_premium = 0.0
 
 i1, i2, i3 = st.columns(3)
 
@@ -82,8 +86,8 @@ i2.metric(
 
 i3.metric(
     "Top partner by premium",
-    top_partner["partner"],
-    f"Rp {top_partner['premium_actual_idr'] / 1e9:,.2f}B",
+    top_partner_name,
+    help="Partner with the highest cumulative actual premium in the current selection.",
 )
 
 if premium_gap < 0:
