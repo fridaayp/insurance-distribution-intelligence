@@ -14,13 +14,103 @@ from src.analytics import (
 st.set_page_config(page_title="Distribution Strategy Intelligence", page_icon="📊", layout="wide")
 st.markdown("""
 <style>
-.stApp{background:#f3f6fb;color:#17263d}
-.block-container{max-width:1500px;padding-top:1.3rem}
-[data-testid="stSidebar"]{background:linear-gradient(180deg,#10233f,#18385c)}
-[data-testid="stSidebar"] *{color:#f5f8fc}
-[data-testid="stMetric"]{background:white;border:1px solid #e1e8f2;padding:15px;border-radius:13px}
-[data-testid="stPlotlyChart"]{background:white;border:1px solid #e1e8f2;border-radius:13px;padding:6px}
-h1,h2,h3{color:#152b4a}
+:root {
+  --navy: #10233f;
+  --blue: #2563eb;
+  --ink: #172b49;
+  --muted: #687a93;
+  --line: #e4ebf4;
+}
+.stApp {
+  background: radial-gradient(ellipse at 10% 0%, #e8f1ff 0%, transparent 32%), #f3f6fb;
+  color: var(--ink);
+}
+.block-container {
+  max-width: 1560px;
+  padding-top: 1.4rem;
+  padding-bottom: 3rem;
+}
+[data-testid="stSidebar"] {
+  background: linear-gradient(165deg, #0d1d34, #132d4d 58%, #1a426a);
+  border-right: 1px solid rgba(255,255,255,.08);
+}
+[data-testid="stSidebar"] * { color: #f5f8fc; }
+[data-testid="stSidebar"] [data-testid="stRadio"] label {
+  padding: 9px 11px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+}
+[data-testid="stSidebar"] [data-testid="stRadio"] label:hover {
+  background: rgba(255,255,255,.09);
+  border-color: rgba(255,255,255,.12);
+}
+h1 {
+  color: #122844;
+  font-size: 2.15rem;
+  font-weight: 780;
+  letter-spacing: -.045em;
+}
+h2 { color: #183452; font-weight: 720; }
+h3 { color: #25405f; font-weight: 700; }
+[data-testid="stMetric"] {
+  background: linear-gradient(145deg, #fff, #fbfdff);
+  border: 1px solid var(--line);
+  padding: 18px 19px;
+  border-radius: 16px;
+  box-shadow: 0 5px 18px rgba(25,53,88,.045);
+  min-height: 112px;
+}
+[data-testid="stMetricLabel"] {
+  color: var(--muted);
+  font-size: .83rem;
+  font-weight: 650;
+}
+[data-testid="stMetricValue"] {
+  color: #142b49;
+  font-weight: 780;
+  letter-spacing: -.035em;
+}
+[data-testid="stPlotlyChart"] {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: 0 5px 18px rgba(25,53,88,.035);
+}
+[data-testid="stDataFrame"],
+[data-testid="stTable"] {
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  overflow: hidden;
+}
+[data-testid="stTabs"] button[role="tab"] {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 9px 9px 0 0;
+  padding: 10px 15px;
+  font-weight: 650;
+}
+[data-testid="stTabs"] button[aria-selected="true"] {
+  background: #eaf1ff;
+  color: #1d4ed8;
+  border-color: #c9d9fb;
+}
+.stButton > button,
+.stDownloadButton > button {
+  border-radius: 10px;
+  border: 1px solid #d7e2f0;
+  font-weight: 650;
+  padding: .55rem .9rem;
+  transition: all .15s ease;
+}
+.stButton > button:hover,
+.stDownloadButton > button:hover {
+  border-color: #8fb2f2;
+  transform: translateY(-1px);
+}
+[data-testid="stAlert"] { border-radius: 12px; }
+hr { border-color: #e0e8f2; }
+#MainMenu, footer { visibility: hidden; }
 </style>
 """, unsafe_allow_html=True)
 
