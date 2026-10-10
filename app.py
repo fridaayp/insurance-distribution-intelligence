@@ -277,15 +277,15 @@ with st.sidebar:
               gap: 12px;
           ">
             <div style="
-                width: 42px;
-                height: 46px;
-                min-width: 42px;
+                width: 52px;
+                height: 56px;
+                min-width: 52px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
             ">
-              <svg viewBox="0 0 52 56" width="42" height="46"
-                   xmlns="http://www.w3.org/2000/svg">
+             <svg viewBox="0 0 52 56" width="52" height="56"
+                xmlns="http://www.w3.org/2000/svg">    
                 <defs>
                   <linearGradient id="brandShield" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0%" stop-color="#42d6ce"/>
@@ -324,7 +324,7 @@ with st.sidebar:
               color:#9fb8d8;
               font-size:11px;
               line-height:1.4;
-              margin:9px 0 0 54px;
+              margin:9px 0 0 64px;
               letter-spacing:.1px;
           ">From data to decisions</div>
         </div>
