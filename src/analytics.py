@@ -156,16 +156,19 @@ def detect_monthly_anomalies(
     )
 
     # Compare only consecutive calendar months, not merely consecutive observations.
-    partner_month["previous_month"] = (
-        partner_month.groupby("partner")["month"].shift(1)
+    month_index = (
+        partner_month["month"].dt.year * 12
+        + partner_month["month"].dt.month
+    )
+    partner_month["previous_month_index"] = (
+        month_index.groupby(partner_month["partner"]).shift(1)
     )
     partner_month["previous_premium"] = (
         partner_month.groupby("partner")["premium_actual_idr"].shift(1)
     )
 
     consecutive = (
-        partner_month["month"].dt.to_period("M")
-        - partner_month["previous_month"].dt.to_period("M")
+        month_index - partner_month["previous_month_index"]
     ).eq(1)
 
     partner_month["partner_mom_change"] = (
