@@ -3073,46 +3073,83 @@ else:
 
     # --- Decision log ---
     st.subheader("Decision log")
-    st.caption("Capture a decision, accountable owner, due date, and supporting evidence.")
-
-    decision = st.text_area(
-        "Decision or next action",
-        placeholder="Describe the decision, action, dependency, or issue...",
+    st.caption(
+        "Track management decisions, accountable owners, deadlines, and outcomes."
     )
 
-    log_col1, log_col2 = st.columns(2)
-
-    with log_col1:
-        decision_owner = st.text_input(
-            "Accountable owner",
-            placeholder="Role or team",
+    with st.form("decision_log_form"):
+        decision = st.text_area(
+            "Decision or next action",
+            placeholder="What decision is needed, and why?",
         )
 
-    with log_col2:
+        decision_col1, decision_col2 = st.columns(2)
+
+        with decision_col1:
+            decision_project = st.selectbox(
+                "Related project",
+                options=projects["Project"].tolist(),
+            )
+            decision_owner = st.text_input(
+                "Accountable owner",
+                placeholder="Role or team",
+            )
+
+        with decision_col2:
+            decision_status = st.selectbox(
+                "Decision status",
+                ["Pending", "Approved", "Rejected", "On hold"],
+            )
+            decision_impact = st.selectbox(
+                "Business impact",
+                ["High", "Medium", "Low"],
+            )
+
         decision_due = st.date_input(
             "Target date",
             value=None,
             format="DD/MM/YYYY",
         )
 
-    if decision.strip():
-        decision_record = pd.DataFrame([{
-            "Decision or next action": decision.strip(),
-            "Owner": decision_owner.strip(),
-            "Target date": str(decision_due) if decision_due else "",
-        }])
-
-        st.download_button(
-            "Download decision log CSV",
-            decision_record.to_csv(index=False).encode("utf-8"),
-            "decision_log.csv",
-            "text/csv",
+        submitted = st.form_submit_button(
+            "Prepare decision record",
+            use_container_width=True,
         )
 
-    st.info(
-        "Prototype limitation: project records are illustrative examples, not "
-        "live project-management data. Editing the table does not persist changes "
-        "to a database or synchronize them with another system."
+    if submitted:
+        if not decision.strip():
+            st.warning("Please enter the decision or next action.")
+        else:
+            decision_record = pd.DataFrame([{
+                "Related project": decision_project,
+                "Decision or next action": decision.strip(),
+                "Owner": decision_owner.strip(),
+                "Status": decision_status,
+                "Business impact": decision_impact,
+                "Target date": (
+                    str(decision_due) if decision_due else ""
+                ),
+            }])
+
+            st.success("Decision record prepared.")
+
+            st.dataframe(
+                decision_record,
+                use_container_width=True,
+                hide_index=True,
+            )
+
+            st.download_button(
+                "Download decision record CSV",
+                decision_record.to_csv(index=False).encode("utf-8"),
+                "decision_log.csv",
+                "text/csv",
+                use_container_width=True,
+            )
+
+    st.caption(
+        "Prototype: records can be downloaded as CSV. "
+        "They are not permanently stored or synchronized with a database."
     )
 
 st.divider()
