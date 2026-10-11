@@ -1878,9 +1878,17 @@ if page == "Executive Overview":
                     "signals": signals,
                     "actions": recommended_actions,
                     "_rank": int(group["_rank"].min()),
+                    "_shortfall": float(
+                        group["_shortfall"].max()
+                    ),
                 })
 
-            consolidated.sort(key=lambda item: item["_rank"])
+            consolidated.sort(
+                key=lambda item: (
+                    item["_rank"],
+                    -item["_shortfall"],
+                )
+            )
             consolidated = consolidated[:3]
 
             if consolidated:
