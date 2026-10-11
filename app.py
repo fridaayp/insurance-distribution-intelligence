@@ -1936,10 +1936,6 @@ if page == "Executive Overview":
                             color:#405874;
                             font-size:11px;
                             line-height:1.6;">
-                          <ol style="padding-left:18px;margin:0;">
-                            {action_list_html}
-                          </ol>
-                        </div>
                         <ol style="padding-left:18px;margin:0;">
                             {action_list_html}
                           </ol>
