@@ -489,7 +489,6 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
     st.divider()
-    st.caption("Independent portfolio prototype • synthetic data only")
 
 df = data.copy()
 
