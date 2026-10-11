@@ -1940,6 +1940,11 @@ if page == "Executive Overview":
                             {action_list_html}
                           </ol>
                         </div>
+                        <ol style="padding-left:18px;margin:0;">
+                            {action_list_html}
+                          </ol>
+                          </div>
+                        </div>
                         """,
                         unsafe_allow_html=True,
                     )
