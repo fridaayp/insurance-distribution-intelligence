@@ -707,8 +707,8 @@ if page == "Executive Overview":
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: 2px;
-    margin-bottom: 14px;
+    gap: 4px;
+    margin-bottom: 18px;
 }
 
 .eo-header > div:last-child {
@@ -739,20 +739,21 @@ if page == "Executive Overview":
 
 .eo-title {
     color: #102844;
-    font-size: clamp(28px, 2.5vw, 34px);
-    font-weight: 820;
-    letter-spacing: -1.1px;
-    line-height: 1;
+    font-size: clamp(30px, 2.6vw, 36px);
+    font-weight: 800;
+    letter-spacing: -1.15px;
+    line-height: 1.08;
     margin: 0 !important;
     padding: 0 !important;
 }
 
 .eo-subtitle {
-    color: #687e98;
+    color: #718198;
     font-size: 12px;
-    line-height: 1.5;
-    margin-top: 0px;
-    padding: 0
+    font-weight: 450;
+    line-height: 1.4;
+    margin-top: 0;
+    padding: 0;
 }
 
 .eo-disclaimer {
@@ -771,15 +772,16 @@ if page == "Executive Overview":
     display: grid;
     grid-template-columns: minmax(220px, 1.35fr) repeat(3, minmax(135px, 1fr));
     background: #ffffff;
-    border: 1px solid #e1e9f2;
-    border-radius: 11px;
-    margin: 0 0 15px;
+    border: 1px solid #dce5ef;
+    border-radius: 10px;
+    margin: 0 0 18px;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(16, 40, 68, 0.035);
 }
 
 .eo-context-item {
     min-width: 0;
-    padding: 11px 13px;
+    padding: 13px 15px;
     border-right: 1px solid #e8eef5;
 }
 
