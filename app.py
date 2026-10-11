@@ -1053,9 +1053,17 @@ if page == "Executive Overview":
         start_period = pd.Period(start_period, freq="M")
         end_period = pd.Period(end_period, freq="M")
 
-        # Apply the same partner/channel scope before validating history.
-        comp = _month_window(data, start_period, end_period)
+        # Reject invalid comparison windows.
+        if start_period > end_period:
+            return None
 
+        comp = _month_window(
+            data,
+            start_period,
+            end_period,
+        )
+
+        # Apply the same scope as the selected reporting period.
         if partner != "All partners":
             comp = comp[comp["partner"] == partner]
 
@@ -1065,33 +1073,25 @@ if page == "Executive Overview":
         if comp.empty:
             return None
 
-        # Require every calendar month in this comparison window
-        # to be present for the selected partner/channel scope.
+        # Confirm every calendar month has records in this scope.
         expected_months = {
             str(month)
             for month in pd.period_range(
-                start_period, end_period, freq="M"
+                start_period,
+                end_period,
+                freq="M",
             )
         }
+
         observed_months = set(
-            comp["month"].dt.to_period("M").astype(str).unique()
+            comp["month"]
+            .dt.to_period("M")
+            .astype(str)
+            .unique()
         )
 
         if not expected_months.issubset(observed_months):
             return None
-
-        return _comparison_summary(comp)
-        if not _window_is_available(
-            start_period, end_period, all_months
-        ):
-            return None
-
-        comp = _month_window(data, start_period, end_period)
-
-        if partner != "All partners":
-            comp = comp[comp["partner"] == partner]
-        if channel != "All channels":
-            comp = comp[comp["channel"] == channel]
 
         return _comparison_summary(comp)
 
