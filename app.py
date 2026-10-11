@@ -1885,6 +1885,7 @@ if page == "Executive Overview":
                     "partners": [str(partner_name)],
                     "signals": signals,
                     "actions": recommended_actions,
+                    "basis": bases,
                     "_rank": int(group["_rank"].min()),
                     "_shortfall": float(
                         group["_shortfall"].max()
@@ -1915,6 +1916,7 @@ if page == "Executive Overview":
                     signal_label = item["signals"][0] if item["signals"] else (
                         "Management review"
                     )
+                    basis_label = " ".join(item.get("basis", []))
                     if len(item["signals"]) > 1:
                         signal_label += (
                             f" · {len(item['signals'])} related signals"
@@ -1976,6 +1978,13 @@ if page == "Executive Overview":
                               line-height:1.5;
                               margin-bottom:7px;">
                             {signal_label}
+                            <div style="
+                              color:#8291a5;
+                              font-size:10px;
+                              line-height:1.5;
+                              margin-bottom:8px;">
+                            <strong>Why flagged:</strong> {basis_label}
+                          </div>
                           </div>
                           <div style="
                             color:#405874;
