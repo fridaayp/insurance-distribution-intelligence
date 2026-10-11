@@ -1434,13 +1434,25 @@ if page == "Executive Overview":
                 automargin=True,
             )
 
+            y_min = min(
+                trend_view["actual_premium_bn"].min(),
+                trend_view["target_premium_bn"].min(),
+            )
+            y_max = max(
+                trend_view["actual_premium_bn"].max(),
+                trend_view["target_premium_bn"].max(),
+            )
+            y_padding = max((y_max - y_min) * 0.8, 1.0)
+
             fig.update_yaxes(
                 title=None,
                 tickprefix="Rp ",
                 ticksuffix="B",
-                tickformat=".0f",
-                dtick=2,
-                rangemode="tozero",
+                tickformat=".1f",
+                range=[
+                    max(0, y_min - y_padding),
+                    y_max + y_padding,
+                ],
                 gridcolor="#EDF2F7",
                 zeroline=False,
                 tickfont=dict(size=10, color="#73849A"),
