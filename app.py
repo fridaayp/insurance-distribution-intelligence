@@ -1916,7 +1916,10 @@ if page == "Executive Overview":
                     signal_label = item["signals"][0] if item["signals"] else (
                         "Management review"
                     )
-                    basis_label = " ".join(item.get("basis", []))
+                    basis_list_html = "".join(
+                        f'<li style="margin-bottom:4px;">{basis}</li>'
+                        for basis in item.get("basis", [])
+                    )
                     if len(item["signals"]) > 1:
                         signal_label += (
                             f" · {len(item['signals'])} related signals"
@@ -1978,13 +1981,16 @@ if page == "Executive Overview":
                               line-height:1.5;
                               margin-bottom:7px;">
                             {signal_label}
-                            <div style="
+                          </div>
+                          <div style="
                               color:#8291a5;
                               font-size:10px;
                               line-height:1.5;
                               margin-bottom:8px;">
-                            <strong>Why flagged:</strong> {basis_label}
-                          </div>
+                            <strong>Why flagged</strong>
+                            <ul style="padding-left:16px;margin:4px 0 0 0;">
+                              {basis_list_html}
+                            </ul>
                           </div>
                           <div style="
                             color:#405874;
