@@ -1191,84 +1191,234 @@ if page == "Executive Overview":
 
     # Continue with the existing section beginning:
     # # Trend and channel attainment
-    left, right = st.columns([1.55, 1], gap="medium")
+    # =========================================================
+    # CHARTS — executive-focused visual refinement
+    # =========================================================
+    left, right = st.columns([1.5, 1], gap="medium")
+
+    # Monthly premium trend
     trend_view = (
-        df.groupby(df["month"].dt.to_period("M").dt.to_timestamp(), as_index=False)
-        .agg(
-            premium_actual_idr=("premium_actual_idr", "sum"),
-            premium_target_idr=("premium_target_idr", "sum"),
+        df.assign(
+            month=df["month"].dt.to_period("M").dt.to_timestamp()
         )
-        .rename(columns={"month": "month"})
+        .groupby("month", as_index=False)
+        .agg(
+            actual_premium=("premium_actual_idr", "sum"),
+            target_premium=("premium_target_idr", "sum"),
+        )
+        .sort_values("month")
     )
-    # The groupby timestamp column is named after the original Series; normalize it.
-    if "month" not in trend_view.columns:
-        trend_view = trend_view.rename(columns={trend_view.columns[0]: "month"})
 
     with left:
         st.markdown(
-            '<div class="exec-panel-title">Premium vs target over time</div>'
-            '<div class="exec-panel-sub">Monthly actual premium against target.</div>',
+            '<div class="exec-panel-title">Premium vs Target</div>'
+            '<div class="exec-panel-sub">'
+            'Monthly premium delivery against target.'
+            '</div>',
             unsafe_allow_html=True,
         )
+
         if not trend_view.empty:
-            fig = px.line(
-                trend_view, x="month",
-                y=["premium_actual_idr", "premium_target_idr"],
-                markers=True,
-                color_discrete_map={
-                    "premium_actual_idr": "#1769aa",
-                    "premium_target_idr": "#9bbce0",
-                },
-                labels={
-                    "month": "Month", "value": "Premium (IDR)",
-                    "variable": "", "premium_actual_idr": "Actual premium",
-                    "premium_target_idr": "Target premium",
-                },
+            fig = go.Figure()
+
+            fig.add_trace(go.Scatter(
+                x=trend_view["month"],
+                y=trend_view["actual_premium"],
+                name="Actual Premium",
+                mode="lines+markers",
+                line=dict(color="#1769AA", width=2.8),
+                marker=dict(size=5, color="#1769AA"),
+                hovertemplate=(
+                    "%{x|%b %Y}<br>"
+                    "Actual: Rp %{y:,.0f}<extra></extra>"
+                ),
+            ))
+
+            fig.add_trace(go.Scatter(
+                x=trend_view["month"],
+                y=trend_view["target_premium"],
+                name="Target Premium",
+                mode="lines+markers",
+                line=dict(color="#A7BED9", width=2.2, dash="dot"),
+                marker=dict(size=4, color="#A7BED9"),
+                hovertemplate=(
+                    "%{x|%b %Y}<br>"
+                    "Target: Rp %{y:,.0f}<extra></extra>"
+                ),
+            ))
+
+            # Keep month labels readable for short and long periods.
+            month_count = len(trend_view)
+            tick_interval = 1 if month_count <= 8 else (
+                2 if month_count <= 18 else 3
             )
-            fig.update_traces(line=dict(width=2.5), marker=dict(size=5))
-            fig.update_xaxes(tickformat="%b %Y", dtick="M2")
-            fig.update_yaxes(tickprefix="Rp ", tickformat="~s", rangemode="tozero")
-            fig.update_layout(hovermode="x unified", height=325)
-            st.plotly_chart(style(fig, 325), use_container_width=True)
+
+            fig.update_xaxes(
+                title=None,
+                tickformat="%b\n%Y",
+                dtick=f"M{tick_interval}",
+                showgrid=False,
+                showline=True,
+                linecolor="#E4EBF3",
+                tickfont=dict(size=10, color="#73849A"),
+                automargin=True,
+            )
+
+            fig.update_yaxes(
+                title=None,
+                tickprefix="Rp ",
+                tickformat="~s",
+                rangemode="tozero",
+                gridcolor="#EDF2F7",
+                zeroline=False,
+                tickfont=dict(size=10, color="#73849A"),
+                automargin=True,
+            )
+
+            fig.update_layout(
+                height=320,
+                margin=dict(l=12, r=16, t=38, b=8),
+                paper_bgcolor="white",
+                plot_bgcolor="white",
+                hovermode="x unified",
+                font=dict(
+                    family="Arial, sans-serif",
+                    size=11,
+                    color="#526680",
+                ),
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=1.02,
+                    xanchor="left",
+                    x=0,
+                    font=dict(size=10),
+                ),
+            )
+
+            st.plotly_chart(
+                fig,
+                use_container_width=True,
+                config={"displayModeBar": False},
+            )
         else:
             st.info("No monthly trend is available for this selection.")
 
+    # Channel target attainment
     channel_view = (
         df.groupby("channel", as_index=False)
         .agg(
-            premium_actual_idr=("premium_actual_idr", "sum"),
-            premium_target_idr=("premium_target_idr", "sum"),
+            actual_premium=("premium_actual_idr", "sum"),
+            target_premium=("premium_target_idr", "sum"),
         )
     )
+
     channel_view["attainment"] = (
-        channel_view["premium_actual_idr"]
-        / channel_view["premium_target_idr"].replace(0, float("nan"))
+        channel_view["actual_premium"]
+        / channel_view["target_premium"].where(
+            channel_view["target_premium"] > 0
+        )
     )
-    channel_view = channel_view.dropna(subset=["attainment"]).sort_values("attainment")
+
+    channel_view = (
+        channel_view.dropna(subset=["attainment"])
+        .sort_values("attainment", ascending=False)
+    )
 
     with right:
         st.markdown(
-            '<div class="exec-panel-title">Target attainment by channel</div>'
-            '<div class="exec-panel-sub">Dashed line marks 100% of target.</div>',
+            '<div class="exec-panel-title">Channel Target Attainment</div>'
+            '<div class="exec-panel-sub">'
+            'Actual premium relative to the 100% target benchmark.'
+            '</div>',
             unsafe_allow_html=True,
         )
-        if not channel_view.empty:
-            fig = px.bar(
-                channel_view, x="attainment", y="channel", orientation="h",
-                text=channel_view["attainment"].map(lambda v: f"{v:.0%}"),
-                labels={"attainment": "Target attainment", "channel": ""},
-                color_discrete_sequence=["#347fc4"],
-            )
-            fig.update_traces(textposition="outside", cliponaxis=False)
-            max_value = max(1.1, float(channel_view["attainment"].max()) * 1.15)
-            fig.update_xaxes(tickformat=".0%", range=[0, max_value])
-            fig.add_vline(x=1, line_dash="dash", line_color="#7c91ab", line_width=1.4)
-            fig.update_layout(showlegend=False, height=325, margin=dict(l=8,r=30,t=20,b=12))
-            st.plotly_chart(style(fig, 325), use_container_width=True)
-        else:
-            st.info("Channel attainment unavailable because target is zero.")
 
-    # Partner ranking and review queue
+        if not channel_view.empty:
+            # Reserve space beyond the longest bar for percentage labels.
+            max_attainment = float(channel_view["attainment"].max())
+            axis_max = max(1.12, max_attainment * 1.16)
+
+            bar_colors = [
+                "#1769AA" if value >= 1.0 else "#729CC8"
+                for value in channel_view["attainment"]
+            ]
+
+            fig = go.Figure()
+
+            fig.add_trace(go.Bar(
+                x=channel_view["attainment"],
+                y=channel_view["channel"],
+                orientation="h",
+                marker=dict(
+                    color=bar_colors,
+                    line=dict(width=0),
+                ),
+                text=[
+                    f"{value:.1%}"
+                    for value in channel_view["attainment"]
+                ],
+                textposition="outside",
+                textfont=dict(size=10, color="#344D6B"),
+                cliponaxis=False,
+                hovertemplate=(
+                    "%{y}<br>Attainment: %{x:.1%}<extra></extra>"
+                ),
+            ))
+
+            # 100% target reference
+            fig.add_vline(
+                x=1.0,
+                line_dash="dash",
+                line_color="#667D98",
+                line_width=1.4,
+            )
+
+            fig.update_xaxes(
+                title=None,
+                tickformat=".0%",
+                range=[0, axis_max],
+                gridcolor="#EDF2F7",
+                zeroline=False,
+                tickfont=dict(size=9, color="#73849A"),
+                automargin=True,
+            )
+
+            fig.update_yaxes(
+                title=None,
+                autorange="reversed",
+                showgrid=False,
+                tickfont=dict(size=10, color="#526680"),
+                automargin=True,
+            )
+
+            fig.update_layout(
+                height=320,
+                showlegend=False,
+                margin=dict(l=8, r=38, t=20, b=10),
+                paper_bgcolor="white",
+                plot_bgcolor="white",
+                bargap=0.36,
+                font=dict(
+                    family="Arial, sans-serif",
+                    size=10,
+                    color="#526680",
+                ),
+            )
+
+            st.plotly_chart(
+                fig,
+                use_container_width=True,
+                config={"displayModeBar": False},
+            )
+        else:
+            st.info(
+                "Channel attainment is unavailable because "
+                "no positive targets exist in this selection."
+            )
+
+    # Keep the existing section below this point:
+    # # Partner ranking and review queue
     partner_view = (
         df.groupby("partner", as_index=False)
         .agg(
