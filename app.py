@@ -1802,49 +1802,58 @@ if page == "Executive Overview":
             if "priority" not in action_df.columns:
                 action_df["priority"] = "Review"
 
-            # Sort by priority before consolidating repeated actions.
+            # Rank actions by priority, then consolidate by partner.
             priority_rank = {
-                "critical": 0, "high": 1,
-                "medium": 2, "low": 3,
+                "critical": 0,
+                "high": 1,
+                "medium": 2,
+                "low": 3,
             }
+
             action_df["_rank"] = (
                 action_df["priority"].astype(str).str.lower()
                 .map(priority_rank).fillna(4)
             )
-            action_df = action_df.sort_values("_rank")
 
-            # Consolidate records that recommend the same action.
             action_df["_action_key"] = (
                 action_df["suggested_action"]
                 .fillna("")
                 .astype(str)
                 .str.strip()
-                .str.lower()
             )
 
-            consolidated = []
-            for action_key, group in action_df.groupby(
-                "_action_key", sort=False
-            ):
-                if not action_key:
-                    continue
+            action_df = action_df[
+                action_df["_action_key"].ne("")
+            ].sort_values("_rank")
 
+            consolidated = []
+
+            for partner_name, group in action_df.groupby(
+                "partner", sort=False
+            ):
                 first = group.iloc[0]
-                partners = (
-                    group["partner"].fillna("Portfolio")
-                    .astype(str).drop_duplicates().tolist()
-                )
+
                 signals = (
                     group["signal"].fillna("")
-                    .astype(str).drop_duplicates().tolist()
+                    .astype(str).str.strip()
+                )
+                signals = signals[signals.ne("")].drop_duplicates().tolist()
+
+                recommended_actions = (
+                    group["_action_key"].drop_duplicates().tolist()
                 )
 
                 consolidated.append({
                     "priority": first["priority"],
-                    "partners": partners,
+                    "partners": [str(partner_name)],
                     "signals": signals,
-                    "action": str(first["suggested_action"]),
-                    "_rank": int(first["_rank"]),
+                    "action": " ".join(
+                        f"{i}. {action}"
+                        for i, action in enumerate(
+                            recommended_actions, start=1
+                        )
+                    ),
+                    "_rank": int(group["_rank"].min()),
                 })
 
             consolidated.sort(key=lambda item: item["_rank"])
