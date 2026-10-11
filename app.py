@@ -706,8 +706,8 @@ if page == "Executive Overview":
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 24px;
-    margin-bottom: 14px;
+    gap: 16px;
+    margin-bottom: 10px;
 }
 
 .eo-header > div:first-child {
