@@ -707,10 +707,8 @@ if page == "Executive Overview":
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 14px;
-    width: 100%;
-    min-width: 0;
 }
 
 .eo-header > div:last-child {
