@@ -1051,6 +1051,13 @@ if page == "Executive Overview":
         font-size: 13px !important;
         line-height: 1.5 !important;
     }
+    
+    /* Remove table borders and shadows */
+div[data-testid="stDataFrame"],
+div[data-testid="stDataEditor"] {
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
 
     /* Premium blue accents */
     :root {
