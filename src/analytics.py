@@ -201,8 +201,8 @@ def generate_recommendations(
                     "recovery plan with the partner."
                 ),
                 "basis": (
-                    "Rule: cumulative actual premium / target is below "
-                    "the configured threshold."
+                    f"Premium attainment is {attainment:.1%}, "
+                    f"below the {attainment_threshold:.0%} threshold."
                 ),
             })
         if row["persistency_rate"] < 0.78:
@@ -215,8 +215,9 @@ def generate_recommendations(
                     "handoffs before increasing acquisition spend."
                 ),
                 "basis": (
-                    "Rule: unweighted mean row-level persistency is below 78%; "
-                    "investigate before inferring a cause."
+                    f"Average persistency is "
+                    f"{row['persistency_rate']:.0%}, below 78%; "
+                    "review lapse patterns and servicing processes."
                 ),
             })
 
@@ -234,8 +235,10 @@ def generate_recommendations(
                 "staffing, and operational changes."
             ),
             "basis": (
-                "Rule: aggregated partner-month premium declined by at least "
-                "30%; this is an alert, not a causal explanation."
+                f"Partner premium fell by "
+                f"{abs(row['partner_mom_change']):.0%} versus the "
+                "previous month; validate data and investigate "
+                "operational changes."
             ),
         })
     order = {"High": 0, "Medium": 1, "Low": 2}
