@@ -882,6 +882,23 @@ if page == "Executive Overview":
 }
 
     /* Section hierarchy */
+    /* Chart titles — premium executive hierarchy */
+    .exec-panel-title {
+        color: #102844 !important;
+        font-size: 22px !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.55px !important;
+        line-height: 1.25 !important;
+        margin: 0 0 7px !important;
+    }
+
+    .exec-panel-sub {
+        color: #718198 !important;
+        font-size: 13px !important;
+        font-weight: 400 !important;
+        line-height: 1.5 !important;
+        margin: 0 0 12px !important;
+    }
     .eo-section-heading {
         color: #1a3554;
         font-size: 12px;
@@ -1347,7 +1364,7 @@ if page == "Executive Overview":
                 y=trend_view["actual_premium"],
                 name="Actual Premium",
                 mode="lines+markers",
-                line=dict(color="#1769AA", width=2.8),
+                line=dict(color="#15EEF", width=3.2),
                 marker=dict(size=5, color="#1769AA"),
                 hovertemplate=(
                     "%{x|%b %Y}<br>"
@@ -1360,7 +1377,7 @@ if page == "Executive Overview":
                 y=trend_view["target_premium"],
                 name="Target Premium",
                 mode="lines+markers",
-                line=dict(color="#A7BED9", width=2.2, dash="dot"),
+                line=dict(color="#AAB8CA", width=2, dash="dot"),
                 marker=dict(size=4, color="#A7BED9"),
                 hovertemplate=(
                     "%{x|%b %Y}<br>"
@@ -1461,7 +1478,9 @@ if page == "Executive Overview":
             axis_max = max(1.12, max_attainment * 1.16)
 
             bar_colors = [
-                "#1769AA" if value >= 1.0 else "#729CC8"
+                "#16856B" if value >= 1.0 else
+                "#155EEF" if value >= threshold else
+                "#D99A2B"
                 for value in channel_view["attainment"]
             ]
 
