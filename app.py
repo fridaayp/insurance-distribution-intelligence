@@ -900,12 +900,13 @@ if page == "Executive Overview":
         margin: 0 0 12px !important;
     }
     .eo-section-heading {
-        color: #1a3554;
-        font-size: 12px;
+        color: #102844;
+        font-size: 22px;
         font-weight: 800;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-        margin: 0 0 10px;
+        letter-spacing: -0.55px;
+        line-height: 1.25;
+        text-transform: none;
+        margin: 0 0 12px;
     }
     .eo-section-note {
         color: #8291a5;
@@ -1239,6 +1240,18 @@ if page == "Executive Overview":
             else "negative" if py.startswith("-")
             else ""
         )
+
+        if metric == "gap":
+            pp_class = (
+                "negative" if "widened" in pp.lower()
+                else "positive" if "narrowed" in pp.lower()
+                else ""
+            )
+            py_class = (
+                "negative" if "widened" in py.lower()
+                else "positive" if "narrowed" in py.lower()
+                else ""
+            )
 
         return f"""
         <div class="eo-kpi">
