@@ -1928,8 +1928,13 @@ if page == "Executive Overview":
                         f'<li style="margin-bottom:4px;">{basis}</li>'
                         for basis in primary_basis
                     )
+
                     additional_basis_html = "".join(
-                        additional_section_html = ""
+                        f'<li style="margin-bottom:4px;">{basis}</li>'
+                        for basis in additional_basis
+                    )
+
+                    additional_section_html = ""
                     if additional_basis:
                         additional_section_html = (
                             '<div style="margin-top:7px;font-weight:700;">'
@@ -1939,9 +1944,6 @@ if page == "Executive Overview":
                             f'{additional_basis_html}'
                             '</ul>'
                         )
-                        f'<li style="margin-bottom:4px;">{basis}</li>'
-                        for basis in additional_basis
-                    )
                     if len(item["signals"]) > 1:
                         signal_label += (
                             f" · {len(item['signals'])} related signals"
