@@ -716,8 +716,22 @@ if page == "Executive Overview":
 }
 
 .eo-header > div:last-child {
-    flex: 0 1 260px;
-    min-width: 180px;
+    flex: 0 1 320px;
+    min-width: 0;
+}
+
+.eo-demo-badge {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 100%;
+}
+
+.eo-disclaimer {
+    max-width: 320px;
+    text-align: left;
+    margin-left: 0;
+    overflow-wrap: anywhere;
 }
 
 .eo-title {
