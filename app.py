@@ -1420,9 +1420,7 @@ if page == "Executive Overview":
             )
 
     # Partner ranking and review queue
-    # =========================================================
     # PARTNER PERFORMANCE — ranking and exception queue
-    # =========================================================
     partner_view = (
         df.groupby("partner", as_index=False)
         .agg(
