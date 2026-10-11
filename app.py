@@ -1661,84 +1661,163 @@ if page == "Executive Overview":
         if actions:
             action_df = pd.DataFrame(actions)
 
+            # Keep only fields available in the existing action records.
             preferred = [
-                column for column in [
-                    "priority",
-                    "partner",
-                    "signal",
-                    "suggested_action",
+                c for c in [
+                    "priority", "partner", "signal", "suggested_action"
                 ]
-                if column in action_df.columns
+                if c in action_df.columns
             ]
+            action_df = action_df[preferred].copy()
 
-            action_df = action_df[preferred].head(4).copy()
-
-            if "priority" in action_df.columns:
-                priority_order = {
-                    "High": 0, "Critical": 0,
-                    "Medium": 1, "Low": 2,
-                }
-                action_df["_priority_order"] = (
-                    action_df["priority"]
-                    .astype(str)
-                    .str.title()
-                    .map(priority_order)
-                    .fillna(3)
+            if "suggested_action" not in action_df.columns:
+                action_df["suggested_action"] = (
+                    "Review partner performance and validate source data."
                 )
-                action_df = (
-                    action_df.sort_values("_priority_order")
-                    .drop(columns="_priority_order")
-                )
+            if "partner" not in action_df.columns:
+                action_df["partner"] = "Portfolio"
+            if "signal" not in action_df.columns:
+                action_df["signal"] = "Management review"
+            if "priority" not in action_df.columns:
+                action_df["priority"] = "Review"
 
-            for _, action in action_df.iterrows():
-                priority = str(action.get("priority", "Review")).title()
-                partner_name = str(action.get("partner", "Portfolio"))
-                signal = str(action.get("signal", "Review required"))
-                recommendation = str(
-                    action.get(
-                        "suggested_action",
-                        "Review performance and validate source data.",
-                    )
-                )
-
-                if priority in ("High", "Critical"):
-                    priority_color = "#a94442"
-                    priority_bg = "#fff0ef"
-                elif priority == "Medium":
-                    priority_color = "#8a641b"
-                    priority_bg = "#fff7e5"
-                else:
-                    priority_color = "#376a9e"
-                    priority_bg = "#edf4fc"
-
-                st.markdown(
-                    f"""
-                    <div class="exec-insight" style="margin-bottom:8px;">
-                      <div style="
-                          display:flex;justify-content:space-between;
-                          align-items:center;gap:8px;margin-bottom:7px;">
-                        <div style="
-                            color:#193655;font-size:11px;font-weight:800;">
-                          {partner_name}
-                        </div>
-                        <span style="
-                            background:{priority_bg};
-                            color:{priority_color};
-                            padding:4px 7px;border-radius:6px;
-                            font-size:9px;font-weight:800;white-space:nowrap;">
-                          {priority}
-                        </span>
-                      </div>
-                      <div class="exec-insight-title">{signal}</div>
-                      <div class="exec-insight-body">{recommendation}</div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-        else:
-            st.info(
-                "No rule-based actions were triggered for this selection."
+            # Sort by priority before consolidating repeated actions.
+            priority_rank = {
+                "critical": 0, "high": 1,
+                "medium": 2, "low": 3,
+            }
+            action_df["_rank"] = (
+                action_df["priority"].astype(str).str.lower()
+                .map(priority_rank).fillna(4)
             )
+            action_df = action_df.sort_values("_rank")
+
+            # Consolidate records that recommend the same action.
+            action_df["_action_key"] = (
+                action_df["suggested_action"]
+                .fillna("")
+                .astype(str)
+                .str.strip()
+                .str.lower()
+            )
+
+            consolidated = []
+            for action_key, group in action_df.groupby(
+                "_action_key", sort=False
+            ):
+                if not action_key:
+                    continue
+
+                first = group.iloc[0]
+                partners = (
+                    group["partner"].fillna("Portfolio")
+                    .astype(str).drop_duplicates().tolist()
+                )
+                signals = (
+                    group["signal"].fillna("")
+                    .astype(str).drop_duplicates().tolist()
+                )
+
+                consolidated.append({
+                    "priority": first["priority"],
+                    "partners": partners,
+                    "signals": signals,
+                    "action": str(first["suggested_action"]),
+                    "_rank": int(first["_rank"]),
+                })
+
+            consolidated.sort(key=lambda item: item["_rank"])
+            consolidated = consolidated[:3]
+
+            if consolidated:
+                for i, item in enumerate(consolidated, start=1):
+                    priority = str(item["priority"]).title()
+
+                    partner_names = item["partners"]
+                    if len(partner_names) <= 2:
+                        partner_label = ", ".join(partner_names)
+                    else:
+                        partner_label = (
+                            ", ".join(partner_names[:2])
+                            + f" +{len(partner_names) - 2} more"
+                        )
+
+                    signal_label = item["signals"][0] if item["signals"] else (
+                        "Management review"
+                    )
+                    if len(item["signals"]) > 1:
+                        signal_label += (
+                            f" · {len(item['signals'])} related signals"
+                        )
+
+                    # Compact, consistent priority treatment.
+                    if priority in ("High", "Critical"):
+                        badge_bg, badge_fg = "#fff0ef", "#a94442"
+                    elif priority == "Medium":
+                        badge_bg, badge_fg = "#fff7e5", "#8a641b"
+                    else:
+                        badge_bg, badge_fg = "#edf4fc", "#376a9e"
+
+                    st.markdown(
+                        f"""
+                        <div style="
+                            border:1px solid #e2eaf3;
+                            border-radius:10px;
+                            padding:12px 13px;
+                            margin-bottom:9px;
+                            background:#ffffff;">
+                          <div style="
+                              display:flex;
+                              align-items:center;
+                              justify-content:space-between;
+                              gap:8px;
+                              margin-bottom:7px;">
+                            <span style="
+                                font-size:10px;
+                                font-weight:800;
+                                color:#8291a5;
+                                letter-spacing:.08em;">
+                              ACTION {i:02d}
+                            </span>
+                            <span style="
+                                background:{badge_bg};
+                                color:{badge_fg};
+                                border-radius:5px;
+                                padding:4px 7px;
+                                font-size:9px;
+                                font-weight:800;">
+                              {priority}
+                            </span>
+                          </div>
+                          <div style="
+                              color:#193655;
+                              font-size:12px;
+                              font-weight:800;
+                              line-height:1.45;
+                              margin-bottom:5px;">
+                            {partner_label}
+                          </div>
+                          <div style="
+                              color:#73849a;
+                              font-size:10px;
+                              line-height:1.5;
+                              margin-bottom:7px;">
+                            {signal_label}
+                          </div>
+                          <div style="
+                              color:#405874;
+                              font-size:11px;
+                              line-height:1.6;">
+                            {item['action']}
+                          </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+            else:
+                st.info("No actionable recommendations are available.")
+        else:
+            st.info("No rule-based actions were triggered for this selection.")
 
     with st.expander("Data transparency and definitions"):
         st.markdown("""
