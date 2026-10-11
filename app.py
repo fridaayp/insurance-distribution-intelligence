@@ -591,7 +591,7 @@ def _comparison_summary(frame):
     }
 
 # EXECUTIVE OVERVIEW V3 PATCH FOR app.py
-# 1) Insert the helper functions below immediately before `if page == "Executive Overview":`.
+# 1) Insert the helper functions below immediately before ` Overview":`.
 # 2) Replace the current Executive Overview block through (but not including)
 #    `elif page == "Performance Analysis":` with the section below.
 # Sidebar, global filters, data loading, and other pages remain unchanged.
@@ -666,45 +666,283 @@ def _kpi_card(title, value, help_text, metric, current, previous_period, previou
 
 # ---------- EXECUTIVE OVERVIEW SECTION ----------
 if page == "Executive Overview":
-    header(
-        "Executive Overview",
-        "Portfolio performance, target delivery, partner contribution, "
-        "and management priorities."
-    )
+    # =========================================================
+    # EXECUTIVE OVERVIEW — VISUAL FOUNDATION
+    # Sidebar, navigation, filters, and other pages unchanged.
+    # =========================================================
 
     st.markdown("""
     <style>
-    .block-container {padding-top:1.25rem;padding-bottom:2rem}
-    .exec-label {font-size:10px;font-weight:800;letter-spacing:.10em;
-        color:#6b7f98;text-transform:uppercase;margin-bottom:8px}
-    .exec-card {background:#fff;border:1px solid #e2eaf3;border-radius:14px;
-        padding:17px 17px 12px;box-shadow:0 3px 12px rgba(16,35,63,.035);
-        min-height:145px}
-    .exec-value {font-size:clamp(23px,2vw,31px);font-weight:800;
-        letter-spacing:-.04em;color:#102844;line-height:1.2;margin:8px 0 12px}
-    .exec-note {font-size:11px;color:#73849a;line-height:1.5}
-    .exec-compare {display:flex;justify-content:space-between;gap:8px;
-        border-top:1px solid #edf1f6;padding-top:7px;margin-top:7px;
-        font-size:10px;color:#71829a}
-    .exec-compare strong {color:#344d6b;font-size:10px}
-    .exec-panel {background:#fff;border:1px solid #e2eaf3;border-radius:14px;
-        padding:15px;box-shadow:0 3px 12px rgba(16,35,63,.025);margin-bottom:8px}
-    .exec-panel-title {font-size:15px;font-weight:800;color:#142d4b}
-    .exec-panel-sub {font-size:11px;color:#71829a;margin:4px 0 12px;line-height:1.5}
-    .exec-callout {padding:12px 15px;border:1px solid #f0dfb3;
-        background:#fff9eb;color:#79571d;border-radius:11px;
-        font-size:12px;line-height:1.6;margin:10px 0 15px}
-    .exec-insight {border:1px solid #e5ecf4;background:#fbfdff;
-        padding:13px;border-radius:11px;min-height:110px}
-    .exec-insight-title {font-size:12px;font-weight:800;color:#193655;margin-bottom:7px}
-    .exec-insight-body {font-size:11px;line-height:1.6;color:#5d7189}
-    [data-testid="stPlotlyChart"] {border:1px solid #e4ebf3;
-        border-radius:12px;background:#fff;padding:4px}
-    [data-testid="stDataFrame"] {border:1px solid #e2eaf3;border-radius:10px}
+    /* Page rhythm */
+    .block-container {
+        padding-top: 1.25rem;
+        padding-bottom: 1.8rem;
+        max-width: 1600px;
+    }
+
+    /* Executive header */
+    .eo-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 18px;
+    }
+    .eo-title {
+        color: #102844;
+        font-size: clamp(28px, 3vw, 36px);
+        font-weight: 820;
+        letter-spacing: -1.25px;
+        line-height: 1.12;
+        margin: 0;
+    }
+    .eo-subtitle {
+        color: #687e98;
+        font-size: 13px;
+        line-height: 1.55;
+        margin-top: 8px;
+    }
+    .eo-demo-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        white-space: nowrap;
+        background: #edf4fc;
+        border: 1px solid #dce8f7;
+        border-radius: 7px;
+        padding: 7px 10px;
+        color: #345c89;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: .08em;
+    }
+    .eo-demo-dot {
+        height: 6px;
+        width: 6px;
+        background: #5287bd;
+        border-radius: 50%;
+    }
+    .eo-disclaimer {
+        color: #657b95;
+        font-size: 10px;
+        line-height: 1.5;
+        margin-top: 7px;
+        max-width: 390px;
+        text-align: right;
+    }
+
+    /* Context strip */
+    .eo-context {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr 1fr 1fr;
+        background: #ffffff;
+        border: 1px solid #e1e9f2;
+        border-radius: 11px;
+        margin: 0 0 19px;
+        overflow: hidden;
+    }
+    .eo-context-item {
+        min-width: 0;
+        padding: 12px 15px;
+        border-right: 1px solid #e8eef5;
+    }
+    .eo-context-item:last-child {
+        border-right: none;
+    }
+    .eo-context-label {
+        color: #8493a7;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: .09em;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+    .eo-context-value {
+        color: #233d5c;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+    }
+
+    /* Section hierarchy */
+    .eo-section-heading {
+        color: #1a3554;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        margin: 0 0 10px;
+    }
+    .eo-section-note {
+        color: #8291a5;
+        font-size: 10px;
+        margin: -4px 0 12px;
+        line-height: 1.5;
+    }
+
+    /* KPI cards */
+    .eo-kpi {
+        background: #ffffff;
+        border: 1px solid #e0e8f1;
+        border-radius: 12px;
+        padding: 16px 16px 12px;
+        min-height: 150px;
+        box-shadow: 0 2px 7px rgba(16,40,68,.025);
+    }
+    .eo-kpi-label {
+        color: #73869d;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: .09em;
+        text-transform: uppercase;
+        min-height: 14px;
+    }
+    .eo-kpi-value-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 7px;
+        margin: 11px 0 7px;
+    }
+    .eo-kpi-value {
+        color: #102844;
+        font-size: clamp(23px, 2.1vw, 31px);
+        font-weight: 820;
+        line-height: 1.12;
+        letter-spacing: -1px;
+        overflow-wrap: anywhere;
+    }
+    .eo-kpi-note {
+        color: #8492a4;
+        font-size: 10px;
+        line-height: 1.45;
+        min-height: 15px;
+        margin-bottom: 11px;
+    }
+    .eo-kpi-comparison {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        border-top: 1px solid #edf1f6;
+        padding-top: 7px;
+        margin-top: 6px;
+        font-size: 10px;
+        line-height: 1.35;
+    }
+    .eo-kpi-comparison span {
+        color: #7d8da1;
+    }
+    .eo-kpi-comparison strong {
+        color: #405874;
+        font-size: 10px;
+        font-weight: 750;
+        text-align: right;
+    }
+
+    /* Portfolio signal */
+    .eo-signal {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 11px 14px;
+        margin: 12px 0 20px;
+        border: 1px solid #eadfca;
+        border-left: 3px solid #b88735;
+        border-radius: 8px;
+        background: #fffdf8;
+        color: #715a34;
+        font-size: 11px;
+        line-height: 1.55;
+    }
+    .eo-signal-label {
+        color: #614820;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+    .eo-signal.good {
+        background: #f7fbf8;
+        border-color: #dce9df;
+        border-left-color: #4e8b6a;
+        color: #476b55;
+    }
+    .eo-signal.good .eo-signal-label {
+        color: #2e6847;
+    }
+
+    @media (max-width: 900px) {
+        .eo-context {
+            grid-template-columns: 1fr 1fr;
+        }
+        .eo-context-item:nth-child(2) {
+            border-right: none;
+        }
+        .eo-context-item:nth-child(-n+2) {
+            border-bottom: 1px solid #e8eef5;
+        }
+        .eo-header {
+            flex-direction: column;
+            gap: 10px;
+        }
+        .eo-disclaimer {
+            text-align: left;
+        }
+    }
     </style>
     """, unsafe_allow_html=True)
 
-    # Use the already-filtered dataframe: all KPIs and visuals stay consistent.
+    # HEADER — replace the generic blue info banner with a compact
+    # title area and a quieter synthetic-data disclosure.
+    st.markdown("""
+    <div class="eo-header">
+      <div>
+        <h1 class="eo-title">Executive Overview</h1>
+        <div class="eo-subtitle">
+          Distribution performance · Target delivery · Partner contribution
+        </div>
+      </div>
+      <div>
+        <div class="eo-demo-badge">
+          <span class="eo-demo-dot"></span>
+          SYNTHETIC DATA
+        </div>
+        <div class="eo-disclaimer">
+          Illustrative portfolio figures only. Not actual insurer performance.
+        </div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # CURRENT PERIOD — use existing sidebar selections.
+    start_p = pd.Period(period_start_key, freq="M")
+    end_p = pd.Period(period_end_key, freq="M")
+    period_length = end_p.ordinal - start_p.ordinal + 1
+
+    st.markdown(f"""
+    <div class="eo-context">
+      <div class="eo-context-item">
+        <div class="eo-context-label">Reporting period</div>
+        <div class="eo-context-value">
+          {start_p.strftime("%b %Y")} – {end_p.strftime("%b %Y")}
+        </div>
+      </div>
+      <div class="eo-context-item">
+        <div class="eo-context-label">Partner scope</div>
+        <div class="eo-context-value">{partner}</div>
+      </div>
+      <div class="eo-context-item">
+        <div class="eo-context-label">Channel scope</div>
+        <div class="eo-context-value">{channel}</div>
+      </div>
+      <div class="eo-context-item">
+        <div class="eo-context-label">Attention threshold</div>
+        <div class="eo-context-value">{threshold:.0%}</div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # KPI calculations — use the filtered dataframe.
     actual = float(df["premium_actual_idr"].sum())
     target = float(df["premium_target_idr"].sum())
     gap_value = target - actual
@@ -712,29 +950,34 @@ if page == "Executive Overview":
     active_partners = int(df["partner"].nunique())
     policies = int(df["policies_issued"].sum())
 
-    available_months = sorted(
-        df["month"].dt.to_period("M").astype(str).unique().tolist()
-    )
-    start_p = pd.Period(period_start_key, freq="M")
-    end_p = pd.Period(period_end_key, freq="M")
-    period_length = end_p.ordinal - start_p.ordinal + 1
-
-    # Previous period is the same number of calendar months immediately before.
-    pp_end = start_p - 1
-    pp_start = pp_end - (period_length - 1)
+    # Comparisons are calculated from the full dataset with the same
+    # partner/channel filters, but with the relevant comparison window.
     all_months = sorted(
         data["month"].dt.to_period("M").astype(str).unique().tolist()
     )
 
     def filtered_comparison(start_period, end_period):
-        if not _window_is_available(start_period, end_period, all_months):
+        if not _window_is_available(
+            start_period, end_period, all_months
+        ):
             return None
+
         comp = _month_window(data, start_period, end_period)
+
         if partner != "All partners":
             comp = comp[comp["partner"] == partner]
         if channel != "All channels":
             comp = comp[comp["channel"] == channel]
+
         return _comparison_summary(comp)
+
+    pp_end = start_p - 1
+    pp_start = pp_end - (period_length - 1)
+    py_start = start_p - 12
+    py_end = end_p - 12
+
+    previous_period = filtered_comparison(pp_start, pp_end)
+    previous_year = filtered_comparison(py_start, py_end)
 
     current_summary = {
         "actual": actual,
@@ -743,89 +986,139 @@ if page == "Executive Overview":
         "gap": gap_value,
         "partners": active_partners,
     }
-    previous_period = filtered_comparison(pp_start, pp_end)
-
-    # Previous year comparison uses the matching months one year earlier.
-    py_start = start_p - 12
-    py_end = end_p - 12
-    previous_year = filtered_comparison(py_start, py_end)
 
     def comparison_text(current, previous, metric):
-        if previous is None or previous.get(metric) is None or current.get(metric) is None:
+        if previous is None:
             return "N/A"
-        c, p = current[metric], previous[metric]
+
+        c = current.get(metric)
+        p = previous.get(metric)
+
+        if c is None or p is None:
+            return "N/A"
+
         if metric == "attainment":
-            return f"{(c-p)*100:+.1f} pp"
+            return f"{(c - p) * 100:+.1f} pp"
+
         if metric == "gap":
             if c == p:
                 return "No change"
-            return f"{'Gap narrowed' if c < p else 'Gap widened'} · {money(abs(p-c))}"
+            direction = "narrowed" if c < p else "widened"
+            return f"Gap {direction} · {money(abs(p - c))}"
+
         if p == 0:
             return "N/A"
-        return f"{(c/p-1)*100:+.1f}%"
 
-    def kpi_card(label, value, note, metric):
-        pp = comparison_text(current_summary, previous_period, metric)
-        py = comparison_text(current_summary, previous_year, metric)
+        return f"{(c / p - 1) * 100:+.1f}%"
+
+    def render_kpi(label, value, note, metric):
+        pp = comparison_text(
+            current_summary, previous_period, metric
+        )
+        py = comparison_text(
+            current_summary, previous_year, metric
+        )
+
         return f"""
-        <div class="exec-card">
-          <div class="exec-label">{label}</div>
-          <div class="exec-value">{value}</div>
-          <div class="exec-note">{note}</div>
-          <div class="exec-compare"><span>vs Previous Period</span><strong>{pp}</strong></div>
-          <div class="exec-compare"><span>vs Previous Year</span><strong>{py}</strong></div>
-        </div>"""
+        <div class="eo-kpi">
+          <div class="eo-kpi-label">{label}</div>
+          <div class="eo-kpi-value-row">
+            <div class="eo-kpi-value">{value}</div>
+          </div>
+          <div class="eo-kpi-note">{note}</div>
+          <div class="eo-kpi-comparison">
+            <span>Previous Period</span><strong>{pp}</strong>
+          </div>
+          <div class="eo-kpi-comparison">
+            <span>Previous Year</span><strong>{py}</strong>
+          </div>
+        </div>
+        """
 
     st.markdown(
-        f'<div class="exec-label">Portfolio snapshot</div>'
-        f'<div class="exec-note">Selected window: '
-        f'{start_p.strftime("%b %Y")} – {end_p.strftime("%b %Y")} '
-        f' · {partner} · {channel}</div>',
+        '<div class="eo-section-heading">Portfolio performance</div>',
         unsafe_allow_html=True,
     )
 
     k1, k2, k3, k4 = st.columns(4, gap="medium")
+
     with k1:
-        st.markdown(kpi_card(
-            "Total Premium", money(actual),
-            "Total actual premium in the selected window.", "actual"
+        st.markdown(render_kpi(
+            "Total Premium",
+            money(actual),
+            "Total actual premium in the selected period.",
+            "actual",
         ), unsafe_allow_html=True)
+
     with k2:
-        st.markdown(kpi_card(
+        st.markdown(render_kpi(
             "Target Attainment",
             f"{attainment:.1%}" if attainment is not None else "N/A",
-            "Actual premium divided by target premium.", "attainment"
+            "Actual premium as a share of target.",
+            "attainment",
         ), unsafe_allow_html=True)
+
     with k3:
-        st.markdown(kpi_card(
-            "Premium Gap", money(abs(gap_value)),
-            "Shortfall" if gap_value > 0 else (
-                "Surplus" if gap_value < 0 else "Target achieved"
-            ), "gap"
+        gap_label = (
+            "Shortfall" if gap_value > 0
+            else "Surplus" if gap_value < 0
+            else "Target achieved"
+        )
+        st.markdown(render_kpi(
+            "Premium Gap",
+            money(abs(gap_value)),
+            gap_label,
+            "gap",
         ), unsafe_allow_html=True)
+
     with k4:
-        st.markdown(kpi_card(
-            "Active Partners", f"{active_partners:,}",
-            f"{policies:,} policies issued.", "partners"
+        st.markdown(render_kpi(
+            "Active Partners",
+            f"{active_partners:,}",
+            f"{policies:,} policies issued in the selected period.",
+            "partners",
         ), unsafe_allow_html=True)
 
-    if target > 0 and gap_value > 0:
-        st.markdown(
-            f'<div class="exec-callout"><b>Management signal</b> · '
-            f'Portfolio attainment is {attainment:.1%}, leaving a '
-            f'{money(gap_value)} premium shortfall against target. '
-            f'Prioritize the largest addressable partner gaps.</div>',
-            unsafe_allow_html=True,
+    # One concise portfolio-level signal. No oversized Streamlit banner.
+    if target <= 0:
+        signal_text = (
+            "Target premium is zero for this selection. "
+            "Attainment cannot be calculated."
         )
-    elif target > 0:
-        st.success(
-            f"Portfolio is at or above target by {money(abs(gap_value))}."
-            if gap_value < 0 else "Portfolio has achieved its premium target."
+        signal_class = ""
+        signal_label = "DATA NOTE"
+    elif gap_value > 0:
+        signal_text = (
+            f"Attainment is {attainment:.1%}, leaving "
+            f"{money(gap_value)} below target. Review the partner "
+            f"exceptions and channel contribution below."
         )
+        signal_class = ""
+        signal_label = "MANAGEMENT SIGNAL"
+    elif gap_value < 0:
+        signal_text = (
+            f"Portfolio is above target by {money(abs(gap_value))}. "
+            f"Review which channels and partners are contributing most."
+        )
+        signal_class = "good"
+        signal_label = "PORTFOLIO SIGNAL"
     else:
-        st.warning("Target is zero for this selection; attainment cannot be calculated.")
+        signal_text = (
+            "Portfolio has achieved its premium target for this selection."
+        )
+        signal_class = "good"
+        signal_label = "PORTFOLIO SIGNAL"
 
-    # Trend and channel attainment
+    st.markdown(
+        f'<div class="eo-signal {signal_class}">'
+        f'<span class="eo-signal-label">{signal_label}</span>'
+        f'<span>{signal_text}</span>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
+    # Continue with the existing section beginning:
+    # # Trend and channel attainment
     left, right = st.columns([1.55, 1], gap="medium")
     trend_view = (
         df.groupby(df["month"].dt.to_period("M").dt.to_timestamp(), as_index=False)
