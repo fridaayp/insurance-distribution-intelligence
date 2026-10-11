@@ -3042,8 +3042,10 @@ else:
         "Changes remain in the current app session; download the CSV to retain a copy."
     )
 
+    tracker_display = projects.copy()
+
     edited = st.data_editor(
-        projects,
+        tracker_display,
         use_container_width=True,
         hide_index=True,
         num_rows="fixed",
