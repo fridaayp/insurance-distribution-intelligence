@@ -2321,7 +2321,6 @@ else:
         "Monitor strategic initiatives, execution health, delivery progress, and management priorities."
     )
 
-    st.caption("PROJECT GOVERNANCE · EXECUTION TRACKING · ILLUSTRATIVE DATA ONLY")
 
     projects = pd.DataFrame([
         {
