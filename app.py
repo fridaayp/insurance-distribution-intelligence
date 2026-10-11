@@ -753,11 +753,12 @@ if page == "Executive Overview":
 .eo-disclaimer {
     color: #657b95;
     font-size: 10px;
-    line-height: 1.5;
-    margin-top: 7px;
-    max-width: 260px;
+    line-height: 1.3;
+    margin-top: 5px;
+    max-width: none;
+    white-space: nowrap;
     text-align: right;
-    margin-left: auto;
+    margin-left: 0;
 }
 
 /* Context bar: protect the reporting-period column */
@@ -858,9 +859,10 @@ if page == "Executive Overview":
     }
 
     .eo-header > div:last-child {
-        flex: 1 1 auto;
-        min-width: 0;
-    }
+    flex: 0 0 auto;
+    min-width: 0;
+    text-align: right;
+}
 
     .eo-disclaimer {
         text-align: left;
