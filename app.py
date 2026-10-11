@@ -1929,6 +1929,16 @@ if page == "Executive Overview":
                         for basis in primary_basis
                     )
                     additional_basis_html = "".join(
+                        additional_section_html = ""
+                    if additional_basis:
+                        additional_section_html = (
+                            '<div style="margin-top:7px;font-weight:700;">'
+                            'Additional signals'
+                            '</div>'
+                            '<ul style="padding-left:16px;margin:4px 0 0 0;">'
+                            f'{additional_basis_html}'
+                            '</ul>'
+                        )
                         f'<li style="margin-bottom:4px;">{basis}</li>'
                         for basis in additional_basis
                     )
@@ -2003,14 +2013,7 @@ if page == "Executive Overview":
                             <ul style="padding-left:16px;margin:4px 0 0 0;">
                               {primary_basis_html}
                             </ul>
-                            {f'''
-                            <div style="margin-top:7px;font-weight:700;">
-                              Additional signals
-                            </div>
-                            <ul style="padding-left:16px;margin:4px 0 0 0;">
-                              {additional_basis_html}
-                            </ul>
-                            ''' if additional_basis else ''}
+                            {additional_section_html}
                           </div>
                           <div style="
                             color:#405874;
