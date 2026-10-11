@@ -2612,20 +2612,132 @@ else:
         },
     ])
 
-    # --- Portfolio-level indicators ---
+    # --- Executive portfolio snapshot ---
     total_projects = len(projects)
     on_track = int((projects["Status"] == "On track").sum())
-    attention = int(projects["Status"].isin(["At risk", "Delayed"]).sum())
+    attention = int(
+        projects["Status"].isin(["At risk", "Delayed"]).sum()
+    )
     completed = int((projects["Status"] == "Completed").sum())
     avg_progress = float(projects["Progress"].mean())
     high_risk = int((projects["Risk"] == "High").sum())
+    active_projects = total_projects - completed
 
-    k1, k2, k3, k4 = st.columns(4, gap="medium")
+    st.markdown(
+        """
+        <div style="margin:8px 0 14px 0;">
+          <div style="font-size:11px;font-weight:800;
+                      letter-spacing:1.4px;color:#64748b;">
+            PORTFOLIO AT A GLANCE
+          </div>
+          <div style="font-size:13px;color:#64748b;
+                      margin-top:4px;">
+            Delivery health, execution progress and risk exposure
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-    k1.metric("TOTAL INITIATIVES", f"{total_projects}")
-    k2.metric("ON TRACK", f"{on_track}")
-    k3.metric("NEEDS ATTENTION", f"{attention}")
-    k4.metric("AVERAGE PROGRESS", f"{avg_progress:.0f}%")
+    metric_cols = st.columns(4, gap="medium")
+
+    snapshot_cards = [
+        {
+            "label": "TOTAL INITIATIVES",
+            "value": f"{total_projects}",
+            "detail": f"{active_projects} active · {completed} completed",
+            "color": "#315eb2",
+            "background": "#eef4ff",
+        },
+        {
+            "label": "ON TRACK",
+            "value": f"{on_track}",
+            "detail": (
+                f"{on_track / total_projects:.0%} of portfolio"
+                if total_projects else "No initiatives"
+            ),
+            "color": "#168568",
+            "background": "#eaf7f1",
+        },
+        {
+            "label": "NEEDS ATTENTION",
+            "value": f"{attention}",
+            "detail": f"{high_risk} high-risk initiatives",
+            "color": "#c65b38" if attention else "#168568",
+            "background": "#fff0e9" if attention else "#eaf7f1",
+        },
+        {
+            "label": "AVERAGE PROGRESS",
+            "value": f"{avg_progress:.0f}%",
+            "detail": "Mean reported completion",
+            "color": "#7254b8",
+            "background": "#f2edff",
+        },
+    ]
+
+    for col, card in zip(metric_cols, snapshot_cards):
+        with col:
+            st.markdown(
+                f"""
+                <div style="
+                    min-height:132px;
+                    padding:17px 16px 15px;
+                    border:1px solid #e3eaf3;
+                    border-top:4px solid {card['color']};
+                    border-radius:12px;
+                    background:linear-gradient(
+                        145deg,#ffffff 55%,{card['background']} 150%
+                    );
+                    box-shadow:0 3px 12px rgba(25,54,85,0.055);
+                ">
+                  <div style="
+                      font-size:10px;font-weight:800;
+                      letter-spacing:1px;color:#718198;
+                      margin-bottom:13px;">
+                    {card['label']}
+                  </div>
+                  <div style="
+                      font-size:32px;font-weight:850;
+                      letter-spacing:-1px;line-height:1.1;
+                      color:{card['color']};">
+                    {card['value']}
+                  </div>
+                  <div style="
+                      font-size:11px;color:#718198;
+                      margin-top:10px;line-height:1.4;">
+                    {card['detail']}
+                  </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+    st.markdown(
+        f"""
+        <div style="
+            display:flex;align-items:center;gap:10px;
+            margin-top:13px;padding:12px 15px;
+            border:1px solid {'#f3d1c6' if attention else '#cce9dc'};
+            border-radius:10px;
+            background:{'#fff8f5' if attention else '#f3fbf7'};
+        ">
+          <div style="
+              width:9px;height:9px;min-width:9px;
+              border-radius:50%;
+              background:{'#c65b38' if attention else '#168568'};
+          "></div>
+          <div style="font-size:12px;color:#40536b;line-height:1.5;">
+            <strong style="color:#193655;">
+              {'Management attention required' if attention else 'Portfolio delivery stable'}
+            </strong>
+            — {attention} initiative(s) need attention and
+            {high_risk} carry high risk. Validate the illustrative
+            project records before making decisions.
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     st.divider()
 
