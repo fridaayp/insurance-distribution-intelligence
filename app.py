@@ -704,23 +704,24 @@ if page == "Executive Overview":
     /* Header: keep title and demo disclosure visually connected */
 .eo-header {
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 10px;
-}
-
-.eo-header > div:first-child {
-    flex: 1 1 auto;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-bottom: 14px;
+    width: 100%;
     min-width: 0;
 }
 
 .eo-header > div:last-child {
-    flex: 0 1 420px;
-    min-width: 0;
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
 }
 
 .eo-demo-badge {
@@ -732,9 +733,10 @@ if page == "Executive Overview":
 }
 
 .eo-disclaimer {
-    max-width: 320px;
+    max-width: 100%;
+    margin: 0;
     text-align: left;
-    margin-left: 0;
+    white-space: normal;
     overflow-wrap: anywhere;
 }
 
