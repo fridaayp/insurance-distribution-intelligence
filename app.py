@@ -1419,8 +1419,8 @@ if page == "Executive Overview":
                 "no positive targets exist in this selection."
             )
 
-    # Keep the existing section below this point:
-    # # Partner ranking and review queue
+    # Partner ranking and review queue
+    # PARTNER PERFORMANCE — ranking and exception queue
     partner_view = (
         df.groupby("partner", as_index=False)
         .agg(
@@ -1429,137 +1429,316 @@ if page == "Executive Overview":
             policies_issued=("policies_issued", "sum"),
         )
     )
+
     partner_view["attainment_rate"] = (
         partner_view["premium_actual_idr"]
-        / partner_view["premium_target_idr"].replace(0, float("nan"))
-    )
-    partner_view["gap_to_target"] = (
-        partner_view["premium_target_idr"] - partner_view["premium_actual_idr"]
+        / partner_view["premium_target_idr"].where(
+            partner_view["premium_target_idr"] > 0
+        )
     )
 
-    table_left, table_right = st.columns(2, gap="medium")
+    partner_view["gap_to_target"] = (
+        partner_view["premium_target_idr"]
+        - partner_view["premium_actual_idr"]
+    )
+
+    partner_view["status"] = partner_view["attainment_rate"].apply(
+        lambda value: (
+            "Above target" if pd.notna(value) and value >= 1
+            else "On track" if pd.notna(value) and value >= threshold
+            else "Needs attention" if pd.notna(value)
+            else "Target unavailable"
+        )
+    )
+
+    table_left, table_right = st.columns([1.2, 1], gap="medium")
+
+    # TOP PARTNERS
     with table_left:
         st.markdown(
-            '<div class="exec-panel-title">Top partners by actual premium</div>'
-            '<div class="exec-panel-sub">Ranked by premium contribution; attainment remains visible.</div>',
+            '<div class="exec-panel-title">Top Partners</div>'
+            '<div class="exec-panel-sub">'
+            'Ranked by actual premium contribution.'
+            '</div>',
             unsafe_allow_html=True,
         )
-        top = partner_view.nlargest(5, "premium_actual_idr").copy()
+
+        top = (
+            partner_view
+            .sort_values("premium_actual_idr", ascending=False)
+            .head(5)
+            .copy()
+            .reset_index(drop=True)
+        )
+
         if not top.empty:
-            top["Rank"] = range(1, len(top)+1)
+            top.insert(0, "Rank", range(1, len(top) + 1))
             top["Actual Premium"] = top["premium_actual_idr"].map(money)
             top["Attainment"] = top["attainment_rate"].map(
-                lambda v: f"{v:.1%}" if pd.notna(v) else "N/A"
+                lambda value: f"{value:.1%}"
+                if pd.notna(value) else "N/A"
             )
+
             st.dataframe(
-                top[["Rank", "partner", "Actual Premium", "Attainment"]].rename(
-                    columns={"partner": "Partner"}
-                ),
-                use_container_width=True, hide_index=True,
+                top[
+                    ["Rank", "partner", "Actual Premium", "Attainment", "status"]
+                ].rename(columns={
+                    "partner": "Partner",
+                    "status": "Status",
+                }),
+                use_container_width=True,
+                hide_index=True,
                 column_config={
-                    "Rank": st.column_config.NumberColumn(width="small"),
-                    "Partner": st.column_config.TextColumn(width="medium"),
+                    "Rank": st.column_config.NumberColumn(
+                        "Rank", width="small"
+                    ),
+                    "Partner": st.column_config.TextColumn(
+                        "Partner", width="medium"
+                    ),
+                    "Actual Premium": st.column_config.TextColumn(
+                        "Actual Premium", width="medium"
+                    ),
+                    "Attainment": st.column_config.TextColumn(
+                        "Attainment", width="small"
+                    ),
+                    "Status": st.column_config.TextColumn(
+                        "Status", width="medium"
+                    ),
                 },
             )
         else:
             st.info("No partner records in this selection.")
 
+    # PARTNERS REQUIRING ATTENTION
     with table_right:
         st.markdown(
-            f'<div class="exec-panel-title">Partners requiring attention</div>'
-            f'<div class="exec-panel-sub">Attainment below {threshold:.0%}; review context before action.</div>',
+            f'<div class="exec-panel-title">Partner Attention Queue</div>'
+            f'<div class="exec-panel-sub">'
+            f'Partner attainment below {threshold:.0%}. '
+            f'Ranked by lowest attainment first.'
+            f'</div>',
             unsafe_allow_html=True,
         )
-        attention = partner_view[
-            partner_view["attainment_rate"] < threshold
-        ].sort_values("attainment_rate", na_position="last").head(5).copy()
+
+        attention = (
+            partner_view[
+                partner_view["attainment_rate"] < threshold
+            ]
+            .sort_values(
+                ["attainment_rate", "gap_to_target"],
+                ascending=[True, False],
+                na_position="first",
+            )
+            .head(5)
+            .copy()
+        )
+
         if not attention.empty:
             attention["Attainment"] = attention["attainment_rate"].map(
-                lambda v: f"{v:.1%}" if pd.notna(v) else "N/A"
+                lambda value: f"{value:.1%}"
+                if pd.notna(value) else "N/A"
             )
             attention["Gap to Target"] = attention["gap_to_target"].map(
-                lambda v: money(v) if v >= 0 else f"{money(abs(v))} surplus"
+                lambda value: (
+                    money(value) if value >= 0
+                    else f"{money(abs(value))} surplus"
+                )
             )
+
             st.dataframe(
-                attention[["partner", "Attainment", "Gap to Target"]].rename(
-                    columns={"partner": "Partner"}
-                ),
-                use_container_width=True, hide_index=True,
+                attention[
+                    ["partner", "Attainment", "Gap to Target"]
+                ].rename(columns={"partner": "Partner"}),
+                use_container_width=True,
+                hide_index=True,
+                column_config={
+                    "Partner": st.column_config.TextColumn(
+                        "Partner", width="medium"
+                    ),
+                    "Attainment": st.column_config.TextColumn(
+                        "Attainment", width="small"
+                    ),
+                    "Gap to Target": st.column_config.TextColumn(
+                        "Gap to Target", width="medium"
+                    ),
+                },
             )
         else:
-            st.success("No partners are below the selected threshold.")
+            st.success(
+                "No partners fall below the selected threshold."
+            )
 
-    # Separate observations from actions to avoid repeating the same message.
-    insight_col, action_col = st.columns([1.05, 1], gap="medium")
+    # =========================================================
+    # DECISION LAYER — insights and action queue
+    # =========================================================
+    insight_col, action_col = st.columns([1, 1.15], gap="medium")
+
     with insight_col:
         st.markdown(
             '<div class="exec-panel-title">Key Insights</div>'
-            '<div class="exec-panel-sub">What the current selection tells us.</div>',
+            '<div class="exec-panel-sub">'
+            'The most decision-relevant signals in this selection.'
+            '</div>',
             unsafe_allow_html=True,
         )
+
         best_channel = (
-            channel_view.sort_values("attainment", ascending=False).iloc[0]
+            channel_view.sort_values(
+                "attainment", ascending=False
+            ).iloc[0]
             if not channel_view.empty else None
         )
-        worst_partner = (
-            attention.sort_values("attainment_rate", na_position="last").iloc[0]
-            if not attention.empty else None
+
+        if attainment is None:
+            portfolio_body = (
+                "Target is unavailable; portfolio attainment "
+                "cannot be assessed."
+            )
+        elif gap_value > 0:
+            portfolio_body = (
+                f"Premium is {money(gap_value)} below target "
+                f"({attainment:.1%} attainment)."
+            )
+        elif gap_value < 0:
+            portfolio_body = (
+                f"Premium is {money(abs(gap_value))} above target "
+                f"({attainment:.1%} attainment)."
+            )
+        else:
+            portfolio_body = "Portfolio premium exactly meets target."
+
+        channel_body = (
+            f"{best_channel['channel']} leads at "
+            f"{best_channel['attainment']:.1%} attainment."
+            if best_channel is not None
+            else "No channel has a valid positive target."
         )
-        insight_cols = st.columns(2, gap="small")
-        with insight_cols[0]:
-            if attainment is not None:
-                body = (
-                    f"Premium is {money(gap_value)} below target."
-                    if gap_value > 0 else "Premium target has been achieved."
-                )
-            else:
-                body = "Target is unavailable for this selection."
+
+        attention_body = (
+            f"{len(attention)} partner(s) fall below the "
+            f"{threshold:.0%} attention threshold."
+            if not attention.empty
+            else "No partner falls below the selected threshold."
+        )
+
+        insight_items = [
+            ("01", "Portfolio delivery", portfolio_body),
+            ("02", "Channel leader", channel_body),
+            ("03", "Partner exceptions", attention_body),
+        ]
+
+        for number, title, body in insight_items:
             st.markdown(
-                f'<div class="exec-insight"><div class="exec-insight-title">Portfolio delivery</div>'
-                f'<div class="exec-insight-body">{body}</div></div>',
+                f"""
+                <div class="exec-insight" style="margin-bottom:8px;">
+                  <div style="display:flex;gap:10px;align-items:flex-start;">
+                    <div style="
+                        background:#eaf2fb;color:#245d96;
+                        border-radius:7px;padding:5px 7px;
+                        font-size:10px;font-weight:800;">
+                      {number}
+                    </div>
+                    <div style="flex:1;">
+                      <div class="exec-insight-title">{title}</div>
+                      <div class="exec-insight-body">{body}</div>
+                    </div>
+                  </div>
+                </div>
+                """,
                 unsafe_allow_html=True,
-            )
-        with insight_cols[1]:
-            body = (
-                f'{best_channel["channel"]} leads channel attainment at '
-                f'{best_channel["attainment"]:.1%}.'
-                if best_channel is not None else "No valid channel comparison is available."
-            )
-            st.markdown(
-                f'<div class="exec-insight"><div class="exec-insight-title">Channel leader</div>'
-                f'<div class="exec-insight-body">{body}</div></div>',
-                unsafe_allow_html=True,
-            )
-        if worst_partner is not None:
-            st.caption(
-                f"Review signal: {worst_partner['partner']} has the lowest attainment "
-                f"among partners below threshold ({worst_partner['attainment_rate']:.1%})."
             )
 
     with action_col:
         st.markdown(
             '<div class="exec-panel-title">Recommended Actions</div>'
-            '<div class="exec-panel-sub">Rule-based prompts for management review, not causal conclusions.</div>',
+            '<div class="exec-panel-sub">'
+            'Rule-based review prompts. Validate the underlying data '
+            'before taking action.'
+            '</div>',
             unsafe_allow_html=True,
         )
+
         if actions:
             action_df = pd.DataFrame(actions)
-            cols = [c for c in ["priority", "partner", "signal", "suggested_action"] if c in action_df.columns]
-            action_df = action_df[cols].head(5).rename(columns={
-                "priority": "Priority", "partner": "Partner",
-                "signal": "Signal", "suggested_action": "Recommended action",
-            })
-            st.dataframe(
-                action_df, use_container_width=True, hide_index=True,
-                column_config={
-                    "Priority": st.column_config.TextColumn(width="small"),
-                    "Partner": st.column_config.TextColumn(width="medium"),
-                    "Signal": st.column_config.TextColumn(width="medium"),
-                    "Recommended action": st.column_config.TextColumn(width="large"),
-                },
-            )
+
+            preferred = [
+                column for column in [
+                    "priority",
+                    "partner",
+                    "signal",
+                    "suggested_action",
+                ]
+                if column in action_df.columns
+            ]
+
+            action_df = action_df[preferred].head(4).copy()
+
+            if "priority" in action_df.columns:
+                priority_order = {
+                    "High": 0, "Critical": 0,
+                    "Medium": 1, "Low": 2,
+                }
+                action_df["_priority_order"] = (
+                    action_df["priority"]
+                    .astype(str)
+                    .str.title()
+                    .map(priority_order)
+                    .fillna(3)
+                )
+                action_df = (
+                    action_df.sort_values("_priority_order")
+                    .drop(columns="_priority_order")
+                )
+
+            for _, action in action_df.iterrows():
+                priority = str(action.get("priority", "Review")).title()
+                partner_name = str(action.get("partner", "Portfolio"))
+                signal = str(action.get("signal", "Review required"))
+                recommendation = str(
+                    action.get(
+                        "suggested_action",
+                        "Review performance and validate source data.",
+                    )
+                )
+
+                if priority in ("High", "Critical"):
+                    priority_color = "#a94442"
+                    priority_bg = "#fff0ef"
+                elif priority == "Medium":
+                    priority_color = "#8a641b"
+                    priority_bg = "#fff7e5"
+                else:
+                    priority_color = "#376a9e"
+                    priority_bg = "#edf4fc"
+
+                st.markdown(
+                    f"""
+                    <div class="exec-insight" style="margin-bottom:8px;">
+                      <div style="
+                          display:flex;justify-content:space-between;
+                          align-items:center;gap:8px;margin-bottom:7px;">
+                        <div style="
+                            color:#193655;font-size:11px;font-weight:800;">
+                          {partner_name}
+                        </div>
+                        <span style="
+                            background:{priority_bg};
+                            color:{priority_color};
+                            padding:4px 7px;border-radius:6px;
+                            font-size:9px;font-weight:800;white-space:nowrap;">
+                          {priority}
+                        </span>
+                      </div>
+                      <div class="exec-insight-title">{signal}</div>
+                      <div class="exec-insight-body">{recommendation}</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
         else:
-            st.info("No rule-based actions were triggered for this selection.")
+            st.info(
+                "No rule-based actions were triggered for this selection."
+            )
 
     with st.expander("Data transparency and definitions"):
         st.markdown("""
