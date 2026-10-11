@@ -3006,7 +3006,7 @@ else:
             priority[priority_cols],
             use_container_width=True,
             hide_index=True,
-            height=min(260, 44 + 38 * len(priority)),
+            height=min(180, 36 + 35 * len(priority)),
             column_config={
                 "Progress": st.column_config.ProgressColumn(
                     "Progress",
