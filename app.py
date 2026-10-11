@@ -2839,10 +2839,13 @@ else:
         )
 
     with right:
-        st.subheader("Portfolio risk profile")
-        st.caption("Number of initiatives by current illustrative risk rating.")
+        st.subheader("Portfolio Risk Profile")
+        st.caption(
+            "Initiative exposure by current illustrative risk rating."
+        )
 
         risk_order = ["Low", "Medium", "High"]
+
         risk_data = (
             projects["Risk"]
             .value_counts()
@@ -2851,23 +2854,79 @@ else:
             .reset_index(name="Projects")
         )
 
+        risk_data["Share"] = (
+            risk_data["Projects"] / max(len(projects), 1) * 100
+        )
+
+        risk_colors = {
+            "Low": "#168568",
+            "Medium": "#E7A23B",
+            "High": "#C65345",
+        }
+
         fig = px.bar(
             risk_data,
-            x="Risk",
-            y="Projects",
+            x="Projects",
+            y="Risk",
             color="Risk",
-            category_orders={"Risk": risk_order},
-            color_discrete_map={
-                "Low": "#39a8a0",
-                "Medium": "#f5ad42",
-                "High": "#dc6b4e",
-            },
+            orientation="h",
             text="Projects",
-            labels={"Projects": "Initiative count"},
+            category_orders={"Risk": ["High", "Medium", "Low"]},
+            color_discrete_map=risk_colors,
+            custom_data=["Share"],
+            labels={
+                "Projects": "Initiative count",
+                "Risk": "Risk rating",
+            },
         )
-        fig.update_traces(textposition="outside")
-        fig.update_layout(showlegend=False)
-        st.plotly_chart(style(fig, 390), use_container_width=True)
+
+        fig.update_traces(
+            texttemplate="%{x:.0f}",
+            textposition="outside",
+            cliponaxis=False,
+            marker_line_width=0,
+            hovertemplate=(
+                "<b>%{y} risk</b><br>"
+                "Initiatives: %{x}<br>"
+                "Portfolio share: %{customdata[0]:.0f}%"
+                "<extra></extra>"
+            ),
+        )
+
+        max_count = max(int(risk_data["Projects"].max()), 1)
+
+        fig.update_layout(
+            height=390,
+            showlegend=False,
+            bargap=0.42,
+            xaxis=dict(
+                title="Number of initiatives",
+                range=[0, max_count * 1.35],
+                dtick=1,
+                showgrid=True,
+                gridcolor="#E8EEF5",
+                zeroline=False,
+            ),
+            yaxis=dict(
+                title=None,
+                showgrid=False,
+                automargin=True,
+            ),
+            margin=dict(l=8, r=24, t=20, b=42),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(
+                family="Arial, sans-serif",
+                size=12,
+                color="#334155",
+            ),
+        )
+
+        st.plotly_chart(
+            fig,
+            use_container_width=True,
+            config={"displayModeBar": False},
+        )
 
     st.divider()
 
