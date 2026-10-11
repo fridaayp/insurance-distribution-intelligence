@@ -2930,7 +2930,7 @@ else:
 
     st.divider()
 
-    # --- Management attention queue ---
+    # --- Management Attention Queue ---
     st.subheader("Management Attention Queue")
     st.caption(
         "Prioritized review list based on delivery status, risk, "
