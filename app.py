@@ -698,7 +698,7 @@ if page == "Executive Overview":
     .block-container {
         padding-top: 1.25rem;
         padding-bottom: 1.8rem;
-        max-width: 1600px;
+        max-width: 100%;
     }
 
     /* Header: keep title and demo disclosure visually connected */
