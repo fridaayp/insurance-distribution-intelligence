@@ -1785,7 +1785,8 @@ if page == "Executive Overview":
             # Keep only fields available in the existing action records.
             preferred = [
                 c for c in [
-                    "priority", "partner", "signal", "suggested_action"
+                    "priority", "partner", "signal",
+                    "suggested_action", "basis"
                 ]
                 if c in action_df.columns
             ]
@@ -1867,6 +1868,13 @@ if page == "Executive Overview":
                     .astype(str).str.strip()
                 )
                 signals = signals[signals.ne("")].drop_duplicates().tolist()
+
+                bases = (
+                    group["basis"].fillna("").astype(str).str.strip()
+                    if "basis" in group.columns
+                    else pd.Series(dtype=str)
+                )
+                bases = bases[bases.ne("")].drop_duplicates().tolist()
 
                 recommended_actions = (
                     group["_action_key"].drop_duplicates().tolist()
