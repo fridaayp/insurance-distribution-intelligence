@@ -833,12 +833,12 @@ if page == "Executive Overview":
     line-height: 1.35;
 }
 
-.eo-kpi-comparison strong {
-    color: #405874;
-    font-size: 10px;
-    font-weight: 750;
-    text-align: right;
-    overflow-wrap: anywhere;
+.eo-kpi-comparison strong.positive {
+    color: #16856B !important;
+}
+
+.eo-kpi-comparison strong.negative {
+    color: #D14343 !important;
 }
 
 .eo-signal {
