@@ -1364,7 +1364,7 @@ if page == "Executive Overview":
                 y=trend_view["actual_premium"],
                 name="Actual Premium",
                 mode="lines+markers",
-                line=dict(color="#15EEF", width=3.2),
+                line=dict(color="#155EEF", width=3.2),
                 marker=dict(size=5, color="#1769AA"),
                 hovertemplate=(
                     "%{x|%b %Y}<br>"
