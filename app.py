@@ -2745,10 +2745,21 @@ else:
     left, right = st.columns([1.2, 1], gap="medium")
 
     with left:
-        st.subheader("Execution progress")
-        st.caption("Progress by initiative, grouped by delivery status.")
+        st.subheader("Execution Progress")
+        st.caption(
+            "Initiative completion against the 100% delivery benchmark."
+        )
 
-        progress_data = projects.sort_values("Progress", ascending=True)
+        progress_data = projects.sort_values(
+            "Progress", ascending=True
+        ).copy()
+
+        status_colors = {
+            "On track": "#168568",
+            "At risk": "#E7A23B",
+            "Delayed": "#C65345",
+            "Completed": "#315EB2",
+        }
 
         fig = px.bar(
             progress_data,
@@ -2756,22 +2767,76 @@ else:
             y="Project",
             color="Status",
             orientation="h",
-            range_x=[0, 100],
             text="Progress",
-            color_discrete_map={
-                "On track": "#39a8a0",
-                "At risk": "#f5ad42",
-                "Delayed": "#dc6b4e",
-                "Completed": "#2563eb",
+            range_x=[0, 115],
+            category_orders={
+                "Project": progress_data["Project"].tolist()
             },
+            color_discrete_map=status_colors,
             labels={
                 "Progress": "Completion (%)",
                 "Project": "Initiative",
                 "Status": "Delivery status",
             },
+            custom_data=["Status", "Owner", "Next milestone"],
         )
-        fig.update_traces(texttemplate="%{text}%", textposition="outside")
-        st.plotly_chart(style(fig, 390), use_container_width=True)
+
+        fig.update_traces(
+            texttemplate="%{x:.0f}%",
+            textposition="outside",
+            cliponaxis=False,
+            marker_line_width=0,
+            hovertemplate=(
+                "<b>%{y}</b><br>"
+                "Progress: %{x:.0f}%<br>"
+                "Status: %{customdata[0]}<br>"
+                "Owner: %{customdata[1]}<br>"
+                "Next milestone: %{customdata[2]}"
+                "<extra></extra>"
+            ),
+        )
+
+        fig.update_layout(
+            height=390,
+            bargap=0.38,
+            showlegend=True,
+            legend_title_text="Delivery status",
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="left",
+                x=0,
+            ),
+            xaxis=dict(
+                title="Completion (%)",
+                range=[0, 115],
+                ticksuffix="%",
+                dtick=25,
+                showgrid=True,
+                gridcolor="#E8EEF5",
+                zeroline=False,
+            ),
+            yaxis=dict(
+                title=None,
+                showgrid=False,
+                automargin=True,
+            ),
+            margin=dict(l=8, r=38, t=58, b=18),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(
+                family="Arial, sans-serif",
+                size=12,
+                color="#334155",
+            ),
+        )
+
+        st.plotly_chart(
+            fig,
+            use_container_width=True,
+            config={"displayModeBar": False},
+        )
 
     with right:
         st.subheader("Portfolio risk profile")
