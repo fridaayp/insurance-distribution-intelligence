@@ -1848,11 +1848,6 @@ if page == "Executive Overview":
                     "partners": [str(partner_name)],
                     "signals": signals,
                     "actions": recommended_actions,
-                        f"{i}. {action}"
-                        for i, action in enumerate(
-                            recommended_actions, start=1
-                        )
-                    ),
                     "_rank": int(group["_rank"].min()),
                 })
 
