@@ -2632,7 +2632,7 @@ else:
     st.markdown(
         """
         <div style="margin:8px 0 14px 0;">
-          <div style="font-size:11px;font-weight:800;
+          <div style="font-size:24px;font-weight:800;
                       letter-spacing:1.4px;color:#64748b;">
             PORTFOLIO AT A GLANCE
           </div>
