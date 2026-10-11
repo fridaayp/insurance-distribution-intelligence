@@ -1937,8 +1937,8 @@ if page == "Executive Overview":
                     additional_section_html = ""
                     if additional_basis:
                         additional_section_html = (
-                            '<div style="margin-top:7px;font-weight:700;">'
-                            'Additional signals'
+                            '<div style="color:#405874;font-size:11px;font-weight:700;line-height:1.5;margin-top:7px;margin-bottom:4px;">'
+                        'Additional signals'
                             '</div>'
                             '<ul style="padding-left:16px;margin:4px 0 0 0;">'
                             f'{additional_basis_html}'
@@ -2011,7 +2011,7 @@ if page == "Executive Overview":
                               font-size:10px;
                               line-height:1.5;
                               margin-bottom:8px;">
-                            <strong>Primary driver</strong>
+                            <strong style="color:#405874;font-size:11px;font-weight:700;line-height:1.5;">Primary driver</strong>
                             <ul style="padding-left:16px;margin:4px 0 0 0;">
                               {primary_basis_html}
                             </ul>
