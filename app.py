@@ -707,7 +707,7 @@ if page == "Executive Overview":
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: 8px;
+    gap: 2px;
     margin-bottom: 14px;
 }
 
@@ -750,7 +750,7 @@ if page == "Executive Overview":
     color: #687e98;
     font-size: 12px;
     line-height: 1.5;
-    margin-top: 7px;
+    margin-top: 0px;
 }
 
 .eo-disclaimer {
