@@ -1370,7 +1370,7 @@ if page == "Executive Overview":
         )
 
         if not trend_view.empty:
-        trend_view["actual_premium_bn"] = (
+            trend_view["actual_premium_bn"] = (
                 trend_view["actual_premium"] / 1_000_000_000
             )
             trend_view["target_premium_bn"] = (
