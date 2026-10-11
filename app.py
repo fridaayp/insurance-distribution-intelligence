@@ -76,9 +76,9 @@ st.markdown("""
 }
 /* Sidebar: sticky viewport layout, without fighting Streamlit */
 [data-testid="stSidebar"] {
-  position: sticky !important;
-  top: 0 !important;
-  align-self: flex-start !important;
+  position: relative !important;
+  top: auto !important;
+  align-self: stretch !important;
   height: 100vh !important;
   min-height: 100vh !important;
   max-height: 100vh !important;
