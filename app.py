@@ -1052,6 +1052,25 @@ if page == "Executive Overview":
 
     previous_period = filtered_comparison(pp_start, pp_end)
     previous_year = filtered_comparison(py_start, py_end)
+    # Explain unavailable comparisons instead of leaving N/A unexplained.
+    comparison_notes = []
+
+    if previous_period is None:
+        comparison_notes.append(
+            "Previous Period is unavailable because the full "
+            "comparison window is outside the available data history."
+        )
+
+    if previous_year is None:
+        comparison_notes.append(
+            "Previous Year is unavailable because the equivalent "
+            "comparison window is incomplete."
+        )
+
+    if comparison_notes:
+        st.caption(
+            "Comparison note: " + " ".join(comparison_notes)
+        )
 
     current_summary = {
         "actual": actual,
