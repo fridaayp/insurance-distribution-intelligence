@@ -2999,7 +2999,7 @@ else:
             priority[priority_cols],
             use_container_width=True,
             hide_index=True,
-            height=min(420, 100 + 42 * len(priority)),
+            height=min(260, 44 + 38 * len(priority)),
             column_config={
                 "Progress": st.column_config.ProgressColumn(
                     "Progress",
@@ -3026,8 +3026,6 @@ else:
         st.success(
             "No initiatives currently meet the management attention rules."
         )
-
-    st.divider()
 
     st.divider()
 
