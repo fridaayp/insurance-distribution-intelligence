@@ -1488,8 +1488,10 @@ if page == "Executive Overview":
                 "no positive targets exist in this selection."
             )
 
-    # Partner ranking and review queue
-    # PARTNER PERFORMANCE — ranking and exception queue
+    # =========================================================
+    # PARTNER DECISION INTELLIGENCE
+    # Contribution ranking vs shortfall priority
+    # =========================================================
     partner_view = (
         df.groupby("partner", as_index=False)
         .agg(
@@ -1499,6 +1501,14 @@ if page == "Executive Overview":
         )
     )
 
+    portfolio_actual = partner_view["premium_actual_idr"].sum()
+
+    partner_view["contribution_share"] = (
+        partner_view["premium_actual_idr"] / portfolio_actual
+        if portfolio_actual > 0
+        else 0.0
+    )
+
     partner_view["attainment_rate"] = (
         partner_view["premium_actual_idr"]
         / partner_view["premium_target_idr"].where(
@@ -1506,6 +1516,7 @@ if page == "Executive Overview":
         )
     )
 
+    # Positive = shortfall; negative = above target.
     partner_view["gap_to_target"] = (
         partner_view["premium_target_idr"]
         - partner_view["premium_actual_idr"]
@@ -1520,29 +1531,49 @@ if page == "Executive Overview":
         )
     )
 
+    # Rank only by actual premium contribution.
+    top = (
+        partner_view.sort_values(
+            "premium_actual_idr", ascending=False
+        )
+        .head(5)
+        .copy()
+        .reset_index(drop=True)
+    )
+
+    # Attention queue: below threshold, with the largest absolute
+    # shortfall first. This is a review priority, not a causal score.
+    attention = (
+        partner_view[
+            (partner_view["attainment_rate"] < threshold)
+            & (partner_view["gap_to_target"] > 0)
+        ]
+        .sort_values(
+            ["gap_to_target", "attainment_rate"],
+            ascending=[False, True],
+        )
+        .head(5)
+        .copy()
+    )
+
     table_left, table_right = st.columns([1.2, 1], gap="medium")
 
-    # TOP PARTNERS
     with table_left:
         st.markdown(
             '<div class="exec-panel-title">Top Partners</div>'
             '<div class="exec-panel-sub">'
-            'Ranked by actual premium contribution.'
+            'Ranked by actual premium. Contribution shows each partner’s '
+            'share of selected portfolio premium.'
             '</div>',
             unsafe_allow_html=True,
-        )
-
-        top = (
-            partner_view
-            .sort_values("premium_actual_idr", ascending=False)
-            .head(5)
-            .copy()
-            .reset_index(drop=True)
         )
 
         if not top.empty:
             top.insert(0, "Rank", range(1, len(top) + 1))
             top["Actual Premium"] = top["premium_actual_idr"].map(money)
+            top["Contribution"] = top["contribution_share"].map(
+                lambda value: f"{value:.1%}"
+            )
             top["Attainment"] = top["attainment_rate"].map(
                 lambda value: f"{value:.1%}"
                 if pd.notna(value) else "N/A"
@@ -1550,7 +1581,10 @@ if page == "Executive Overview":
 
             st.dataframe(
                 top[
-                    ["Rank", "partner", "Actual Premium", "Attainment", "status"]
+                    [
+                        "Rank", "partner", "Actual Premium",
+                        "Contribution", "Attainment", "status",
+                    ]
                 ].rename(columns={
                     "partner": "Partner",
                     "status": "Status",
@@ -1567,6 +1601,9 @@ if page == "Executive Overview":
                     "Actual Premium": st.column_config.TextColumn(
                         "Actual Premium", width="medium"
                     ),
+                    "Contribution": st.column_config.TextColumn(
+                        "Contribution", width="small"
+                    ),
                     "Attainment": st.column_config.TextColumn(
                         "Attainment", width="small"
                     ),
@@ -1578,45 +1615,39 @@ if page == "Executive Overview":
         else:
             st.info("No partner records in this selection.")
 
-    # PARTNERS REQUIRING ATTENTION
     with table_right:
         st.markdown(
-            f'<div class="exec-panel-title">Partner Attention Queue</div>'
+            f'<div class="exec-panel-title">Shortfall Priority</div>'
             f'<div class="exec-panel-sub">'
-            f'Partner attainment below {threshold:.0%}. '
-            f'Ranked by lowest attainment first.'
+            f'Partners below {threshold:.0%} attainment, ordered by '
+            f'largest premium shortfall.'
             f'</div>',
             unsafe_allow_html=True,
         )
 
-        attention = (
-            partner_view[
-                partner_view["attainment_rate"] < threshold
-            ]
-            .sort_values(
-                ["attainment_rate", "gap_to_target"],
-                ascending=[True, False],
-                na_position="first",
-            )
-            .head(5)
-            .copy()
-        )
-
         if not attention.empty:
-            attention["Attainment"] = attention["attainment_rate"].map(
-                lambda value: f"{value:.1%}"
-                if pd.notna(value) else "N/A"
+            attention_display = attention.copy()
+            attention_display["Attainment"] = (
+                attention_display["attainment_rate"].map(
+                    lambda value: f"{value:.1%}"
+                    if pd.notna(value) else "N/A"
+                )
             )
-            attention["Gap to Target"] = attention["gap_to_target"].map(
-                lambda value: (
-                    money(value) if value >= 0
-                    else f"{money(abs(value))} surplus"
+            attention_display["Premium Shortfall"] = (
+                attention_display["gap_to_target"].map(money)
+            )
+            attention_display["Portfolio Share"] = (
+                attention_display["contribution_share"].map(
+                    lambda value: f"{value:.1%}"
                 )
             )
 
             st.dataframe(
-                attention[
-                    ["partner", "Attainment", "Gap to Target"]
+                attention_display[
+                    [
+                        "partner", "Attainment",
+                        "Premium Shortfall", "Portfolio Share",
+                    ]
                 ].rename(columns={"partner": "Partner"}),
                 use_container_width=True,
                 hide_index=True,
@@ -1627,14 +1658,18 @@ if page == "Executive Overview":
                     "Attainment": st.column_config.TextColumn(
                         "Attainment", width="small"
                     ),
-                    "Gap to Target": st.column_config.TextColumn(
-                        "Gap to Target", width="medium"
+                    "Premium Shortfall": st.column_config.TextColumn(
+                        "Premium Shortfall", width="medium"
+                    ),
+                    "Portfolio Share": st.column_config.TextColumn(
+                        "Portfolio Share", width="small"
                     ),
                 },
             )
         else:
             st.success(
-                "No partners fall below the selected threshold."
+                "No partner has both below-threshold attainment "
+                "and a positive premium shortfall in this selection."
             )
 
     # =========================================================
