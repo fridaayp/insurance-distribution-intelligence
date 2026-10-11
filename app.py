@@ -2018,12 +2018,22 @@ if page == "Executive Overview":
                             {additional_section_html}
                           </div>
                           <div style="
-                            color:#405874;
-                            font-size:11px;
-                            line-height:1.6;">
-                        <ol style="padding-left:18px;margin:0;">
-                            {action_list_html}
-                          </ol>
+                              border-top:1px solid #e8edf3;
+                              margin-top:12px;
+                              padding-top:10px;
+                              color:#405874;
+                              font-size:11px;
+                              line-height:1.6;">
+                            <div style="
+                                color:#193655;
+                                font-size:11px;
+                                font-weight:800;
+                                margin-bottom:7px;">
+                              Recommended actions
+                            </div>
+                            <ol style="padding-left:18px;margin:0;">
+                              {action_list_html}
+                            </ol>
                           </div>
                         </div>
                         """,
