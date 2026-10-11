@@ -3046,7 +3046,7 @@ else:
         projects,
         use_container_width=True,
         hide_index=True,
-        num_rows="dynamic",
+        num_rows="fixed",
         column_config={
             "Progress": st.column_config.ProgressColumn(
                 "Progress",
