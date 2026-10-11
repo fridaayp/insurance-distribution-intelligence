@@ -1822,9 +1822,38 @@ if page == "Executive Overview":
                 .str.strip()
             )
 
-            action_df = action_df[
-                action_df["_action_key"].ne("")
-            ].sort_values("_rank")
+            action_df["_rank"] = (
+                action_df["priority"].astype(str).str.lower()
+                .map(priority_rank).fillna(4)
+            )
+
+            # Financial impact: positive shortfall only.
+            shortfall_by_partner = (
+                partner_view.set_index("partner")["gap_to_target"]
+                .clip(lower=0)
+                .to_dict()
+            )
+
+            action_df["_shortfall"] = (
+                action_df["partner"]
+                .map(shortfall_by_partner)
+                .fillna(0.0)
+            )
+
+            action_df["_action_key"] = (
+                action_df["suggested_action"]
+                .fillna("")
+                .astype(str)
+                .str.strip()
+            )
+
+            action_df = (
+                action_df[action_df["_action_key"].ne("")]
+                .sort_values(
+                    ["_rank", "_shortfall"],
+                    ascending=[True, False],
+                )
+            )
 
             consolidated = []
 
