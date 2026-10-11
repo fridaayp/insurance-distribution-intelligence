@@ -1916,9 +1916,21 @@ if page == "Executive Overview":
                     signal_label = item["signals"][0] if item["signals"] else (
                         "Management review"
                     )
-                    basis_list_html = "".join(
+                    basis_items = item.get("basis", [])
+
+                    primary_basis = (
+                        basis_items[:1]
+                        if basis_items else []
+                    )
+                    additional_basis = basis_items[1:]
+
+                    primary_basis_html = "".join(
                         f'<li style="margin-bottom:4px;">{basis}</li>'
-                        for basis in item.get("basis", [])
+                        for basis in primary_basis
+                    )
+                    additional_basis_html = "".join(
+                        f'<li style="margin-bottom:4px;">{basis}</li>'
+                        for basis in additional_basis
                     )
                     if len(item["signals"]) > 1:
                         signal_label += (
@@ -1987,10 +1999,18 @@ if page == "Executive Overview":
                               font-size:10px;
                               line-height:1.5;
                               margin-bottom:8px;">
-                            <strong>Why flagged</strong>
+                            <strong>Primary driver</strong>
                             <ul style="padding-left:16px;margin:4px 0 0 0;">
-                              {basis_list_html}
+                              {primary_basis_html}
                             </ul>
+                            {f'''
+                            <div style="margin-top:7px;font-weight:700;">
+                              Additional signals
+                            </div>
+                            <ul style="padding-left:16px;margin:4px 0 0 0;">
+                              {additional_basis_html}
+                            </ul>
+                            ''' if additional_basis else ''}
                           </div>
                           <div style="
                             color:#405874;
