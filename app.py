@@ -2931,50 +2931,103 @@ else:
     st.divider()
 
     # --- Management attention queue ---
-    st.subheader("Management attention queue")
+    st.subheader("Management Attention Queue")
     st.caption(
-        "Illustrative prioritization based on delivery status, risk, "
-        "and milestone proximity. Confirm ownership and actual status before acting."
+        "Prioritized review list based on delivery status, risk, "
+        "and proximity to the next milestone."
     )
 
     priority = projects[
         projects["Status"].isin(["At risk", "Delayed"])
         | (projects["Risk"] == "High")
+        | (projects["Days to milestone"] <= 7)
     ].copy()
 
     if not priority.empty:
+        def classify_priority(row):
+            if row["Status"] == "Delayed" and row["Risk"] == "High":
+                return "Critical"
+            if row["Status"] == "Delayed":
+                return "High"
+            if row["Risk"] == "High":
+                return "High"
+            if row["Days to milestone"] <= 7:
+                return "Monitor"
+            return "Monitor"
+
+        def recommend_action(row):
+            if row["Status"] == "Delayed":
+                return "Confirm recovery plan and revised delivery date"
+            if row["Risk"] == "High":
+                return "Review risk mitigation and accountable owner"
+            if row["Days to milestone"] <= 7:
+                return "Validate milestone readiness"
+            return "Review delivery progress"
+
         priority["Priority"] = priority.apply(
-            lambda row: (
-                "Critical"
-                if row["Status"] == "Delayed" and row["Risk"] == "High"
-                else "High"
-                if row["Risk"] == "High"
-                else "Monitor"
-            ),
-            axis=1,
+            classify_priority, axis=1
         )
+        priority["Recommended next action"] = priority.apply(
+            recommend_action, axis=1
+        )
+
+        priority_order = {
+            "Critical": 0,
+            "High": 1,
+            "Monitor": 2,
+        }
+        priority["_sort"] = priority["Priority"].map(priority_order)
+
         priority = priority.sort_values(
-            ["Days to milestone", "Progress"],
-            ascending=[True, True],
+            ["_sort", "Days to milestone", "Progress"],
+            ascending=[True, True, True],
         )
+
+        priority_cols = [
+            "Project",
+            "Owner",
+            "Priority",
+            "Status",
+            "Risk",
+            "Progress",
+            "Next milestone",
+            "Days to milestone",
+            "Recommended next action",
+        ]
+
         st.dataframe(
-            priority[
-                [
-                    "Project",
-                    "Owner",
-                    "Status",
-                    "Risk",
-                    "Progress",
-                    "Next milestone",
-                    "Days to milestone",
-                    "Priority",
-                ]
-            ],
+            priority[priority_cols],
             use_container_width=True,
             hide_index=True,
+            height=min(420, 100 + 42 * len(priority)),
+            column_config={
+                "Progress": st.column_config.ProgressColumn(
+                    "Progress",
+                    min_value=0,
+                    max_value=100,
+                    format="%d%%",
+                ),
+                "Days to milestone": st.column_config.NumberColumn(
+                    "Days to milestone",
+                    format="%d days",
+                ),
+                "Priority": st.column_config.TextColumn(
+                    "Priority",
+                    help="Screening category based on illustrative project fields.",
+                ),
+            },
+        )
+
+        st.caption(
+            "Priority labels are rule-based screening indicators, not "
+            "a substitute for a confirmed project-owner assessment."
         )
     else:
-        st.success("No initiatives currently meet the attention-screening rules.")
+        st.success(
+            "No initiatives currently meet the management attention rules."
+        )
+
+    st.divider()
 
     st.divider()
 
