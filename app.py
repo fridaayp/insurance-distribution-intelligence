@@ -716,7 +716,7 @@ if page == "Executive Overview":
 }
 
 .eo-header > div:last-child {
-    flex: 0 0 auto;
+    flex: 0 1 420px;
     min-width: 0;
     display: flex;
     flex-direction: column;
@@ -726,7 +726,8 @@ if page == "Executive Overview":
 .eo-demo-badge {
     display: inline-flex;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    width: fit-content;
     max-width: 100%;
 }
 
