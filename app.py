@@ -1686,11 +1686,9 @@ if page == "Executive Overview":
             unsafe_allow_html=True,
         )
 
-        best_channel = (
-            channel_view.sort_values(
-                "attainment", ascending=False
-            ).iloc[0]
-            if not channel_view.empty else None
+        # Identify the leading partner by portfolio contribution.
+        leading_partner = (
+            top.iloc[0] if not top.empty else None
         )
 
         if attainment is None:
@@ -1709,26 +1707,45 @@ if page == "Executive Overview":
                 f"({attainment:.1%} attainment)."
             )
         else:
-            portfolio_body = "Portfolio premium exactly meets target."
+            portfolio_body = (
+                "Portfolio premium exactly meets target."
+            )
 
-        channel_body = (
-            f"{best_channel['channel']} leads at "
-            f"{best_channel['attainment']:.1%} attainment."
-            if best_channel is not None
-            else "No channel has a valid positive target."
-        )
+        if leading_partner is not None:
+            leading_body = (
+                f"{leading_partner['partner']} contributes "
+                f"{leading_partner['contribution_share']:.1%} "
+                f"of portfolio premium, with "
+                f"{leading_partner['attainment_rate']:.1%} "
+                f"attainment."
+                if pd.notna(leading_partner["attainment_rate"])
+                else (
+                    f"{leading_partner['partner']} contributes "
+                    f"{leading_partner['contribution_share']:.1%} "
+                    "of portfolio premium; target attainment is unavailable."
+                )
+            )
+        else:
+            leading_body = "No partner records in this selection."
 
-        attention_body = (
-            f"{len(attention)} partner(s) fall below the "
-            f"{threshold:.0%} attention threshold."
-            if not attention.empty
-            else "No partner falls below the selected threshold."
-        )
+        if not attention.empty:
+            priority_partner = attention.iloc[0]
+            attention_body = (
+                f"{len(attention)} partner(s) are below the "
+                f"{threshold:.0%} threshold. Largest shortfall: "
+                f"{priority_partner['partner']} at "
+                f"{money(priority_partner['gap_to_target'])}."
+            )
+        else:
+            attention_body = (
+                "No partner meets both the below-threshold "
+                "and positive-shortfall criteria."
+            )
 
         insight_items = [
             ("01", "Portfolio delivery", portfolio_body),
-            ("02", "Channel leader", channel_body),
-            ("03", "Partner exceptions", attention_body),
+            ("02", "Contribution leader", leading_body),
+            ("03", "Shortfall priority", attention_body),
         ]
 
         for number, title, body in insight_items:
