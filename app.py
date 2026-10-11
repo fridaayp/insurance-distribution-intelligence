@@ -716,8 +716,11 @@ if page == "Executive Overview":
 }
 
 .eo-header > div:last-child {
-    flex: 0 1 320px;
+    flex: 0 0 auto;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
 .eo-demo-badge {
