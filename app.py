@@ -713,11 +713,10 @@ if page == "Executive Overview":
 
 .eo-header > div:last-child {
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
+    flex-direction: column;
+    align-items: flex-start;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
     min-width: 0;
 }
