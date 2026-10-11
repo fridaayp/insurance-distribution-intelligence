@@ -1011,12 +1011,13 @@ if page == "Executive Overview":
     # title area and a quieter synthetic-data disclosure.
     st.markdown("""
     <div class="eo-header">
-      <div>
-        <h1 class="eo-title">Executive Overview</h1>
-        <div class="eo-subtitle">
-          Distribution performance · Target delivery · Partner contribution
-        </div>
-      </div>
+  <div>
+    <h1 class="eo-title">Executive Overview</h1>
+    <div class="eo-subtitle">
+      Distribution performance · Target delivery · Partner contribution
+    </div>
+  </div>
+</div>
       <div>
         <div class="eo-demo-badge">
           <span class="eo-demo-dot"></span>
