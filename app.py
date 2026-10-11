@@ -1005,6 +1005,42 @@ if page == "Executive Overview":
             text-align: left;
         }
     }
+    /* Executive chart typography */
+    .block-container h2,
+    .block-container h3 {
+        color: #102844 !important;
+        font-weight: 750 !important;
+        letter-spacing: -0.35px !important;
+        line-height: 1.25 !important;
+    }
+
+    .block-container h2 {
+        font-size: 23px !important;
+        margin-top: 20px !important;
+        margin-bottom: 6px !important;
+    }
+
+    .block-container h3 {
+        font-size: 19px !important;
+        margin-top: 14px !important;
+        margin-bottom: 6px !important;
+    }
+
+    /* Supporting text under chart titles */
+    .block-container h2 + p,
+    .block-container h3 + p {
+        color: #718198 !important;
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+    }
+
+    /* Premium blue accents */
+    :root {
+        --eo-navy: #102844;
+        --eo-blue: #2369A8;
+        --eo-teal: #278C87;
+        --eo-amber: #B88735;
+    }
     </style>
     """, unsafe_allow_html=True)
 
