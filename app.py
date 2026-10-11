@@ -1272,7 +1272,7 @@ if page == "Executive Overview":
         """
         
     st.markdown(
-        '<div class="eo-section-heading">Portfolio performance</div>',
+        '<div class="eo-section-heading">Portfolio Performance</div>',
         unsafe_allow_html=True,
     )
 
