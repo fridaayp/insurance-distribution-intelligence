@@ -564,7 +564,6 @@ def style(fig, height=330):
 def header(title, subtitle):
     st.title(title)
     st.caption(subtitle)
-    st.info("Portfolio demo using synthetic data only. Figures are fictional and do not represent actual insurer performance.")
 
 def score_display(frame):
     out = frame.copy()
