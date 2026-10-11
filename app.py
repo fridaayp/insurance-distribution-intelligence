@@ -1223,6 +1223,16 @@ if page == "Executive Overview":
 
     def render_kpi(label, value, note, metric):
         pp = comparison_text(
+            pp_class = (
+            "positive" if pp.startswith("+")
+            else "negative" if pp.startswith("-")
+            else ""
+        )
+        py_class = (
+            "positive" if py.startswith("+")
+            else "negative" if py.startswith("-")
+            else ""
+        )
             current_summary, previous_period, metric
         )
         py = comparison_text(
@@ -1237,12 +1247,21 @@ if page == "Executive Overview":
           </div>
           <div class="eo-kpi-note">{note}</div>
           <div class="eo-kpi-comparison">
-            <span>Previous Period</span><strong>{pp}</strong>
+            <span>Previous Period</span>
+            <strong class="{pp_class}">{pp}</strong>
           </div>
           <div class="eo-kpi-comparison">
-            <span>Previous Year</span><strong>{py}</strong>
+            <span>Previous Year</span>
+            <strong class="{py_class}">{py}</strong>
+        .eo-kpi-comparison strong.positive {
+        color: #16856B !important;
+    }
+
+    .eo-kpi-comparison strong.negative {
+        color: #D14343 !important;
+    }
           </div>
-        </div>
+        
         """
 
     st.markdown(
@@ -1357,31 +1376,37 @@ if page == "Executive Overview":
         )
 
         if not trend_view.empty:
+        trend_view["actual_premium_bn"] = (
+                trend_view["actual_premium"] / 1_000_000_000
+            )
+            trend_view["target_premium_bn"] = (
+                trend_view["target_premium"] / 1_000_000_000
+            )
             fig = go.Figure()
 
             fig.add_trace(go.Scatter(
                 x=trend_view["month"],
-                y=trend_view["actual_premium"],
+                y=trend_view["actual_premium_bn"],
                 name="Actual Premium",
                 mode="lines+markers",
                 line=dict(color="#155EEF", width=3.2),
                 marker=dict(size=5, color="#1769AA"),
                 hovertemplate=(
                     "%{x|%b %Y}<br>"
-                    "Actual: Rp %{y:,.0f}<extra></extra>"
+                    "Actual: Rp %{y:,.2f}<extra></extra>"
                 ),
             ))
 
             fig.add_trace(go.Scatter(
                 x=trend_view["month"],
-                y=trend_view["target_premium"],
+                y=trend_view["target_premium_bn"],
                 name="Target Premium",
                 mode="lines+markers",
                 line=dict(color="#AAB8CA", width=2, dash="dot"),
                 marker=dict(size=4, color="#A7BED9"),
                 hovertemplate=(
                     "%{x|%b %Y}<br>"
-                    "Target: Rp %{y:,.0f}<extra></extra>"
+                    "Target: Rp %{y:,.2f}<extra></extra>"
                 ),
             ))
 
@@ -1405,7 +1430,9 @@ if page == "Executive Overview":
             fig.update_yaxes(
                 title=None,
                 tickprefix="Rp ",
-                tickformat="~s",
+                ticksuffix="B",
+                tickformat=".0f",
+                dtick=2,
                 rangemode="tozero",
                 gridcolor="#EDF2F7",
                 zeroline=False,
