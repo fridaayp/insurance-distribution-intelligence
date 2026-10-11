@@ -383,7 +383,8 @@ with st.sidebar:
         ["All channels"] + sorted(data.channel.dropna().unique().tolist()),
     )
 
-    # Month-level global filter: defaults to all available data.
+    # Month-level global filter:
+    # default to Jan-Sep 2026 when those months are available.
     month_keys = sorted(
         data["month"].dropna().dt.to_period("M").astype(str).unique().tolist()
     )
@@ -397,15 +398,24 @@ with st.sidebar:
         st.error("No valid month values are available in the dataset.")
         st.stop()
 
+    # Versioned keys initialize the new default without reusing
+    # stale selections from the previous filter widgets.
+    start_key = "period_start_month_v2"
+    end_key = "period_end_month_v2"
+
+    default_start = "2026-01" if "2026-01" in month_keys else month_keys[0]
+
+    if start_key not in st.session_state:
+        st.session_state[start_key] = default_start
+
     period_cols = st.columns(2, gap="small")
 
     with period_cols[0]:
         period_start_key = st.selectbox(
             "Period from",
             options=month_keys,
-            index=0,
             format_func=lambda value: month_labels[value],
-            key="period_start_month",
+            key=start_key,
             help="First month included in the analysis.",
         )
 
@@ -414,15 +424,24 @@ with st.sidebar:
         if key >= period_start_key
     ]
 
-    if st.session_state.get("period_end_month") not in end_options:
-        st.session_state["period_end_month"] = end_options[-1]
+    default_end = (
+        "2026-09"
+        if "2026-09" in end_options
+        else end_options[-1]
+    )
+
+    if (
+        end_key not in st.session_state
+        or st.session_state[end_key] not in end_options
+    ):
+        st.session_state[end_key] = default_end
 
     with period_cols[1]:
         period_end_key = st.selectbox(
             "Period to",
             options=end_options,
             format_func=lambda value: month_labels[value],
-            key="period_end_month",
+            key=end_key,
             help="Last month included in the analysis.",
         )
 
