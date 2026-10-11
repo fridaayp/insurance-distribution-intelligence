@@ -3054,6 +3054,7 @@ else:
                 "Progress",
                 min_value=0,
                 max_value=100,
+                step=1,
                 format="%d%%",
             ),
             "Days to milestone": st.column_config.NumberColumn(
