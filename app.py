@@ -742,8 +742,9 @@ if page == "Executive Overview":
     font-size: clamp(28px, 2.5vw, 34px);
     font-weight: 820;
     letter-spacing: -1.1px;
-    line-height: 1.12;
-    margin: 0;
+    line-height: 1;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .eo-subtitle {
@@ -751,6 +752,7 @@ if page == "Executive Overview":
     font-size: 12px;
     line-height: 1.5;
     margin-top: 0px;
+    padding: 0
 }
 
 .eo-disclaimer {
