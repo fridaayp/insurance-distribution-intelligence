@@ -1847,7 +1847,7 @@ if page == "Executive Overview":
                     "priority": first["priority"],
                     "partners": [str(partner_name)],
                     "signals": signals,
-                    "action": " ".join(
+                    "actions": recommended_actions,
                         f"{i}. {action}"
                         for i, action in enumerate(
                             recommended_actions, start=1
@@ -1887,7 +1887,10 @@ if page == "Executive Overview":
                         badge_bg, badge_fg = "#fff7e5", "#8a641b"
                     else:
                         badge_bg, badge_fg = "#edf4fc", "#376a9e"
-
+                    action_list_html = "".join(
+                        f'<li style="margin-bottom:6px;">{action}</li>'
+                        for action in item["actions"]
+                    )
                     st.markdown(
                         f"""
                         <div style="
@@ -1935,11 +1938,12 @@ if page == "Executive Overview":
                             {signal_label}
                           </div>
                           <div style="
-                              color:#405874;
-                              font-size:11px;
-                              line-height:1.6;">
-                            {item['action']}
-                          </div>
+                            color:#405874;
+                            font-size:11px;
+                            line-height:1.6;">
+                          <ol style="padding-left:18px;margin:0;">
+                            {action_list_html}
+                          </ol>
                         </div>
                         """,
                         unsafe_allow_html=True,
