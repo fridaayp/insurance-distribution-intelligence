@@ -1223,7 +1223,13 @@ if page == "Executive Overview":
 
     def render_kpi(label, value, note, metric):
         pp = comparison_text(
-            pp_class = (
+            current_summary, previous_period, metric
+        )
+        py = comparison_text(
+            current_summary, previous_year, metric
+        )
+
+        pp_class = (
             "positive" if pp.startswith("+")
             else "negative" if pp.startswith("-")
             else ""
@@ -1232,11 +1238,6 @@ if page == "Executive Overview":
             "positive" if py.startswith("+")
             else "negative" if py.startswith("-")
             else ""
-        )
-            current_summary, previous_period, metric
-        )
-        py = comparison_text(
-            current_summary, previous_year, metric
         )
 
         return f"""
@@ -1253,17 +1254,10 @@ if page == "Executive Overview":
           <div class="eo-kpi-comparison">
             <span>Previous Year</span>
             <strong class="{py_class}">{py}</strong>
-        .eo-kpi-comparison strong.positive {
-        color: #16856B !important;
-    }
-
-    .eo-kpi-comparison strong.negative {
-        color: #D14343 !important;
-    }
           </div>
-        
+        </div>
         """
-
+        
     st.markdown(
         '<div class="eo-section-heading">Portfolio performance</div>',
         unsafe_allow_html=True,
