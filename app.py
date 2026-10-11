@@ -4,6 +4,8 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 import base64
+import plotly.express as px
+import plotly.graph_objects as go
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
