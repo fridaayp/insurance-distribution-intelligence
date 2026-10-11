@@ -2535,7 +2535,33 @@ else:
             ),
         },
     )
+    # --- Green progress visualization ---
+    st.subheader("Progress overview")
+    st.caption("Live view of progress values from the editable tracker.")
 
+    for _, row in edited.iterrows():
+        progress_value = max(0, min(100, int(row["Progress"])))
+
+        st.markdown(
+            f"""
+            <div style="margin-bottom: 14px;">
+                <div style="display: flex; justify-content: space-between;
+                            margin-bottom: 5px; font-size: 14px;">
+                    <span>{row["Project"]}</span>
+                    <strong>{progress_value}%</strong>
+                </div>
+                <div style="background: #e8edf0; border-radius: 8px;
+                            height: 12px; overflow: hidden;">
+                    <div style="width: {progress_value}%;
+                                background: #22a06b;
+                                height: 12px; border-radius: 8px;">
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        
     st.download_button(
         "Download project tracker CSV",
         edited.to_csv(index=False).encode("utf-8"),
