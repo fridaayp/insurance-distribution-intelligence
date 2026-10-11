@@ -14,7 +14,7 @@ from src.analytics import (
     detect_underperformance, detect_monthly_anomalies, generate_recommendations,
 )
 
-st.set_page_config(page_title="Distribution Strategy Intelligence", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Insurance Distribution Intelligence", page_icon="📊", layout="wide")
 st.markdown("""
 <style>
 /* Clean, aligned sidebar navigation */
@@ -283,7 +283,7 @@ with st.sidebar:
       ">
         <img
           src="data:image/png;base64,{logo_base64}"
-          alt="Distribution Strategy Intelligence"
+          alt="Insurance Distribution Intelligence"
           style="
               width: 58px;
               height: 62px;
@@ -298,11 +298,11 @@ with st.sidebar:
             color: #f6f9ff;
             font-size: 18px;
             font-weight: 750;
-            line-height: 1.3;
-            letter-spacing: -0.25px;
+            line-height: 1.25;
+            letter-spacing: -0.3px;
         ">
-          <div>Distribution</div>
-          <div>Strategy Intelligence</div>
+          <div>Insurance</div>
+          <div>Distribution Intelligence</div>
         </div>
       </div>
 
