@@ -3034,7 +3034,8 @@ else:
             "No initiatives currently meet the management attention rules."
         )
 
-
+    st.divider()
+    
     # --- Editable project tracker ---
     st.subheader("Project tracker")
     st.caption(
