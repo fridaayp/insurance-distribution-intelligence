@@ -320,16 +320,16 @@ with st.sidebar:
         "Executive Overview",
         "Performance Analysis",
         "Partnership Intelligence",
-        "Scenario Lab",
-        "Project Portfolio & Execution",
+        "Machine Learning",
+        "Project Management",
     ]
 
     page_labels = {
         "Executive Overview": "⌂   Executive Overview",
         "Performance Analysis": "▥   Performance Analysis",
         "Partnership Intelligence": "♧   Partnership Intelligence",
-        "Scenario Lab": "↗️   Scenario Lab",
-        "Project Portfolio & Execution": "▤   Project Portfolio & Execution",
+        "Machine Learning": "↗️   Machine Learning",
+        "Project Management": "▤   Project Management",
     }
 
     if "selected_page" not in st.session_state:
@@ -340,8 +340,8 @@ with st.sidebar:
         "Executive Overview": ":material/dashboard:",
         "Performance Analysis": ":material/analytics:",
         "Partnership Intelligence": ":material/handshake:",
-        "Scenario Lab": ":material/trending_up:",
-        "Project Portfolio & Execution": ":material/assignment:",
+        "Machine Learning": ":material/trending_up:",
+        "Project Management": ":material/assignment:",
     }
 
     for target_page in pages:
@@ -2100,9 +2100,9 @@ elif page == "Partnership Intelligence":
             "No partner scorecards are below the selected attainment threshold."
         )
 
-elif page == "Scenario Lab":
+elif page == "Machine Learning":
     header(
-        "Scenario Lab",
+        "Machine Learning",
         "Model illustrative growth assumptions and compare their potential premium impact."
     )
 
@@ -2317,7 +2317,7 @@ elif page == "Scenario Lab":
 
 else:
     header(
-        "Project Portfolio & Execution",
+        "Project Management",
         "Monitor strategic initiatives, execution health, delivery progress, and management priorities."
     )
 
