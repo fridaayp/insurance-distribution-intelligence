@@ -1,6 +1,6 @@
 """Experimental premium forecasting for synthetic distribution data."""
 
-from _future_ import annotations
+from __future__ import annotations
 
 import numpy as np
 import pandas as pd
