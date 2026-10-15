@@ -2450,10 +2450,18 @@ elif page == "Machine Learning":
 
                         if change is not None:
                             st.metric(
-                                label="",
+                                label=" ",
                                 value=f"{change:+.1%}",
                                 delta=money(change_amount),
-                                help="Comparison with the latest observed month.",
+                                help=(
+                                    "Comparison with the latest observed "
+                                    "month, not year-over-year growth."
+                                ),
+                            )
+                        else:
+                            st.metric(
+                                label=" ",
+                                value="N/A",
                             )
 
                 with c4:
