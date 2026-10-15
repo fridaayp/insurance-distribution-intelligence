@@ -2558,73 +2558,44 @@ elif page == "Machine Learning":
 
                 with right:
                     st.subheader("Model intelligence")
-                    st.caption("Historical evaluation against baseline.")
-                
-                    with st.container(border=True, height=125):
+                    st.caption(
+                        "Historical evaluation against baseline."
+                    )
+
+                    with st.container(border=True):
                         st.caption("RANDOM FOREST · MAE")
                         st.subheader(money(ml_mae))
                         st.caption("Lower error is better")
-                
-                    with st.container(border=True, height=125):
+
+                    with st.container(border=True):
                         st.caption("LAST-MONTH BASELINE · MAE")
                         st.subheader(money(baseline_mae))
                         st.caption("Previous month's actual premium")
-                
+
                     if baseline_mae > 0:
                         improvement = (
-                            (baseline_mae - ml_mae) / baseline_mae
+                            (baseline_mae - ml_mae)
+                            / baseline_mae
                         )
-                
+
                         if ml_mae < baseline_mae:
                             st.success(
-                                f"MAE is {improvement:.1%} lower than baseline."
+                                f"MAE is {improvement:.1%} "
+                                "lower than baseline."
                             )
                         elif ml_mae > baseline_mae:
                             st.warning(
-                                f"MAE is {abs(improvement):.1%} higher than baseline."
+                                f"MAE is {abs(improvement):.1%} "
+                                "higher than baseline."
                             )
-                        else:
-                            st.info("Model and baseline have equal MAE.")
-                    else:
-                        st.info("Relative improvement is unavailable.")
-                
-                    st.caption(
-                        f"Evaluation coverage: {evaluation_months} "
-                        "distinct held-out calendar months."
-                    )
-
-                        st.divider()
-
-                        st.caption("LAST-MONTH BASELINE · MAE")
-                        st.subheader(money(baseline_mae))
-                        st.caption("Previous month's actual premium")
-
-                        if baseline_mae > 0:
-                            improvement = (
-                                (baseline_mae - ml_mae)
-                                / baseline_mae
-                            )
-
-                            if ml_mae < baseline_mae:
-                                st.success(
-                                    f"MAE is {improvement:.1%} lower "
-                                    "than the baseline on this test set."
-                                )
-                            elif ml_mae > baseline_mae:
-                                st.warning(
-                                    f"MAE is {abs(improvement):.1%} higher "
-                                    "than the baseline. No improvement "
-                                    "has been demonstrated."
-                                )
-                            else:
-                                st.info(
-                                    "Model and baseline have equal MAE."
-                                )
                         else:
                             st.info(
-                                "Relative improvement is unavailable "
-                                "because baseline MAE is zero."
+                                "Model and baseline have equal MAE."
                             )
+                    else:
+                        st.info(
+                            "Relative improvement is unavailable."
+                        )
 
                     st.caption(
                         f"Evaluation coverage: {evaluation_months} "
@@ -2632,6 +2603,9 @@ elif page == "Machine Learning":
                     )
 
                 st.divider()
+
+                # DATA-DRIVEN INTERPRETATION
+                st.subheader("Forecast interpretation")
 
                 # DATA-DRIVEN INTERPRETATION
                 st.subheader("Forecast interpretation")
