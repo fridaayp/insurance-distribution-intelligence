@@ -2449,20 +2449,20 @@ elif page == "Machine Learning":
                         st.caption("FORECAST VS ACTUAL")
 
                         if change is not None:
-                            st.metric(
-                                label=" ",
-                                value=f"{change:+.1%}",
-                                delta=money(change_amount),
-                                help=(
-                                    "Comparison with the latest observed "
-                                    "month, not year-over-year growth."
-                                ),
+                            st.markdown(
+                                f"## {change:+.1%}"
                             )
+
+                            if change_amount >= 0:
+                                st.caption(
+                                    f"↑ {money(change_amount)}"
+                                )
+                            else:
+                                st.caption(
+                                    f"↓ {money(abs(change_amount))}"
+                                )
                         else:
-                            st.metric(
-                                label=" ",
-                                value="N/A",
-                            )
+                            st.markdown("## N/A")
 
                 with c4:
                     with st.container(border=True):
