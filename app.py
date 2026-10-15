@@ -24,7 +24,7 @@ from src.ml.forecasting import (
     forecast_next_month,
 )
 
-st.set_page_config(page_title="Distribution Strategy Intelligence", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Insurance Distribution Intelligence", page_icon="📊", layout="wide")
 st.markdown("""
 <style>
 /* Clean, aligned sidebar navigation */
@@ -293,7 +293,7 @@ with st.sidebar:
       ">
         <img
           src="data:image/png;base64,{logo_base64}"
-          alt="Distribution Strategy Intelligence"
+          alt="Insurance Distribution Intelligence"
           style="
               width: 58px;
               height: 62px;
@@ -308,11 +308,11 @@ with st.sidebar:
             color: #f6f9ff;
             font-size: 18px;
             font-weight: 750;
-            line-height: 1.3;
-            letter-spacing: -0.25px;
+            line-height: 1.25;
+            letter-spacing: -0.3px;
         ">
-          <div>Distribution</div>
-          <div>Strategy Intelligence</div>
+          <div>Insurance</div>
+          <div>Distribution Intelligence</div>
         </div>
       </div>
 
@@ -499,7 +499,6 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
     st.divider()
-    st.caption("Independent portfolio prototype • synthetic data only")
 
 df = data.copy()
 
@@ -574,7 +573,6 @@ def style(fig, height=330):
 def header(title, subtitle):
     st.title(title)
     st.caption(subtitle)
-    st.info("Portfolio demo using synthetic data only. Figures are fictional and do not represent actual insurer performance.")
 
 def score_display(frame):
     out = frame.copy()
@@ -708,52 +706,73 @@ if page == "Executive Overview":
     .block-container {
         padding-top: 1.25rem;
         padding-bottom: 1.8rem;
-        max-width: 1600px;
+        max-width: 100%;
     }
 
     /* Header: keep title and demo disclosure visually connected */
 .eo-header {
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
-    justify-content: space-between;
-    gap: 24px;
-    margin-bottom: 14px;
-}
-
-.eo-header > div:first-child {
-    flex: 1 1 auto;
-    min-width: 0;
+    justify-content: flex-start;
+    gap: 4px;
+    margin-bottom: 18px;
 }
 
 .eo-header > div:last-child {
-    flex: 0 1 260px;
-    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+}
+
+.eo-demo-badge {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    width: fit-content;
+    max-width: 100%;
+}
+
+.eo-disclaimer {
+    max-width: 100%;
+    margin: 0;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .eo-title {
     color: #102844;
-    font-size: clamp(28px, 2.5vw, 34px);
-    font-weight: 820;
-    letter-spacing: -1.1px;
-    line-height: 1.12;
-    margin: 0;
+    font-size: clamp(30px, 2.6vw, 36px);
+    font-weight: 800;
+    letter-spacing: -1.15px;
+    line-height: 1.08;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .eo-subtitle {
-    color: #687e98;
+    color: #718198;
     font-size: 12px;
-    line-height: 1.5;
-    margin-top: 7px;
+    font-weight: 450;
+    line-height: 1.4;
+    margin-top: 0;
+    padding: 0;
 }
 
 .eo-disclaimer {
     color: #657b95;
     font-size: 10px;
-    line-height: 1.5;
-    margin-top: 7px;
-    max-width: 260px;
+    line-height: 1.3;
+    margin-top: 5px;
+    max-width: none;
+    white-space: nowrap;
     text-align: right;
-    margin-left: auto;
+    margin-left: 0;
 }
 
 /* Context bar: protect the reporting-period column */
@@ -761,15 +780,16 @@ if page == "Executive Overview":
     display: grid;
     grid-template-columns: minmax(220px, 1.35fr) repeat(3, minmax(135px, 1fr));
     background: #ffffff;
-    border: 1px solid #e1e9f2;
-    border-radius: 11px;
-    margin: 0 0 15px;
+    border: 1px solid #dce5ef;
+    border-radius: 10px;
+    margin: 0 0 18px;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(16, 40, 68, 0.035);
 }
 
 .eo-context-item {
     min-width: 0;
-    padding: 11px 13px;
+    padding: 13px 15px;
     border-right: 1px solid #e8eef5;
 }
 
@@ -821,12 +841,12 @@ if page == "Executive Overview":
     line-height: 1.35;
 }
 
-.eo-kpi-comparison strong {
-    color: #405874;
-    font-size: 10px;
-    font-weight: 750;
-    text-align: right;
-    overflow-wrap: anywhere;
+.eo-kpi-comparison strong.positive {
+    color: #16856B !important;
+}
+
+.eo-kpi-comparison strong.negative {
+    color: #D14343 !important;
 }
 
 .eo-signal {
@@ -854,9 +874,10 @@ if page == "Executive Overview":
     }
 
     .eo-header > div:last-child {
-        flex: 1 1 auto;
-        min-width: 0;
-    }
+    flex: 0 0 auto;
+    min-width: 0;
+    text-align: right;
+}
 
     .eo-disclaimer {
         text-align: left;
@@ -869,13 +890,31 @@ if page == "Executive Overview":
 }
 
     /* Section hierarchy */
+    /* Chart titles — premium executive hierarchy */
+    .exec-panel-title {
+        color: #102844 !important;
+        font-size: 22px !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.55px !important;
+        line-height: 1.25 !important;
+        margin: 0 0 7px !important;
+    }
+
+    .exec-panel-sub {
+        color: #718198 !important;
+        font-size: 13px !important;
+        font-weight: 400 !important;
+        line-height: 1.5 !important;
+        margin: 0 0 12px !important;
+    }
     .eo-section-heading {
-        color: #1a3554;
-        font-size: 12px;
+        color: #102844;
+        font-size: 22px;
         font-weight: 800;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-        margin: 0 0 10px;
+        letter-spacing: -0.55px;
+        line-height: 1.25;
+        text-transform: none;
+        margin: 0 0 12px;
     }
     .eo-section-note {
         color: #8291a5;
@@ -992,6 +1031,49 @@ if page == "Executive Overview":
             text-align: left;
         }
     }
+    /* Executive chart typography */
+    .block-container h2,
+    .block-container h3 {
+        color: #102844 !important;
+        font-weight: 750 !important;
+        letter-spacing: -0.35px !important;
+        line-height: 1.25 !important;
+    }
+
+    .block-container h2 {
+        font-size: 23px !important;
+        margin-top: 20px !important;
+        margin-bottom: 6px !important;
+    }
+
+    .block-container h3 {
+        font-size: 19px !important;
+        margin-top: 14px !important;
+        margin-bottom: 6px !important;
+    }
+
+    /* Supporting text under chart titles */
+    .block-container h2 + p,
+    .block-container h3 + p {
+        color: #718198 !important;
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+    }
+    
+    /* Remove table borders and shadows */
+div[data-testid="stDataFrame"],
+div[data-testid="stDataEditor"] {
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+
+    /* Premium blue accents */
+    :root {
+        --eo-navy: #102844;
+        --eo-blue: #2369A8;
+        --eo-teal: #278C87;
+        --eo-amber: #B88735;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -999,21 +1081,12 @@ if page == "Executive Overview":
     # title area and a quieter synthetic-data disclosure.
     st.markdown("""
     <div class="eo-header">
-      <div>
-        <h1 class="eo-title">Executive Overview</h1>
-        <div class="eo-subtitle">
-          Distribution performance · Target delivery · Partner contribution
+        <div>
+            <h1 class="eo-title">Executive Overview</h1>
+            <div class="eo-subtitle">
+                Distribution performance · Target delivery · Partner contribution
+            </div>
         </div>
-      </div>
-      <div>
-        <div class="eo-demo-badge">
-          <span class="eo-demo-dot"></span>
-          SYNTHETIC DATA
-        </div>
-        <div class="eo-disclaimer">
-          Illustrative portfolio figures only. Not actual insurer performance.
-        </div>
-      </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1172,6 +1245,29 @@ if page == "Executive Overview":
             current_summary, previous_year, metric
         )
 
+        pp_class = (
+            "positive" if pp.startswith("+")
+            else "negative" if pp.startswith("-")
+            else ""
+        )
+        py_class = (
+            "positive" if py.startswith("+")
+            else "negative" if py.startswith("-")
+            else ""
+        )
+
+        if metric == "gap":
+            pp_class = (
+                "negative" if "widened" in pp.lower()
+                else "positive" if "narrowed" in pp.lower()
+                else ""
+            )
+            py_class = (
+                "negative" if "widened" in py.lower()
+                else "positive" if "narrowed" in py.lower()
+                else ""
+            )
+
         return f"""
         <div class="eo-kpi">
           <div class="eo-kpi-label">{label}</div>
@@ -1180,16 +1276,18 @@ if page == "Executive Overview":
           </div>
           <div class="eo-kpi-note">{note}</div>
           <div class="eo-kpi-comparison">
-            <span>Previous Period</span><strong>{pp}</strong>
+            <span>Previous Period</span>
+            <strong class="{pp_class}">{pp}</strong>
           </div>
           <div class="eo-kpi-comparison">
-            <span>Previous Year</span><strong>{py}</strong>
+            <span>Previous Year</span>
+            <strong class="{py_class}">{py}</strong>
           </div>
         </div>
         """
-
+        
     st.markdown(
-        '<div class="eo-section-heading">Portfolio performance</div>',
+        '<div class="eo-section-heading">Portfolio Performance</div>',
         unsafe_allow_html=True,
     )
 
@@ -1300,31 +1398,37 @@ if page == "Executive Overview":
         )
 
         if not trend_view.empty:
+            trend_view["actual_premium_bn"] = (
+                trend_view["actual_premium"] / 1_000_000_000
+            )
+            trend_view["target_premium_bn"] = (
+                trend_view["target_premium"] / 1_000_000_000
+            )
             fig = go.Figure()
 
             fig.add_trace(go.Scatter(
                 x=trend_view["month"],
-                y=trend_view["actual_premium"],
+                y=trend_view["actual_premium_bn"],
                 name="Actual Premium",
                 mode="lines+markers",
-                line=dict(color="#1769AA", width=2.8),
+                line=dict(color="#155EEF", width=3.2),
                 marker=dict(size=5, color="#1769AA"),
                 hovertemplate=(
                     "%{x|%b %Y}<br>"
-                    "Actual: Rp %{y:,.0f}<extra></extra>"
+                    "Actual: Rp %{y:,.2f}<extra></extra>"
                 ),
             ))
 
             fig.add_trace(go.Scatter(
                 x=trend_view["month"],
-                y=trend_view["target_premium"],
+                y=trend_view["target_premium_bn"],
                 name="Target Premium",
                 mode="lines+markers",
-                line=dict(color="#A7BED9", width=2.2, dash="dot"),
+                line=dict(color="#AAB8CA", width=2, dash="dot"),
                 marker=dict(size=4, color="#A7BED9"),
                 hovertemplate=(
                     "%{x|%b %Y}<br>"
-                    "Target: Rp %{y:,.0f}<extra></extra>"
+                    "Target: Rp %{y:,.2f}<extra></extra>"
                 ),
             ))
 
@@ -1345,11 +1449,25 @@ if page == "Executive Overview":
                 automargin=True,
             )
 
+            y_min = min(
+                trend_view["actual_premium_bn"].min(),
+                trend_view["target_premium_bn"].min(),
+            )
+            y_max = max(
+                trend_view["actual_premium_bn"].max(),
+                trend_view["target_premium_bn"].max(),
+            )
+            y_padding = max((y_max - y_min) * 0.8, 1.0)
+
             fig.update_yaxes(
                 title=None,
                 tickprefix="Rp ",
-                tickformat="~s",
-                rangemode="tozero",
+                ticksuffix="B",
+                tickformat=".1f",
+                range=[
+                    max(0, y_min - y_padding),
+                    y_max + y_padding,
+                ],
                 gridcolor="#EDF2F7",
                 zeroline=False,
                 tickfont=dict(size=10, color="#73849A"),
@@ -1421,7 +1539,9 @@ if page == "Executive Overview":
             axis_max = max(1.12, max_attainment * 1.16)
 
             bar_colors = [
-                "#1769AA" if value >= 1.0 else "#729CC8"
+                "#16856B" if value >= 1.0 else
+                "#155EEF" if value >= threshold else
+                "#D99A2B"
                 for value in channel_view["attainment"]
             ]
 
@@ -1696,11 +1816,9 @@ if page == "Executive Overview":
             unsafe_allow_html=True,
         )
 
-        best_channel = (
-            channel_view.sort_values(
-                "attainment", ascending=False
-            ).iloc[0]
-            if not channel_view.empty else None
+        # Identify the leading partner by portfolio contribution.
+        leading_partner = (
+            top.iloc[0] if not top.empty else None
         )
 
         if attainment is None:
@@ -1719,26 +1837,45 @@ if page == "Executive Overview":
                 f"({attainment:.1%} attainment)."
             )
         else:
-            portfolio_body = "Portfolio premium exactly meets target."
+            portfolio_body = (
+                "Portfolio premium exactly meets target."
+            )
 
-        channel_body = (
-            f"{best_channel['channel']} leads at "
-            f"{best_channel['attainment']:.1%} attainment."
-            if best_channel is not None
-            else "No channel has a valid positive target."
-        )
+        if leading_partner is not None:
+            leading_body = (
+                f"{leading_partner['partner']} contributes "
+                f"{leading_partner['contribution_share']:.1%} "
+                f"of portfolio premium, with "
+                f"{leading_partner['attainment_rate']:.1%} "
+                f"attainment."
+                if pd.notna(leading_partner["attainment_rate"])
+                else (
+                    f"{leading_partner['partner']} contributes "
+                    f"{leading_partner['contribution_share']:.1%} "
+                    "of portfolio premium; target attainment is unavailable."
+                )
+            )
+        else:
+            leading_body = "No partner records in this selection."
 
-        attention_body = (
-            f"{len(attention)} partner(s) fall below the "
-            f"{threshold:.0%} attention threshold."
-            if not attention.empty
-            else "No partner falls below the selected threshold."
-        )
+        if not attention.empty:
+            priority_partner = attention.iloc[0]
+            attention_body = (
+                f"{len(attention)} partner(s) are below the "
+                f"{threshold:.0%} threshold. Largest shortfall: "
+                f"{priority_partner['partner']} at "
+                f"{money(priority_partner['gap_to_target'])}."
+            )
+        else:
+            attention_body = (
+                "No partner meets both the below-threshold "
+                "and positive-shortfall criteria."
+            )
 
         insight_items = [
             ("01", "Portfolio delivery", portfolio_body),
-            ("02", "Channel leader", channel_body),
-            ("03", "Partner exceptions", attention_body),
+            ("02", "Contribution leader", leading_body),
+            ("03", "Shortfall priority", attention_body),
         ]
 
         for number, title, body in insight_items:
@@ -1778,7 +1915,8 @@ if page == "Executive Overview":
             # Keep only fields available in the existing action records.
             preferred = [
                 c for c in [
-                    "priority", "partner", "signal", "suggested_action"
+                    "priority", "partner", "signal",
+                    "suggested_action", "basis"
                 ]
                 if c in action_df.columns
             ]
@@ -1795,52 +1933,101 @@ if page == "Executive Overview":
             if "priority" not in action_df.columns:
                 action_df["priority"] = "Review"
 
-            # Sort by priority before consolidating repeated actions.
+            # Rank actions by priority, then consolidate by partner.
             priority_rank = {
-                "critical": 0, "high": 1,
-                "medium": 2, "low": 3,
+                "critical": 0,
+                "high": 1,
+                "medium": 2,
+                "low": 3,
             }
+
             action_df["_rank"] = (
                 action_df["priority"].astype(str).str.lower()
                 .map(priority_rank).fillna(4)
             )
-            action_df = action_df.sort_values("_rank")
 
-            # Consolidate records that recommend the same action.
             action_df["_action_key"] = (
                 action_df["suggested_action"]
                 .fillna("")
                 .astype(str)
                 .str.strip()
-                .str.lower()
+            )
+
+            action_df["_rank"] = (
+                action_df["priority"].astype(str).str.lower()
+                .map(priority_rank).fillna(4)
+            )
+
+            # Financial impact: positive shortfall only.
+            shortfall_by_partner = (
+                partner_view.set_index("partner")["gap_to_target"]
+                .clip(lower=0)
+                .to_dict()
+            )
+
+            action_df["_shortfall"] = (
+                action_df["partner"]
+                .map(shortfall_by_partner)
+                .fillna(0.0)
+            )
+
+            action_df["_action_key"] = (
+                action_df["suggested_action"]
+                .fillna("")
+                .astype(str)
+                .str.strip()
+            )
+
+            action_df = (
+                action_df[action_df["_action_key"].ne("")]
+                .sort_values(
+                    ["_rank", "_shortfall"],
+                    ascending=[True, False],
+                )
             )
 
             consolidated = []
-            for action_key, group in action_df.groupby(
-                "_action_key", sort=False
-            ):
-                if not action_key:
-                    continue
 
+            for partner_name, group in action_df.groupby(
+                "partner", sort=False
+            ):
                 first = group.iloc[0]
-                partners = (
-                    group["partner"].fillna("Portfolio")
-                    .astype(str).drop_duplicates().tolist()
-                )
+
                 signals = (
                     group["signal"].fillna("")
-                    .astype(str).drop_duplicates().tolist()
+                    .astype(str).str.strip()
+                )
+                signals = signals[signals.ne("")].drop_duplicates().tolist()
+
+                bases = (
+                    group["basis"].fillna("").astype(str).str.strip()
+                    if "basis" in group.columns
+                    else pd.Series(dtype=str)
+                )
+                bases = bases[bases.ne("")].drop_duplicates().tolist()
+
+                recommended_actions = (
+                    group["_action_key"].drop_duplicates().tolist()
                 )
 
                 consolidated.append({
                     "priority": first["priority"],
-                    "partners": partners,
+                    "partners": [str(partner_name)],
                     "signals": signals,
-                    "action": str(first["suggested_action"]),
-                    "_rank": int(first["_rank"]),
+                    "actions": recommended_actions,
+                    "basis": bases,
+                    "_rank": int(group["_rank"].min()),
+                    "_shortfall": float(
+                        group["_shortfall"].max()
+                    ),
                 })
 
-            consolidated.sort(key=lambda item: item["_rank"])
+            consolidated.sort(
+                key=lambda item: (
+                    item["_rank"],
+                    -item["_shortfall"],
+                )
+            )
             consolidated = consolidated[:3]
 
             if consolidated:
@@ -1859,6 +2046,34 @@ if page == "Executive Overview":
                     signal_label = item["signals"][0] if item["signals"] else (
                         "Management review"
                     )
+                    basis_items = item.get("basis", [])
+
+                    primary_basis = (
+                        basis_items[:1]
+                        if basis_items else []
+                    )
+                    additional_basis = basis_items[1:]
+
+                    primary_basis_html = "".join(
+                        f'<li style="margin-bottom:4px;">{basis}</li>'
+                        for basis in primary_basis
+                    )
+
+                    additional_basis_html = "".join(
+                        f'<li style="margin-bottom:4px;">{basis}</li>'
+                        for basis in additional_basis
+                    )
+
+                    additional_section_html = ""
+                    if additional_basis:
+                        additional_section_html = (
+                            '<div style="color:#405874;font-size:11px;font-weight:700;line-height:1.5;margin-top:7px;margin-bottom:4px;">'
+                        'Additional signals'
+                            '</div>'
+                            '<ul style="padding-left:16px;margin:4px 0 0 0;">'
+                            f'{additional_basis_html}'
+                            '</ul>'
+                        )
                     if len(item["signals"]) > 1:
                         signal_label += (
                             f" · {len(item['signals'])} related signals"
@@ -1871,7 +2086,10 @@ if page == "Executive Overview":
                         badge_bg, badge_fg = "#fff7e5", "#8a641b"
                     else:
                         badge_bg, badge_fg = "#edf4fc", "#376a9e"
-
+                    action_list_html = "".join(
+                        f'<li style="margin-bottom:6px;">{action}</li>'
+                        for action in item["actions"]
+                    )
                     st.markdown(
                         f"""
                         <div style="
@@ -1919,10 +2137,33 @@ if page == "Executive Overview":
                             {signal_label}
                           </div>
                           <div style="
+                              color:#8291a5;
+                              font-size:10px;
+                              line-height:1.5;
+                              margin-bottom:8px;">
+                            <strong style="color:#405874;font-size:11px;font-weight:700;line-height:1.5;">Primary driver</strong>
+                            <ul style="padding-left:16px;margin:4px 0 0 0;">
+                              {primary_basis_html}
+                            </ul>
+                            {additional_section_html}
+                          </div>
+                          <div style="
+                              border-top:1px solid #e8edf3;
+                              margin-top:12px;
+                              padding-top:10px;
                               color:#405874;
                               font-size:11px;
                               line-height:1.6;">
-                            {item['action']}
+                            <div style="
+                                color:#193655;
+                                font-size:11px;
+                                font-weight:800;
+                                margin-bottom:7px;">
+                              Recommended actions
+                            </div>
+                            <ol style="padding-left:18px;margin:0;">
+                              {action_list_html}
+                            </ol>
                           </div>
                         </div>
                         """,
@@ -2191,15 +2432,16 @@ elif page == "Machine Learning":
                     f"Latest actual: {actual_month:%B %Y}"
                 )
 
-                c1, c2, c3, c4 = st.columns(4, gap="medium")
+                c1, c2, c3, c4 = st.columns(
+                    [1, 1, 1, 1],
+                    gap="small",
+                )
 
                 with c1:
                     with st.container(border=True):
                         st.caption("FORECAST PREMIUM")
                         st.subheader(money(total_forecast))
-                        st.caption(
-                            f"Next month · {forecast_month:%b %Y}"
-                        )
+                        st.caption(f"Next month · {forecast_month:%b %Y}")
 
                 with c2:
                     with st.container(border=True):
@@ -2240,7 +2482,7 @@ elif page == "Machine Learning":
                 # PARTNER FORECAST AND MODEL EVALUATION
                 left, right = st.columns(
                     [1.55, 1],
-                    gap="large",
+                    gap="medium",
                 )
 
                 with left:
@@ -2317,7 +2559,7 @@ elif page == "Machine Learning":
                 with right:
                     st.subheader("Model intelligence")
                     st.caption(
-                        "Historical evaluation against a simple baseline."
+                        "Historical evaluation against baseline."
                     )
 
                     with st.container(border=True):
@@ -2325,38 +2567,35 @@ elif page == "Machine Learning":
                         st.subheader(money(ml_mae))
                         st.caption("Lower error is better")
 
-                        st.divider()
-
+                    with st.container(border=True):
                         st.caption("LAST-MONTH BASELINE · MAE")
                         st.subheader(money(baseline_mae))
                         st.caption("Previous month's actual premium")
 
-                        if baseline_mae > 0:
-                            improvement = (
-                                (baseline_mae - ml_mae)
-                                / baseline_mae
-                            )
+                    if baseline_mae > 0:
+                        improvement = (
+                            (baseline_mae - ml_mae)
+                            / baseline_mae
+                        )
 
-                            if ml_mae < baseline_mae:
-                                st.success(
-                                    f"MAE is {improvement:.1%} lower "
-                                    "than the baseline on this test set."
-                                )
-                            elif ml_mae > baseline_mae:
-                                st.warning(
-                                    f"MAE is {abs(improvement):.1%} higher "
-                                    "than the baseline. No improvement "
-                                    "has been demonstrated."
-                                )
-                            else:
-                                st.info(
-                                    "Model and baseline have equal MAE."
-                                )
+                        if ml_mae < baseline_mae:
+                            st.success(
+                                f"MAE is {improvement:.1%} "
+                                "lower than baseline."
+                            )
+                        elif ml_mae > baseline_mae:
+                            st.warning(
+                                f"MAE is {abs(improvement):.1%} "
+                                "higher than baseline."
+                            )
                         else:
                             st.info(
-                                "Relative improvement is unavailable "
-                                "because baseline MAE is zero."
+                                "Model and baseline have equal MAE."
                             )
+                    else:
+                        st.info(
+                            "Relative improvement is unavailable."
+                        )
 
                     st.caption(
                         f"Evaluation coverage: {evaluation_months} "
@@ -2364,6 +2603,9 @@ elif page == "Machine Learning":
                     )
 
                 st.divider()
+
+                # DATA-DRIVEN INTERPRETATION
+                st.subheader("Forecast interpretation")
 
                 # DATA-DRIVEN INTERPRETATION
                 st.subheader("Forecast interpretation")
@@ -2598,20 +2840,132 @@ else:
         },
     ])
 
-    # --- Portfolio-level indicators ---
+    # --- Executive portfolio snapshot ---
     total_projects = len(projects)
     on_track = int((projects["Status"] == "On track").sum())
-    attention = int(projects["Status"].isin(["At risk", "Delayed"]).sum())
+    attention = int(
+        projects["Status"].isin(["At risk", "Delayed"]).sum()
+    )
     completed = int((projects["Status"] == "Completed").sum())
     avg_progress = float(projects["Progress"].mean())
     high_risk = int((projects["Risk"] == "High").sum())
+    active_projects = total_projects - completed
 
-    k1, k2, k3, k4 = st.columns(4, gap="medium")
+    st.markdown(
+        """
+        <div style="margin:8px 0 14px 0;">
+          <div style="font-size:24px;font-weight:800;
+                      letter-spacing:1.4px;color:#64748b;">
+            PORTFOLIO AT A GLANCE
+          </div>
+          <div style="font-size:13px;color:#64748b;
+                      margin-top:4px;">
+            Delivery health, execution progress and risk exposure
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-    k1.metric("TOTAL INITIATIVES", f"{total_projects}")
-    k2.metric("ON TRACK", f"{on_track}")
-    k3.metric("NEEDS ATTENTION", f"{attention}")
-    k4.metric("AVERAGE PROGRESS", f"{avg_progress:.0f}%")
+    metric_cols = st.columns(4, gap="medium")
+
+    snapshot_cards = [
+        {
+            "label": "TOTAL INITIATIVES",
+            "value": f"{total_projects}",
+            "detail": f"{active_projects} active · {completed} completed",
+            "color": "#315eb2",
+            "background": "#eef4ff",
+        },
+        {
+            "label": "ON TRACK",
+            "value": f"{on_track}",
+            "detail": (
+                f"{on_track / total_projects:.0%} of portfolio"
+                if total_projects else "No initiatives"
+            ),
+            "color": "#168568",
+            "background": "#eaf7f1",
+        },
+        {
+            "label": "NEEDS ATTENTION",
+            "value": f"{attention}",
+            "detail": f"{high_risk} high-risk initiatives",
+            "color": "#c65b38" if attention else "#168568",
+            "background": "#fff0e9" if attention else "#eaf7f1",
+        },
+        {
+            "label": "AVERAGE PROGRESS",
+            "value": f"{avg_progress:.0f}%",
+            "detail": "Mean reported completion",
+            "color": "#7254b8",
+            "background": "#f2edff",
+        },
+    ]
+
+    for col, card in zip(metric_cols, snapshot_cards):
+        with col:
+            st.markdown(
+                f"""
+                <div style="
+                    min-height:132px;
+                    padding:17px 16px 15px;
+                    border:1px solid #e3eaf3;
+                    border-top:4px solid {card['color']};
+                    border-radius:12px;
+                    background:linear-gradient(
+                        145deg,#ffffff 55%,{card['background']} 150%
+                    );
+                    box-shadow:0 3px 12px rgba(25,54,85,0.055);
+                ">
+                  <div style="
+                      font-size:10px;font-weight:800;
+                      letter-spacing:1px;color:#718198;
+                      margin-bottom:13px;">
+                    {card['label']}
+                  </div>
+                  <div style="
+                      font-size:32px;font-weight:850;
+                      letter-spacing:-1px;line-height:1.1;
+                      color:{card['color']};">
+                    {card['value']}
+                  </div>
+                  <div style="
+                      font-size:11px;color:#718198;
+                      margin-top:10px;line-height:1.4;">
+                    {card['detail']}
+                  </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+    st.markdown(
+        f"""
+        <div style="
+            display:flex;align-items:center;gap:10px;
+            margin-top:13px;padding:12px 15px;
+            border:1px solid {'#f3d1c6' if attention else '#cce9dc'};
+            border-radius:10px;
+            background:{'#fff8f5' if attention else '#f3fbf7'};
+        ">
+          <div style="
+              width:9px;height:9px;min-width:9px;
+              border-radius:50%;
+              background:{'#c65b38' if attention else '#168568'};
+          "></div>
+          <div style="font-size:12px;color:#40536b;line-height:1.5;">
+            <strong style="color:#193655;">
+              {'Management attention required' if attention else 'Portfolio delivery stable'}
+            </strong>
+            — {attention} initiative(s) need attention and
+            {high_risk} carry high risk. Validate the illustrative
+            project records before making decisions.
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     st.divider()
 
@@ -2619,10 +2973,21 @@ else:
     left, right = st.columns([1.2, 1], gap="medium")
 
     with left:
-        st.subheader("Execution progress")
-        st.caption("Progress by initiative, grouped by delivery status.")
+        st.subheader("Execution Progress")
+        st.caption(
+            "Initiative completion against the 100% delivery benchmark."
+        )
 
-        progress_data = projects.sort_values("Progress", ascending=True)
+        progress_data = projects.sort_values(
+            "Progress", ascending=True
+        ).copy()
+
+        status_colors = {
+            "On track": "#168568",
+            "At risk": "#E7A23B",
+            "Delayed": "#C65345",
+            "Completed": "#315EB2",
+        }
 
         fig = px.bar(
             progress_data,
@@ -2630,28 +2995,85 @@ else:
             y="Project",
             color="Status",
             orientation="h",
-            range_x=[0, 100],
             text="Progress",
-            color_discrete_map={
-                "On track": "#39a8a0",
-                "At risk": "#f5ad42",
-                "Delayed": "#dc6b4e",
-                "Completed": "#2563eb",
+            range_x=[0, 115],
+            category_orders={
+                "Project": progress_data["Project"].tolist()
             },
+            color_discrete_map=status_colors,
             labels={
                 "Progress": "Completion (%)",
                 "Project": "Initiative",
                 "Status": "Delivery status",
             },
+            custom_data=["Status", "Owner", "Next milestone"],
         )
-        fig.update_traces(texttemplate="%{text}%", textposition="outside")
-        st.plotly_chart(style(fig, 390), use_container_width=True)
+
+        fig.update_traces(
+            texttemplate="%{x:.0f}%",
+            textposition="outside",
+            cliponaxis=False,
+            marker_line_width=0,
+            hovertemplate=(
+                "<b>%{y}</b><br>"
+                "Progress: %{x:.0f}%<br>"
+                "Status: %{customdata[0]}<br>"
+                "Owner: %{customdata[1]}<br>"
+                "Next milestone: %{customdata[2]}"
+                "<extra></extra>"
+            ),
+        )
+
+        fig.update_layout(
+            height=390,
+            bargap=0.38,
+            showlegend=True,
+            legend_title_text="Delivery status",
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="left",
+                x=0,
+            ),
+            xaxis=dict(
+                title="Completion (%)",
+                range=[0, 115],
+                ticksuffix="%",
+                dtick=25,
+                showgrid=True,
+                gridcolor="#E8EEF5",
+                zeroline=False,
+            ),
+            yaxis=dict(
+                title=None,
+                showgrid=False,
+                automargin=True,
+            ),
+            margin=dict(l=8, r=38, t=58, b=18),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(
+                family="Arial, sans-serif",
+                size=12,
+                color="#334155",
+            ),
+        )
+
+        st.plotly_chart(
+            fig,
+            use_container_width=True,
+            config={"displayModeBar": False},
+        )
 
     with right:
-        st.subheader("Portfolio risk profile")
-        st.caption("Number of initiatives by current illustrative risk rating.")
+        st.subheader("Portfolio Risk Profile")
+        st.caption(
+            "Initiative exposure by current illustrative risk rating."
+        )
 
         risk_order = ["Low", "Medium", "High"]
+
         risk_data = (
             projects["Risk"]
             .value_counts()
@@ -2660,72 +3082,178 @@ else:
             .reset_index(name="Projects")
         )
 
+        risk_data["Share"] = (
+            risk_data["Projects"] / max(len(projects), 1) * 100
+        )
+
+        risk_colors = {
+            "Low": "#168568",
+            "Medium": "#E7A23B",
+            "High": "#C65345",
+        }
+
         fig = px.bar(
             risk_data,
-            x="Risk",
-            y="Projects",
+            x="Projects",
+            y="Risk",
             color="Risk",
-            category_orders={"Risk": risk_order},
-            color_discrete_map={
-                "Low": "#39a8a0",
-                "Medium": "#f5ad42",
-                "High": "#dc6b4e",
-            },
+            orientation="h",
             text="Projects",
-            labels={"Projects": "Initiative count"},
+            category_orders={"Risk": ["High", "Medium", "Low"]},
+            color_discrete_map=risk_colors,
+            custom_data=["Share"],
+            labels={
+                "Projects": "Initiative count",
+                "Risk": "Risk rating",
+            },
         )
-        fig.update_traces(textposition="outside")
-        fig.update_layout(showlegend=False)
-        st.plotly_chart(style(fig, 390), use_container_width=True)
+
+        fig.update_traces(
+            texttemplate="%{x:.0f}",
+            textposition="outside",
+            cliponaxis=False,
+            marker_line_width=0,
+            hovertemplate=(
+                "<b>%{y} risk</b><br>"
+                "Initiatives: %{x}<br>"
+                "Portfolio share: %{customdata[0]:.0f}%"
+                "<extra></extra>"
+            ),
+        )
+
+        max_count = max(int(risk_data["Projects"].max()), 1)
+
+        fig.update_layout(
+            height=390,
+            showlegend=False,
+            bargap=0.42,
+            xaxis=dict(
+                title="Number of initiatives",
+                range=[0, max_count * 1.35],
+                dtick=1,
+                showgrid=True,
+                gridcolor="#E8EEF5",
+                zeroline=False,
+            ),
+            yaxis=dict(
+                title=None,
+                showgrid=False,
+                automargin=True,
+            ),
+            margin=dict(l=8, r=24, t=20, b=42),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(
+                family="Arial, sans-serif",
+                size=12,
+                color="#334155",
+            ),
+        )
+
+        st.plotly_chart(
+            fig,
+            use_container_width=True,
+            config={"displayModeBar": False},
+        )
 
     st.divider()
 
-    # --- Management attention queue ---
-    st.subheader("Management attention queue")
+    # --- Management Attention Queue ---
+    st.subheader("Management Attention Queue")
     st.caption(
-        "Illustrative prioritization based on delivery status, risk, "
-        "and milestone proximity. Confirm ownership and actual status before acting."
+        "Prioritized review list based on delivery status, risk, "
+        "and proximity to the next milestone."
     )
 
     priority = projects[
         projects["Status"].isin(["At risk", "Delayed"])
         | (projects["Risk"] == "High")
+        | (projects["Days to milestone"] <= 7)
     ].copy()
 
     if not priority.empty:
+        def classify_priority(row):
+            if row["Status"] == "Delayed" and row["Risk"] == "High":
+                return "Critical"
+            if row["Status"] == "Delayed":
+                return "High"
+            if row["Risk"] == "High":
+                return "High"
+            if row["Days to milestone"] <= 7:
+                return "Monitor"
+            return "Monitor"
+
+        def recommend_action(row):
+            if row["Status"] == "Delayed":
+                return "Confirm recovery plan and revised delivery date"
+            if row["Risk"] == "High":
+                return "Review risk mitigation and accountable owner"
+            if row["Days to milestone"] <= 7:
+                return "Validate milestone readiness"
+            return "Review delivery progress"
+
         priority["Priority"] = priority.apply(
-            lambda row: (
-                "Critical"
-                if row["Status"] == "Delayed" and row["Risk"] == "High"
-                else "High"
-                if row["Risk"] == "High"
-                else "Monitor"
-            ),
-            axis=1,
+            classify_priority, axis=1
         )
+        priority["Recommended next action"] = priority.apply(
+            recommend_action, axis=1
+        )
+
+        priority_order = {
+            "Critical": 0,
+            "High": 1,
+            "Monitor": 2,
+        }
+        priority["_sort"] = priority["Priority"].map(priority_order)
+
         priority = priority.sort_values(
-            ["Days to milestone", "Progress"],
-            ascending=[True, True],
+            ["_sort", "Days to milestone", "Progress"],
+            ascending=[True, True, True],
         )
+
+        priority_cols = [
+            "Project",
+            "Owner",
+            "Priority",
+            "Status",
+            "Risk",
+            "Progress",
+            "Next milestone",
+            "Days to milestone",
+            "Recommended next action",
+        ]
+
         st.dataframe(
-            priority[
-                [
-                    "Project",
-                    "Owner",
-                    "Status",
-                    "Risk",
-                    "Progress",
-                    "Next milestone",
-                    "Days to milestone",
-                    "Priority",
-                ]
-            ],
+            priority[priority_cols],
             use_container_width=True,
             hide_index=True,
+            height=min(180, 36 + 35 * len(priority)),
+            column_config={
+                "Progress": st.column_config.ProgressColumn(
+                    "Progress",
+                    min_value=0,
+                    max_value=100,
+                    format="%d%%",
+                ),
+                "Days to milestone": st.column_config.NumberColumn(
+                    "Days to milestone",
+                    format="%d days",
+                ),
+                "Priority": st.column_config.TextColumn(
+                    "Priority",
+                    help="Screening category based on illustrative project fields.",
+                ),
+            },
+        )
+
+        st.caption(
+            "Priority labels are rule-based screening indicators, not "
+            "a substitute for a confirmed project-owner assessment."
         )
     else:
-        st.success("No initiatives currently meet the attention-screening rules.")
-
+        st.success(
+            "No initiatives currently meet the management attention rules."
+        )
     st.divider()
 
     # --- Editable project tracker ---
@@ -2741,7 +3269,7 @@ else:
         tracker_display,
         use_container_width=True,
         hide_index=True,
-        num_rows="dynamic",
+        num_rows="fixed",
         column_config={
             "Progress": st.column_config.ProgressColumn(
                 "Progress",
@@ -2769,46 +3297,83 @@ else:
 
     # --- Decision log ---
     st.subheader("Decision log")
-    st.caption("Capture a decision, accountable owner, due date, and supporting evidence.")
-
-    decision = st.text_area(
-        "Decision or next action",
-        placeholder="Describe the decision, action, dependency, or issue...",
+    st.caption(
+        "Track management decisions, accountable owners, deadlines, and outcomes."
     )
 
-    log_col1, log_col2 = st.columns(2)
-
-    with log_col1:
-        decision_owner = st.text_input(
-            "Accountable owner",
-            placeholder="Role or team",
+    with st.form("decision_log_form"):
+        decision = st.text_area(
+            "Decision or next action",
+            placeholder="What decision is needed, and why?",
         )
 
-    with log_col2:
+        decision_col1, decision_col2 = st.columns(2)
+
+        with decision_col1:
+            decision_project = st.selectbox(
+                "Related project",
+                options=projects["Project"].tolist(),
+            )
+            decision_owner = st.text_input(
+                "Accountable owner",
+                placeholder="Role or team",
+            )
+
+        with decision_col2:
+            decision_status = st.selectbox(
+                "Decision status",
+                ["Pending", "Approved", "Rejected", "On hold"],
+            )
+            decision_impact = st.selectbox(
+                "Business impact",
+                ["High", "Medium", "Low"],
+            )
+
         decision_due = st.date_input(
             "Target date",
             value=None,
             format="DD/MM/YYYY",
         )
 
-    if decision.strip():
-        decision_record = pd.DataFrame([{
-            "Decision or next action": decision.strip(),
-            "Owner": decision_owner.strip(),
-            "Target date": str(decision_due) if decision_due else "",
-        }])
-
-        st.download_button(
-            "Download decision log CSV",
-            decision_record.to_csv(index=False).encode("utf-8"),
-            "decision_log.csv",
-            "text/csv",
+        submitted = st.form_submit_button(
+            "Prepare decision record",
+            use_container_width=True,
         )
 
-    st.info(
-        "Prototype limitation: project records are illustrative examples, not "
-        "live project-management data. Editing the table does not persist changes "
-        "to a database or synchronize them with another system."
+    if submitted:
+        if not decision.strip():
+            st.warning("Please enter the decision or next action.")
+        else:
+            decision_record = pd.DataFrame([{
+                "Related project": decision_project,
+                "Decision or next action": decision.strip(),
+                "Owner": decision_owner.strip(),
+                "Status": decision_status,
+                "Business impact": decision_impact,
+                "Target date": (
+                    str(decision_due) if decision_due else ""
+                ),
+            }])
+
+            st.success("Decision record prepared.")
+
+            st.dataframe(
+                decision_record,
+                use_container_width=True,
+                hide_index=True,
+            )
+
+            st.download_button(
+                "Download decision record CSV",
+                decision_record.to_csv(index=False).encode("utf-8"),
+                "decision_log.csv",
+                "text/csv",
+                use_container_width=True,
+            )
+
+    st.caption(
+        "Prototype: records can be downloaded as CSV. "
+        "They are not permanently stored or synchronized with a database."
     )
 
 st.divider()
@@ -2823,3 +3388,4 @@ with st.expander("Data dictionary & methodology"):
     """)
 st.download_button("Download filtered data (CSV)",df.to_csv(index=False).encode("utf-8"),
                    "distribution_performance_filtered.csv","text/csv")
+
