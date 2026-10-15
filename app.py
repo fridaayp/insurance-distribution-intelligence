@@ -2354,18 +2354,19 @@ elif page == "Partnership Intelligence":
 elif page == "Machine Learning":
     header(
         "Machine Learning",
-        "Forecast next-month premium and evaluate model performance against a simple baseline."
+        "Premium Forecast & Model Intelligence",
     )
 
-    st.caption("PREMIUM FORECAST · RANDOM FOREST · EXPERIMENTAL")
+    st.caption(
+        "FORECASTING  /  RANDOM FOREST  /  MODEL VALIDATION"
+    )
 
     st.info(
-        "This prototype uses synthetic data only. Forecasts are experimental "
-        "estimates, not actual business guidance or guaranteed outcomes."
+        "Experimental prototype using synthetic data only. "
+        "Forecasts are estimates, not actual business guidance."
     )
 
-    # Keep the selected partner and channel, but retain all available
-    # historical months so the model can learn from the full time series.
+    # Preserve all available history for forecasting.
     forecast_data = data.copy()
 
     if partner != "All partners":
@@ -2379,7 +2380,9 @@ elif page == "Machine Learning":
         ]
 
     if forecast_data.empty:
-        st.warning("No historical records match the selected filters.")
+        st.warning(
+            "No historical records match the selected filters."
+        )
     else:
         try:
             evaluation = evaluate_forecast(forecast_data)
@@ -2387,8 +2390,7 @@ elif page == "Machine Learning":
 
             if forecasts.empty:
                 st.warning(
-                    "There is not enough historical data to produce "
-                    "a forecast for the selected filters."
+                    "Not enough historical data to produce a forecast."
                 )
             else:
                 forecasts = forecasts.sort_values(
@@ -2399,7 +2401,7 @@ elif page == "Machine Learning":
                 total_forecast = float(
                     forecasts["forecast_premium_idr"].sum()
                 )
-                total_last_actual = float(
+                total_actual = float(
                     forecasts["last_actual_premium_idr"].sum()
                 )
 
@@ -2407,56 +2409,85 @@ elif page == "Machine Learning":
                     forecasts["forecast_month"]
                 ).max()
 
-                st.subheader("Next-month forecast")
-                st.caption(
-                    f"Forecast period: {forecast_month:%B %Y}. "
-                    "Forecasts use the complete available history, "
-                    "independent of the selected date range."
-                )
-
-                k1, k2, k3 = st.columns(3, gap="medium")
-
-                k1.metric(
-                    "FORECAST PREMIUM",
-                    money(total_forecast),
-                )
-
-                k2.metric(
-                    "LATEST ACTUAL PREMIUM",
-                    money(total_last_actual),
-                )
+                actual_month = pd.to_datetime(
+                    forecasts["last_actual_month"]
+                ).max()
 
                 change = (
-                    total_forecast / total_last_actual - 1
-                    if total_last_actual > 0
+                    total_forecast / total_actual - 1
+                    if total_actual > 0
                     else None
                 )
 
-                k3.metric(
-                    "FORECAST VS LATEST ACTUAL",
-                    (
-                        f"{change:+.1%}"
-                        if change is not None
-                        else "N/A"
-                    ),
-                    help=(
-                        "Directional comparison with the latest observed "
-                        "monthly premium, not a year-over-year growth rate."
-                    ),
+                change_amount = total_forecast - total_actual
+
+                ml_mae = float(evaluation["ml_mae"])
+                baseline_mae = float(evaluation["baseline_mae"])
+                evaluation_months = evaluation["evaluation_months"]
+
+                # EXECUTIVE FORECAST OVERVIEW
+                st.subheader("Forecast overview")
+                st.caption(
+                    f"Forecast period: {forecast_month:%B %Y}  ·  "
+                    f"Latest actual: {actual_month:%B %Y}"
                 )
+
+                c1, c2, c3, c4 = st.columns(4, gap="medium")
+
+                with c1:
+                    with st.container(border=True):
+                        st.caption("FORECAST PREMIUM")
+                        st.subheader(money(total_forecast))
+                        st.caption(
+                            f"Next month · {forecast_month:%b %Y}"
+                        )
+
+                with c2:
+                    with st.container(border=True):
+                        st.caption("LATEST ACTUAL PREMIUM")
+                        st.subheader(money(total_actual))
+                        st.caption(
+                            f"Observed · {actual_month:%b %Y}"
+                        )
+
+                with c3:
+                    with st.container(border=True):
+                        st.caption("FORECAST VS ACTUAL")
+
+                        if change is not None:
+                            st.metric(
+                                "Projected change",
+                                f"{change:+.1%}",
+                                delta=money(change_amount),
+                                help=(
+                                    "Comparison with the latest observed "
+                                    "month, not year-over-year growth."
+                                ),
+                            )
+                        else:
+                            st.metric(
+                                "Projected change",
+                                "N/A",
+                            )
+
+                with c4:
+                    with st.container(border=True):
+                        st.caption("EVALUATION COVERAGE")
+                        st.subheader(f"{evaluation_months} months")
+                        st.caption("Held-out test period")
 
                 st.divider()
 
+                # PARTNER FORECAST AND MODEL EVALUATION
                 left, right = st.columns(
-                    [1.4, 1],
-                    gap="medium",
+                    [1.55, 1],
+                    gap="large",
                 )
 
                 with left:
-                    st.subheader("Actual vs forecast by partner")
+                    st.subheader("Partner forecast")
                     st.caption(
-                        "Comparison between each partner's latest observed "
-                        "month and its next-month forecast."
+                        "Latest observed premium versus next-month estimate."
                     )
 
                     chart_data = forecasts.melt(
@@ -2481,14 +2512,42 @@ elif page == "Machine Learning":
                         color="series",
                         barmode="group",
                         color_discrete_map={
-                            "Latest actual": "#9abce9",
-                            "Forecast": "#2563eb",
+                            "Latest actual": "#17365D",
+                            "Forecast": "#80A9D6",
+                        },
+                        category_orders={
+                            "partner": forecasts["partner"].tolist(),
+                            "series": ["Latest actual", "Forecast"],
                         },
                         labels={
                             "partner": "Partner",
                             "premium_idr": "Premium (IDR)",
-                            "series": "Measure",
+                            "series": "",
                         },
+                    )
+
+                    fig.update_layout(
+                        legend=dict(
+                            orientation="h",
+                            yanchor="bottom",
+                            y=1.02,
+                            xanchor="right",
+                            x=1,
+                        ),
+                        margin=dict(l=10, r=10, t=35, b=10),
+                        bargap=0.24,
+                        bargroupgap=0.08,
+                    )
+
+                    fig.update_xaxes(
+                        title=None,
+                        showgrid=False,
+                    )
+
+                    fig.update_yaxes(
+                        title="Premium (IDR)",
+                        gridcolor="rgba(128, 150, 175, 0.20)",
+                        zeroline=False,
                     )
 
                     st.plotly_chart(
@@ -2497,65 +2556,142 @@ elif page == "Machine Learning":
                     )
 
                 with right:
-                    st.subheader("Model evaluation")
+                    st.subheader("Model intelligence")
                     st.caption(
-                        "Historical one-step-ahead evaluation on held-out "
-                        "months, compared with a last-month baseline."
+                        "Historical evaluation against a simple baseline."
                     )
 
-                    ml_mae = evaluation["ml_mae"]
-                    baseline_mae = evaluation["baseline_mae"]
+                    with st.container(border=True):
+                        st.caption("RANDOM FOREST · MAE")
+                        st.subheader(money(ml_mae))
+                        st.caption("Lower error is better")
 
-                    m1, m2 = st.columns(2)
+                        st.divider()
 
-                    m1.metric(
-                        "RANDOM FOREST MAE",
-                        money(ml_mae),
-                        help="Lower mean absolute error is better.",
-                    )
+                        st.caption("LAST-MONTH BASELINE · MAE")
+                        st.subheader(money(baseline_mae))
+                        st.caption("Previous month's actual premium")
 
-                    m2.metric(
-                        "LAST-MONTH BASELINE MAE",
-                        money(baseline_mae),
-                        help=(
-                            "Predicts each test month's premium using "
-                            "the preceding month's actual premium."
-                        ),
-                    )
+                        if baseline_mae > 0:
+                            improvement = (
+                                (baseline_mae - ml_mae)
+                                / baseline_mae
+                            )
 
-                    if ml_mae < baseline_mae:
-                        st.success(
-                            "Random Forest had lower MAE than the baseline "
-                            "on this historical test set."
-                        )
-                    elif ml_mae > baseline_mae:
-                        st.warning(
-                            "The baseline had lower MAE on this historical "
-                            "test set. The ML model has not demonstrated "
-                            "an improvement here."
-                        )
-                    else:
-                        st.info(
-                            "Both approaches had equal MAE on this test set."
-                        )
+                            if ml_mae < baseline_mae:
+                                st.success(
+                                    f"MAE is {improvement:.1%} lower "
+                                    "than the baseline on this test set."
+                                )
+                            elif ml_mae > baseline_mae:
+                                st.warning(
+                                    f"MAE is {abs(improvement):.1%} higher "
+                                    "than the baseline. No improvement "
+                                    "has been demonstrated."
+                                )
+                            else:
+                                st.info(
+                                    "Model and baseline have equal MAE."
+                                )
+                        else:
+                            st.info(
+                                "Relative improvement is unavailable "
+                                "because baseline MAE is zero."
+                            )
 
                     st.caption(
-                        f"Evaluation coverage: "
-                        f"{evaluation['evaluation_months']} distinct "
-                        "held-out calendar months."
+                        f"Evaluation coverage: {evaluation_months} "
+                        "distinct held-out calendar months."
                     )
 
                 st.divider()
 
+                # DATA-DRIVEN INTERPRETATION
+                st.subheader("Forecast interpretation")
+
+                insight_left, insight_right = st.columns(
+                    [1.2, 1],
+                    gap="medium",
+                )
+
+                with insight_left:
+                    with st.container(border=True):
+                        if change is None:
+                            st.markdown("*Comparison unavailable*")
+                            st.write(
+                                "The latest actual premium is zero, "
+                                "so percentage change cannot be calculated."
+                            )
+                        elif change > 0:
+                            st.markdown("*Forecast is above latest actual*")
+                            st.write(
+                                f"Forecast premium is {money(total_forecast)}, "
+                                f"{change:.1%} above the latest observed "
+                                f"premium, a difference of "
+                                f"{money(change_amount)}."
+                            )
+                        elif change < 0:
+                            st.markdown("*Forecast is below latest actual*")
+                            st.write(
+                                f"Forecast premium is {money(total_forecast)}, "
+                                f"{abs(change):.1%} below the latest observed "
+                                f"premium, a difference of "
+                                f"{money(change_amount)}."
+                            )
+                        else:
+                            st.markdown("*Forecast is unchanged*")
+                            st.write(
+                                "Forecast premium matches the latest "
+                                "observed total premium."
+                            )
+
+                with insight_right:
+                    with st.container(border=True):
+                        st.markdown("*What to review next*")
+                        st.markdown(
+                            "- Review partners with the largest forecast "
+                            "movements."
+                        )
+                        st.markdown(
+                            "- Compare estimates with the next actual "
+                            "reporting period."
+                        )
+                        st.markdown(
+                            "- Validate model performance before using "
+                            "forecasts for business decisions."
+                        )
+
+                st.divider()
+
+                # PARTNER-LEVEL FORECAST DETAIL
                 st.subheader("Forecast detail by partner")
+                st.caption(
+                    "Partner-level estimates and changes from "
+                    "the latest observed month."
+                )
 
                 detail = forecasts.copy()
+
                 detail["last_actual_month"] = pd.to_datetime(
                     detail["last_actual_month"]
                 ).dt.strftime("%b %Y")
+
                 detail["forecast_month"] = pd.to_datetime(
                     detail["forecast_month"]
                 ).dt.strftime("%b %Y")
+
+                detail["change_idr"] = (
+                    forecasts["forecast_premium_idr"]
+                    - forecasts["last_actual_premium_idr"]
+                )
+
+                detail["change_pct"] = (
+                    forecasts["forecast_premium_idr"]
+                    / forecasts["last_actual_premium_idr"].replace(
+                        0, float("nan")
+                    )
+                    - 1
+                )
 
                 detail = detail.rename(columns={
                     "partner": "Partner",
@@ -2563,18 +2699,44 @@ elif page == "Machine Learning":
                     "forecast_month": "Forecast month",
                     "last_actual_premium_idr": "Latest actual premium (IDR)",
                     "forecast_premium_idr": "Forecast premium (IDR)",
+                    "change_idr": "Change (IDR)",
+                    "change_pct": "Change (%)",
                 })
 
+                display_columns = [
+                    "Partner",
+                    "Latest actual month",
+                    "Latest actual premium (IDR)",
+                    "Forecast month",
+                    "Forecast premium (IDR)",
+                    "Change (IDR)",
+                    "Change (%)",
+                ]
+
                 st.dataframe(
-                    detail,
+                    detail[display_columns],
                     use_container_width=True,
                     hide_index=True,
                     column_config={
-                        "Latest actual premium (IDR)": st.column_config.NumberColumn(
-                            format="localized",
+                        "Latest actual premium (IDR)": (
+                            st.column_config.NumberColumn(
+                                format="localized",
+                            )
                         ),
-                        "Forecast premium (IDR)": st.column_config.NumberColumn(
-                            format="localized",
+                        "Forecast premium (IDR)": (
+                            st.column_config.NumberColumn(
+                                format="localized",
+                            )
+                        ),
+                        "Change (IDR)": (
+                            st.column_config.NumberColumn(
+                                format="localized",
+                            )
+                        ),
+                        "Change (%)": (
+                            st.column_config.NumberColumn(
+                                format="percent",
+                            )
                         ),
                     },
                 )
@@ -2586,28 +2748,35 @@ elif page == "Machine Learning":
                     "text/csv",
                 )
 
-                st.subheader("Methodology and limitations")
-                st.markdown(
-                    """
-                    - *Model:* Random Forest regression.
-                    - *Features:* Previous 1, 2, and 3 months of premium,
-                      a trailing three-month mean, and calendar month.
-                    - *Evaluation:* The last three eligible historical
-                      observations per partner are held out for testing.
-                    - *Baseline:* Previous month's actual premium.
-                    - *Metric:* Mean absolute error (MAE); lower is better.
-                    - *Scope:* Partner-level monthly premium forecasts.
-                    - *Limitations:* Synthetic data, limited history,
-                      no external business drivers, and no uncertainty
-                      intervals. A lower test MAE does not guarantee
-                      future performance.
-                    """
-                )
+                with st.expander("Methodology and limitations"):
+                    st.markdown(
+                        """
+                        *Model:* Random Forest regression.
+
+                        *Features:* Previous 1, 2, and 3 months of
+                        premium, trailing three-month mean, and calendar
+                        month.
+
+                        *Evaluation:* Historical one-step-ahead testing
+                        using held-out observations.
+
+                        *Baseline:* Previous month's actual premium.
+
+                        *Metric:* Mean absolute error (MAE); lower is better.
+
+                        *Scope:* Partner-level monthly premium.
+
+                        *Limitations:* Synthetic data, limited history,
+                        no external business drivers, and no uncertainty
+                        intervals. Better historical test performance
+                        does not guarantee future performance.
+                        """
+                    )
 
         except (ValueError, KeyError) as exc:
             st.warning(
-                "The model could not complete forecasting with the "
-                f"available data: {exc}"
+                "The model could not complete forecasting with "
+                f"the available data: {exc}"
             )
 
 else:
