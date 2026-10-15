@@ -9,9 +9,9 @@ import plotly.graph_objects as go
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
-from src.analytics import (
-    prepare_data, kpi_summary, partner_scorecard, monthly_trend,
-    detect_underperformance, detect_monthly_anomalies, generate_recommendations,
+from src.ml.forecasting import (
+    evaluate_forecast,
+    forecast_next_month,
 )
 
 st.set_page_config(page_title="Distribution Strategy Intelligence", page_icon="📊", layout="wide")
