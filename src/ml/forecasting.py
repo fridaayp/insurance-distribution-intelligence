@@ -91,7 +91,7 @@ def evaluate_forecast(data: pd.DataFrame) -> dict:
 
 
 def forecast_next_month(data: pd.DataFrame) -> pd.DataFrame:
-    """Train per partner and forecast one month beyond the latest observation."""
+    """Forecast the month after each partner's latest observed month."""
     forecasts = []
 
     for partner, raw_group in data.groupby("partner"):
@@ -100,6 +100,8 @@ def forecast_next_month(data: pd.DataFrame) -> pd.DataFrame:
             .sum()
             .sort_values("month")
         )
+        group["month"] = pd.to_datetime(group["month"])
+
         features = _make_features(group).dropna(subset=FEATURES)
 
         if len(features) < 5:
@@ -108,19 +110,30 @@ def forecast_next_month(data: pd.DataFrame) -> pd.DataFrame:
         model = _model()
         model.fit(features[FEATURES], features["premium"])
 
-        latest = features.iloc[[-1]]
+        history = group["premium_actual_idr"].astype(float).to_numpy()
+        last_actual_month = group["month"].max()
+        forecast_month = (
+            pd.Timestamp(last_actual_month) + pd.offsets.MonthBegin(1)
+        )
+
+        next_features = pd.DataFrame([{
+            "lag_1": history[-1],
+            "lag_2": history[-2],
+            "lag_3": history[-3],
+            "rolling_mean_3": float(history[-3:].mean()),
+            "month_number": forecast_month.month,
+        }])
+
         prediction = max(
             0.0,
-            float(model.predict(latest[FEATURES])[0]),
+            float(model.predict(next_features[FEATURES])[0]),
         )
 
         forecasts.append({
             "partner": partner,
-            "last_actual_month": latest["month"].iloc[0],
-            "forecast_month": (
-                latest["month"].iloc[0] + pd.offsets.MonthBegin(1)
-            ),
-            "last_actual_premium_idr": float(latest["premium"].iloc[0]),
+            "last_actual_month": last_actual_month,
+            "forecast_month": forecast_month,
+            "last_actual_premium_idr": float(history[-1]),
             "forecast_premium_idr": prediction,
         })
 
