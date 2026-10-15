@@ -2425,50 +2425,46 @@ elif page == "Machine Learning":
                     f"Latest actual: {actual_month:%B %Y}"
                 )
 
-                c1, c2, c3, c4 = st.columns(
-                    [1, 1, 1, 1],
-                    gap="small",
-                )
+                c1, c2, c3, c4 = st.columns(4, gap="small")
 
                 with c1:
-                    with st.container(border=True):
-                        st.caption("FORECAST PREMIUM")
-                        st.subheader(money(total_forecast))
-                        st.caption(f"Next month · {forecast_month:%b %Y}")
+                    st.caption("FORECAST PREMIUM")
+                    st.metric(
+                        label=" ",
+                        value=money(total_forecast),
+                        help=f"Forecast for {forecast_month:%B %Y}",
+                    )
+                    st.caption(f"Next month · {forecast_month:%b %Y}")
 
                 with c2:
-                    with st.container(border=True):
-                        st.caption("LATEST ACTUAL PREMIUM")
-                        st.subheader(money(total_actual))
-                        st.caption(
-                            f"Observed · {actual_month:%b %Y}"
-                        )
+                    st.caption("LATEST ACTUAL PREMIUM")
+                    st.metric(
+                        label=" ",
+                        value=money(total_actual),
+                        help=f"Latest actual for {actual_month:%B %Y}",
+                    )
+                    st.caption(f"Observed · {actual_month:%b %Y}")
 
                 with c3:
-                    with st.container(border=True):
-                        st.caption("FORECAST VS ACTUAL")
-
-                        if change is not None:
-                            st.markdown(
-                                f"## {change:+.1%}"
-                            )
-
-                            if change_amount >= 0:
-                                st.caption(
-                                    f"↑ {money(change_amount)}"
-                                )
-                            else:
-                                st.caption(
-                                    f"↓ {money(abs(change_amount))}"
-                                )
-                        else:
-                            st.markdown("## N/A")
+                    st.caption("FORECAST VS ACTUAL")
+                    if change is not None:
+                        st.metric(
+                            label=" ",
+                            value=f"{change:+.1%}",
+                            delta=money(change_amount),
+                            help="Compared with the latest observed month.",
+                        )
+                    else:
+                        st.metric(label=" ", value="N/A")
 
                 with c4:
-                    with st.container(border=True):
-                        st.caption("EVALUATION COVERAGE")
-                        st.subheader(f"{evaluation_months} months")
-                        st.caption("Held-out test period")
+                    st.caption("EVALUATION COVERAGE")
+                    st.metric(
+                        label=" ",
+                        value=f"{evaluation_months} months",
+                        help="Distinct held-out calendar months.",
+                    )
+                    st.caption("Held-out test period")
 
                 st.divider()
 
