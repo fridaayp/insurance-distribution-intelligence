@@ -2113,217 +2113,261 @@ elif page == "Partnership Intelligence":
 elif page == "Machine Learning":
     header(
         "Machine Learning",
-        "Model illustrative growth assumptions and compare their potential premium impact."
+        "Forecast next-month premium and evaluate model performance against a simple baseline."
     )
 
-    st.caption("SCENARIO PLANNING · ASSUMPTION-DRIVEN · NOT A FORECAST")
-
-    # --- Assumption controls ---
-    st.subheader("Scenario assumptions")
-    st.caption(
-        "Adjust the inputs to explore alternative growth paths. "
-        "All results are illustrative and use the current filtered portfolio as the baseline."
-    )
-
-    base = float(actual)
-    partner_count = max(int(df["partner"].nunique()), 1)
-
-    controls = st.columns(4, gap="medium")
-
-    with controls[0]:
-        growth = st.slider(
-            "Annual growth (%)",
-            min_value=0, max_value=30, value=5, step=1,
-            help="Annual growth applied to both scenarios."
-        ) / 100
-
-    with controls[1]:
-        uplift = st.slider(
-            "Productivity uplift (%)",
-            min_value=0, max_value=50, value=15, step=5,
-            help="Illustrative uplift applied to baseline premium."
-        ) / 100
-
-    with controls[2]:
-        new_partners = st.slider(
-            "New partner equivalents",
-            min_value=0, max_value=100, value=20, step=5,
-            help="Illustrative number of additional partner equivalents."
-        )
-
-    with controls[3]:
-        contribution = st.slider(
-            "New-partner contribution (%)",
-            min_value=0, max_value=60, value=30, step=5,
-            help="Assumed contribution relative to current average partner premium."
-        ) / 100
-
-    years = st.slider(
-        "Projection horizon",
-        min_value=1, max_value=5, value=4,
-        format="%d years"
-    )
-
-    # --- Scenario calculations ---
-    incremental_productivity = base * uplift
-    incremental_partners = (base / partner_count) * new_partners * contribution
-    scenario_increment = incremental_productivity + incremental_partners
-
-    projection_years = list(range(0, years + 1))
-    projection = pd.DataFrame({
-        "Year": [f"Year {i}" for i in projection_years],
-        "Base case": [
-            base * ((1 + growth) ** i) for i in projection_years
-        ],
-        "Growth scenario": [
-            (base + scenario_increment) * ((1 + growth) ** i)
-            for i in projection_years
-        ],
-    })
-    projection["Incremental premium"] = (
-        projection["Growth scenario"] - projection["Base case"]
-    )
-
-    base_horizon = float(projection["Base case"].iloc[-1])
-    scenario_horizon = float(projection["Growth scenario"].iloc[-1])
-    incremental_horizon = scenario_horizon - base_horizon
-    uplift_horizon = (
-        incremental_horizon / base_horizon if base_horizon else 0
-    )
-
-    st.divider()
-
-    # --- Executive scenario summary ---
-    st.subheader("Scenario impact")
-    k1, k2, k3, k4 = st.columns(4, gap="medium")
-
-    k1.metric(
-        "CURRENT BASELINE",
-        money(base),
-        help="Actual premium in the selected filters and period."
-    )
-    k2.metric(
-        "BASE CASE AT HORIZON",
-        money(base_horizon),
-        help="Baseline premium compounded by the assumed annual growth rate."
-    )
-    k3.metric(
-        "GROWTH SCENARIO",
-        money(scenario_horizon),
-        help="Illustrative scenario including the selected productivity and partner assumptions."
-    )
-    k4.metric(
-        "INCREMENTAL PREMIUM",
-        money(incremental_horizon),
-        delta=f"{uplift_horizon:.1%} vs. base case",
-        help="Difference between the scenario and base case at the selected horizon."
-    )
-
-    st.divider()
-
-    # --- Visual comparison ---
-    left, right = st.columns([1.45, 1], gap="medium")
-
-    with left:
-        st.subheader("Premium trajectory")
-        st.caption(
-            "Compare the base case with the scenario over the selected horizon."
-        )
-
-        fig = px.line(
-            projection,
-            x="Year",
-            y=["Base case", "Growth scenario"],
-            markers=True,
-            color_discrete_map={
-                "Base case": "#9abce9",
-                "Growth scenario": "#2563eb",
-            },
-            labels={
-                "value": "Projected premium (IDR)",
-                "variable": "Scenario",
-                "Year": "Projection horizon",
-            },
-        )
-        fig.update_traces(line=dict(width=3))
-        st.plotly_chart(
-            style(fig, 390),
-            use_container_width=True
-        )
-
-    with right:
-        st.subheader("Incremental premium by year")
-        st.caption(
-            "Illustrative difference between the scenario and the base case."
-        )
-
-        incremental_chart = projection[["Year", "Incremental premium"]].copy()
-        fig = px.bar(
-            incremental_chart,
-            x="Year",
-            y="Incremental premium",
-            labels={
-                "Year": "Projection horizon",
-                "Incremental premium": "Incremental premium (IDR)",
-            },
-            color_discrete_sequence=["#39a8a0"],
-        )
-        fig.update_layout(showlegend=False)
-        st.plotly_chart(
-            style(fig, 390),
-            use_container_width=True
-        )
-
-    # --- Explain the scenario drivers ---
-    st.divider()
-    st.subheader("Contribution assumptions")
-
-    driver1, driver2 = st.columns(2, gap="medium")
-
-    with driver1:
-        st.markdown("*Productivity contribution*")
-        st.metric(
-            "Illustrative premium uplift",
-            money(incremental_productivity)
-        )
-        st.caption(
-            f"Calculated as {uplift:.0%} of the current premium baseline."
-        )
-
-    with driver2:
-        st.markdown("*New-partner contribution*")
-        st.metric(
-            "Illustrative premium contribution",
-            money(incremental_partners)
-        )
-        st.caption(
-            f"{new_partners} partner equivalents × "
-            f"{contribution:.0%} of average current partner premium."
-        )
-
-    st.divider()
-    st.subheader("Projection detail")
-    st.caption(
-        "Values are model outputs, not guaranteed business results."
-    )
-
-    detail = projection.copy()
-    for col in ["Base case", "Growth scenario", "Incremental premium"]:
-        detail[col] = detail[col].map(money)
-
-    st.dataframe(
-        detail,
-        use_container_width=True,
-        hide_index=True
-    )
+    st.caption("PREMIUM FORECAST · RANDOM FOREST · EXPERIMENTAL")
 
     st.info(
-        "Interpretation note: this model applies a simplified one-time "
-        "incremental premium assumption and compounds both scenarios using "
-        "the same annual growth rate. It does not model costs, partner ramp-up, "
-        "capacity constraints, cannibalization, persistency changes, or probability "
-        "of execution. Validate assumptions before using the outputs in a business case."
+        "This prototype uses synthetic data only. Forecasts are experimental "
+        "estimates, not actual business guidance or guaranteed outcomes."
     )
+
+    # Keep the selected partner and channel, but retain all available
+    # historical months so the model can learn from the full time series.
+    forecast_data = data.copy()
+
+    if partner != "All partners":
+        forecast_data = forecast_data[
+            forecast_data["partner"] == partner
+        ]
+
+    if channel != "All channels":
+        forecast_data = forecast_data[
+            forecast_data["channel"] == channel
+        ]
+
+    if forecast_data.empty:
+        st.warning("No historical records match the selected filters.")
+    else:
+        try:
+            evaluation = evaluate_forecast(forecast_data)
+            forecasts = forecast_next_month(forecast_data)
+
+            if forecasts.empty:
+                st.warning(
+                    "There is not enough historical data to produce "
+                    "a forecast for the selected filters."
+                )
+            else:
+                forecasts = forecasts.sort_values(
+                    "forecast_premium_idr",
+                    ascending=False,
+                )
+
+                total_forecast = float(
+                    forecasts["forecast_premium_idr"].sum()
+                )
+                total_last_actual = float(
+                    forecasts["last_actual_premium_idr"].sum()
+                )
+
+                forecast_month = pd.to_datetime(
+                    forecasts["forecast_month"]
+                ).max()
+
+                st.subheader("Next-month forecast")
+                st.caption(
+                    f"Forecast period: {forecast_month:%B %Y}. "
+                    "Forecasts use the complete available history, "
+                    "independent of the selected date range."
+                )
+
+                k1, k2, k3 = st.columns(3, gap="medium")
+
+                k1.metric(
+                    "FORECAST PREMIUM",
+                    money(total_forecast),
+                )
+
+                k2.metric(
+                    "LATEST ACTUAL PREMIUM",
+                    money(total_last_actual),
+                )
+
+                change = (
+                    total_forecast / total_last_actual - 1
+                    if total_last_actual > 0
+                    else None
+                )
+
+                k3.metric(
+                    "FORECAST VS LATEST ACTUAL",
+                    (
+                        f"{change:+.1%}"
+                        if change is not None
+                        else "N/A"
+                    ),
+                    help=(
+                        "Directional comparison with the latest observed "
+                        "monthly premium, not a year-over-year growth rate."
+                    ),
+                )
+
+                st.divider()
+
+                left, right = st.columns(
+                    [1.4, 1],
+                    gap="medium",
+                )
+
+                with left:
+                    st.subheader("Actual vs forecast by partner")
+                    st.caption(
+                        "Comparison between each partner's latest observed "
+                        "month and its next-month forecast."
+                    )
+
+                    chart_data = forecasts.melt(
+                        id_vars=["partner"],
+                        value_vars=[
+                            "last_actual_premium_idr",
+                            "forecast_premium_idr",
+                        ],
+                        var_name="series",
+                        value_name="premium_idr",
+                    )
+
+                    chart_data["series"] = chart_data["series"].map({
+                        "last_actual_premium_idr": "Latest actual",
+                        "forecast_premium_idr": "Forecast",
+                    })
+
+                    fig = px.bar(
+                        chart_data,
+                        x="partner",
+                        y="premium_idr",
+                        color="series",
+                        barmode="group",
+                        color_discrete_map={
+                            "Latest actual": "#9abce9",
+                            "Forecast": "#2563eb",
+                        },
+                        labels={
+                            "partner": "Partner",
+                            "premium_idr": "Premium (IDR)",
+                            "series": "Measure",
+                        },
+                    )
+
+                    st.plotly_chart(
+                        style(fig, 390),
+                        use_container_width=True,
+                    )
+
+                with right:
+                    st.subheader("Model evaluation")
+                    st.caption(
+                        "Historical one-step-ahead evaluation on held-out "
+                        "months, compared with a last-month baseline."
+                    )
+
+                    ml_mae = evaluation["ml_mae"]
+                    baseline_mae = evaluation["baseline_mae"]
+
+                    m1, m2 = st.columns(2)
+
+                    m1.metric(
+                        "RANDOM FOREST MAE",
+                        money(ml_mae),
+                        help="Lower mean absolute error is better.",
+                    )
+
+                    m2.metric(
+                        "LAST-MONTH BASELINE MAE",
+                        money(baseline_mae),
+                        help=(
+                            "Predicts each test month's premium using "
+                            "the preceding month's actual premium."
+                        ),
+                    )
+
+                    if ml_mae < baseline_mae:
+                        st.success(
+                            "Random Forest had lower MAE than the baseline "
+                            "on this historical test set."
+                        )
+                    elif ml_mae > baseline_mae:
+                        st.warning(
+                            "The baseline had lower MAE on this historical "
+                            "test set. The ML model has not demonstrated "
+                            "an improvement here."
+                        )
+                    else:
+                        st.info(
+                            "Both approaches had equal MAE on this test set."
+                        )
+
+                    st.caption(
+                        f"Evaluation coverage: "
+                        f"{evaluation['evaluation_months']} distinct "
+                        "held-out calendar months."
+                    )
+
+                st.divider()
+
+                st.subheader("Forecast detail by partner")
+
+                detail = forecasts.copy()
+                detail["last_actual_month"] = pd.to_datetime(
+                    detail["last_actual_month"]
+                ).dt.strftime("%b %Y")
+                detail["forecast_month"] = pd.to_datetime(
+                    detail["forecast_month"]
+                ).dt.strftime("%b %Y")
+
+                detail = detail.rename(columns={
+                    "partner": "Partner",
+                    "last_actual_month": "Latest actual month",
+                    "forecast_month": "Forecast month",
+                    "last_actual_premium_idr": "Latest actual premium (IDR)",
+                    "forecast_premium_idr": "Forecast premium (IDR)",
+                })
+
+                st.dataframe(
+                    detail,
+                    use_container_width=True,
+                    hide_index=True,
+                    column_config={
+                        "Latest actual premium (IDR)": st.column_config.NumberColumn(
+                            format="localized",
+                        ),
+                        "Forecast premium (IDR)": st.column_config.NumberColumn(
+                            format="localized",
+                        ),
+                    },
+                )
+
+                st.download_button(
+                    "Download forecast CSV",
+                    forecasts.to_csv(index=False).encode("utf-8"),
+                    "premium_forecast.csv",
+                    "text/csv",
+                )
+
+                st.subheader("Methodology and limitations")
+                st.markdown(
+                    """
+                    - *Model:* Random Forest regression.
+                    - *Features:* Previous 1, 2, and 3 months of premium,
+                      a trailing three-month mean, and calendar month.
+                    - *Evaluation:* The last three eligible historical
+                      observations per partner are held out for testing.
+                    - *Baseline:* Previous month's actual premium.
+                    - *Metric:* Mean absolute error (MAE); lower is better.
+                    - *Scope:* Partner-level monthly premium forecasts.
+                    - *Limitations:* Synthetic data, limited history,
+                      no external business drivers, and no uncertainty
+                      intervals. A lower test MAE does not guarantee
+                      future performance.
+                    """
+                )
+
+        except (ValueError, KeyError) as exc:
+            st.warning(
+                "The model could not complete forecasting with the "
+                f"available data: {exc}"
+            )
 
 else:
     header(
