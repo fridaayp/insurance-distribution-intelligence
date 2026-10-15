@@ -2457,7 +2457,6 @@ elif page == "Machine Learning":
 
                         if change is not None:
                             st.metric(
-                                "Projected change",
                                 f"{change:+.1%}",
                                 delta=money(change_amount),
                                 help=(
