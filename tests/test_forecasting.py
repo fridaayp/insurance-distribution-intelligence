@@ -7,7 +7,7 @@ from src.ml.forecasting import evaluate_forecast, forecast_next_month
 
 
 DATA_PATH = (
-    Path(_file_).resolve().parents[1]
+    Path(__file__).resolve().parents[1]
     / "data"
     / "synthetic_distribution_performance.csv"
 )
@@ -48,5 +48,5 @@ class TestForecasting(unittest.TestCase):
         self.assertFalse(result["predictions"].empty)
 
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     unittest.main()
