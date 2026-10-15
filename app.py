@@ -2432,18 +2432,19 @@ elif page == "Machine Learning":
                     f"Latest actual: {actual_month:%B %Y}"
                 )
 
-                c1, c2, c3, c4 = st.columns(4, gap="medium")
+                c1, c2, c3, c4 = st.columns(
+                    [1, 1, 1, 1],
+                    gap="small",
+                )
 
                 with c1:
-                    with st.container(border=True):
+                    with st.container(border=True, height=150):
                         st.caption("FORECAST PREMIUM")
                         st.subheader(money(total_forecast))
-                        st.caption(
-                            f"Next month · {forecast_month:%b %Y}"
-                        )
+                        st.caption(f"Next month · {forecast_month:%b %Y}")
 
                 with c2:
-                    with st.container(border=True):
+                    with st.container(border=True, height=150):
                         st.caption("LATEST ACTUAL PREMIUM")
                         st.subheader(money(total_actual))
                         st.caption(
@@ -2451,7 +2452,7 @@ elif page == "Machine Learning":
                         )
 
                 with c3:
-                    with st.container(border=True):
+                    with st.container(border=True, height=150):
                         st.caption("FORECAST VS ACTUAL")
 
                         if change is not None:
@@ -2471,7 +2472,7 @@ elif page == "Machine Learning":
                             )
 
                 with c4:
-                    with st.container(border=True):
+                    with st.container(border=True, height=150):
                         st.caption("EVALUATION COVERAGE")
                         st.subheader(f"{evaluation_months} months")
                         st.caption("Held-out test period")
@@ -2481,7 +2482,7 @@ elif page == "Machine Learning":
                 # PARTNER FORECAST AND MODEL EVALUATION
                 left, right = st.columns(
                     [1.55, 1],
-                    gap="large",
+                    gap="medium",
                 )
 
                 with left:
@@ -2557,14 +2558,40 @@ elif page == "Machine Learning":
 
                 with right:
                     st.subheader("Model intelligence")
-                    st.caption(
-                        "Historical evaluation against a simple baseline."
-                    )
-
-                    with st.container(border=True):
+                    st.caption("Historical evaluation against baseline.")
+                
+                    with st.container(border=True, height=125):
                         st.caption("RANDOM FOREST · MAE")
                         st.subheader(money(ml_mae))
                         st.caption("Lower error is better")
+                
+                    with st.container(border=True, height=125):
+                        st.caption("LAST-MONTH BASELINE · MAE")
+                        st.subheader(money(baseline_mae))
+                        st.caption("Previous month's actual premium")
+                
+                    if baseline_mae > 0:
+                        improvement = (
+                            (baseline_mae - ml_mae) / baseline_mae
+                        )
+                
+                        if ml_mae < baseline_mae:
+                            st.success(
+                                f"MAE is {improvement:.1%} lower than baseline."
+                            )
+                        elif ml_mae > baseline_mae:
+                            st.warning(
+                                f"MAE is {abs(improvement):.1%} higher than baseline."
+                            )
+                        else:
+                            st.info("Model and baseline have equal MAE.")
+                    else:
+                        st.info("Relative improvement is unavailable.")
+                
+                    st.caption(
+                        f"Evaluation coverage: {evaluation_months} "
+                        "distinct held-out calendar months."
+                    )
 
                         st.divider()
 
