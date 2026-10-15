@@ -2457,7 +2457,7 @@ elif page == "Machine Learning":
 
                         if change is not None:
                             st.metric(
-                                f"{change:+.1%}",
+                                value=f"{change:+.1%}",
                                 delta=money(change_amount),
                                 help=(
                                     "Comparison with the latest observed "
