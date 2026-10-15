@@ -2354,16 +2354,9 @@ elif page == "Partnership Intelligence":
 elif page == "Machine Learning":
     header(
         "Machine Learning",
-        "Premium Forecast & Model Intelligence",
-    )
 
     st.caption(
         "FORECASTING  /  RANDOM FOREST  /  MODEL VALIDATION"
-    )
-
-    st.info(
-        "Experimental prototype using synthetic data only. "
-        "Forecasts are estimates, not actual business guidance."
     )
 
     # Preserve all available history for forecasting.
