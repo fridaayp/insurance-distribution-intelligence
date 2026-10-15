@@ -2354,9 +2354,11 @@ elif page == "Partnership Intelligence":
 elif page == "Machine Learning":
     header(
         "Machine Learning",
+        "Premium Forecast & Model Intelligence",
+    )
 
     st.caption(
-        "FORECASTING  /  RANDOM FOREST  /  MODEL VALIDATION"
+        "FORECASTING / RANDOM FOREST / MODEL VALIDATION"
     )
 
     # Preserve all available history for forecasting.
