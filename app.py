@@ -2596,61 +2596,51 @@ elif page == "Machine Learning":
                 st.divider()
 
                 # DATA-DRIVEN INTERPRETATION
-                st.subheader("Forecast interpretation")
-
-                # DATA-DRIVEN INTERPRETATION
+                # FORECAST INTERPRETATION
                 st.subheader("Forecast interpretation")
 
                 insight_left, insight_right = st.columns(
-                    [1.2, 1],
+                    [1.35, 1],
                     gap="medium",
                 )
 
                 with insight_left:
                     with st.container(border=True):
-                        if change is None:
-                            st.markdown("*Comparison unavailable*")
-                            st.write(
-                                "The latest actual premium is zero, "
-                                "so percentage change cannot be calculated."
-                            )
-                        elif change > 0:
-                            st.markdown("*Forecast is above latest actual*")
-                            st.write(
-                                f"Forecast premium is {money(total_forecast)}, "
-                                f"{change:.1%} above the latest observed "
-                                f"premium, a difference of "
-                                f"{money(change_amount)}."
-                            )
-                        elif change < 0:
-                            st.markdown("*Forecast is below latest actual*")
-                            st.write(
-                                f"Forecast premium is {money(total_forecast)}, "
-                                f"{abs(change):.1%} below the latest observed "
-                                f"premium, a difference of "
-                                f"{money(change_amount)}."
+                        if change is not None:
+                            if change > 0:
+                                st.caption("POSITIVE FORECAST SIGNAL")
+                                st.markdown("### Forecast above latest actual")
+                            elif change < 0:
+                                st.caption("DOWNSIDE FORECAST SIGNAL")
+                                st.markdown("### Forecast below latest actual")
+                            else:
+                                st.caption("STABLE FORECAST SIGNAL")
+                                st.markdown("### Forecast near latest actual")
+
+                            st.markdown(
+                                f"Forecast premium is *{money(total_forecast)}*, "
+                                f"**{abs(change):.1%} "
+                                f"{'above' if change > 0 else 'below' if change < 0 else 'in line with'}** "
+                                "the latest observed premium, with a difference of "
+                                f"*{money(abs(change_amount))}*."
                             )
                         else:
-                            st.markdown("*Forecast is unchanged*")
+                            st.caption("FORECAST COMPARISON")
+                            st.markdown("### Comparison unavailable")
                             st.write(
-                                "Forecast premium matches the latest "
-                                "observed total premium."
+                                "A comparison cannot be calculated because "
+                                "the latest actual premium is unavailable."
                             )
 
                 with insight_right:
                     with st.container(border=True):
-                        st.markdown("*What to review next*")
+                        st.caption("WHAT TO REVIEW NEXT")
                         st.markdown(
-                            "- Review partners with the largest forecast "
-                            "movements."
-                        )
-                        st.markdown(
-                            "- Compare estimates with the next actual "
-                            "reporting period."
-                        )
-                        st.markdown(
-                            "- Validate model performance before using "
-                            "forecasts for business decisions."
+                            """
+                            - Review partners with the largest forecast movements.
+                            - Compare estimates with the next actual reporting period.
+                            - Validate model performance before using forecasts for business decisions.
+                            """
                         )
 
                 st.divider()
