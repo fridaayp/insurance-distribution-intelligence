@@ -24,6 +24,12 @@ from src.ml.forecasting import (
     forecast_next_month,
 )
 
+@st.cache_data(show_spinner=False)
+def get_cached_forecast_results(forecast_data):
+    evaluation = evaluate_forecast(forecast_data)
+    forecasts = forecast_next_month(forecast_data)
+    return evaluation, forecasts
+
 st.set_page_config(page_title="Insurance Distribution Intelligence", page_icon="📊", layout="wide")
 st.markdown("""
 <style>
@@ -2380,8 +2386,7 @@ elif page == "Machine Learning":
         )
     else:
         try:
-            evaluation = evaluate_forecast(forecast_data)
-            forecasts = forecast_next_month(forecast_data)
+            evaluation, forecasts = get_cached_forecast_results(forecast_data)
 
             if forecasts.empty:
                 st.warning(
